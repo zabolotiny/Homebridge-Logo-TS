@@ -48,11 +48,8 @@ class TeslaAccessory {
   }
 
   getServices() {
-    const {
-      connectionService
-    } = this;
     return [
-      connectionService
+      this.connectionService
     ];
   }
 
