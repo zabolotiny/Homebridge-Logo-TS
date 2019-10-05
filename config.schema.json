@@ -1,0 +1,53 @@
+{
+	"pluginAlias": "Logo-TS",
+	"pluginType": "accessory",
+	"schema": {
+		"type": "object",
+		"properties": {
+			"name": {
+				"title": "Name",
+				"type": "string",
+				"required": true,
+				"default": "Logo Accessory"
+			},
+			"interface": {
+				"title": "Interface to communicate with the LOGO. (modbus or snap7",
+				"type": "string",
+				"required": true,
+				"default": "modbus"
+			},
+			"ip": {
+				"title": "IP Address",
+				"type": "string",
+				"required": true,
+				"default": ""
+			},
+			"port": {
+				"title": "Modbus Port",
+				"type": "integer",
+				"required": false,
+				"default": 1
+			},
+			"localTSAP": {
+				"title": "Local TSAP",
+				"type": "integer",
+				"required": false,
+				"default": 4608,
+				"description": "0x1200 == 4608"
+			},
+			"remoteTSAP": {
+				"title": "Remote TSAP",
+				"type": "integer",
+				"required": false,
+				"default": 8704,
+				"description": "0x2200 == 8704"
+			},
+			"type": {
+				"title": "Type of Accessory (switch, blind, garagedoor, lightbulb",
+				"type": "string",
+				"required": true,
+				"default": "switch"
+			}
+		}
+	}
+}
