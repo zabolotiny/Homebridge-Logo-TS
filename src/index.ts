@@ -1,4 +1,3 @@
-require("@babel/polyfill");
 import { wait } from "./util/wait";
 import callbackify from "./util/callbackify";
 
@@ -33,7 +32,7 @@ class LogoAccessory {
   garagedoorService: any;
   lightbulbService: any;
 
-  constructor(log, config) {
+  constructor(log: any, config: any) {
     this.log        = log;
     this.name       = config["name"];
     this.interface  = config["interface"]  || "modbus";
@@ -125,7 +124,7 @@ class LogoAccessory {
 
     if (this.type == lightbulbType) {
       
-      const lightbulbService = new Service.Switch(
+      const lightbulbService = new Service.Lightbulb(
         this.name,
         "lightbulb",
       );
@@ -310,14 +309,14 @@ class LogoAccessory {
   getLightbulbBrightness = async () => {
     // const return = await logoFunctionToGetOnOrOff();
 
-    const pos = 100;
+    const bright = 100;
 
-    this.log("BlindTargetPosition ?", pos);
-    return pos;
+    this.log("LightbulbBrightness ?", bright);
+    return bright;
   };
 
-  setLightbulbBrightness = async (pos: number) => {
-    this.log("Set BlindTargetPosition to", pos);
+  setLightbulbBrightness = async (bright: number) => {
+    this.log("Set LightbulbBrightness to", bright);
 
     // await logoFunctionToSetOff();
   };
