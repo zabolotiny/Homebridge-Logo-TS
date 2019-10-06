@@ -385,7 +385,7 @@ class LogoAccessory {
 
         let now = + new Date();
 
-        if (now >= (this.lastBlindTargetPosTime + accessoryAnalogTimeOut)) {
+        if ((now >= (this.lastBlindTargetPosTime + accessoryAnalogTimeOut)) || (this.lastBlindTargetPos == 0) || (this.lastBlindTargetPos == 100)) {
 
           this.log("Set BlindTargetPosition to", this.lastBlindTargetPos);
           this.lastBlindTargetPosTimerSet = false;
@@ -406,7 +406,7 @@ class LogoAccessory {
 
         let now = + new Date();
 
-        if (now >= (this.lastLightbulbTargetBrightnessTime + accessoryAnalogTimeOut)) {
+        if ((now >= (this.lastLightbulbTargetBrightnessTime + accessoryAnalogTimeOut)) || (this.lastLightbulbTargetBrightness == 0) || (this.lastLightbulbTargetBrightness == 100)) {
 
           this.log("Set LightbulbTargetBrightness to", this.lastLightbulbTargetBrightness);
           this.lastLightbulbTargetBrightnessTimerSet = false;
