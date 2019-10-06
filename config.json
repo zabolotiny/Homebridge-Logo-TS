@@ -1,0 +1,45 @@
+{
+    "bridge": {
+    "name": "Homebridge",
+    "username": "CC:22:3D:E3:CE:30",
+    "port": 51826,
+    "pin": "031-45-154"
+},
+
+"platforms": [],
+
+"accessories": [
+    {
+        "accessory": "Logo-TS",
+        "name": "Test Switch",
+        "interface": "modbus",
+        "ip": "192.168.1.166",
+        "port": 505,
+        "type": "switch"
+    },
+    {
+        "accessory": "Logo-TS",
+        "name": "Test Blind",
+        "interface": "modbus",
+        "ip": "192.168.1.166",
+        "port": 505,
+        "type": "blind"
+    },
+    {
+        "accessory": "Logo-TS",
+        "name": "Test GarageDoor",
+        "interface": "modbus",
+        "ip": "192.168.1.166",
+        "port": 505,
+        "type": "garagedoor"
+    },
+    {
+        "accessory": "Logo-TS",
+        "name": "Test Lightbulb",
+        "interface": "modbus",
+        "ip": "192.168.1.166",
+        "port": 505,
+        "type": "lightbulb"
+    }
+    ]
+}

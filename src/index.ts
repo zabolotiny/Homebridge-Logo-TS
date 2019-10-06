@@ -1,12 +1,24 @@
 import { wait } from "./util/wait";
 import callbackify from "./util/callbackify";
 
+import { ModBusLogo } from "./util/modbus-logo";
+import { Snap7Logo } from "./util/snap7-logo";
+
 let Service: any, Characteristic: any;
+
+const modbusInterface: string = "modbus";
+const snap7Interface: string  = "snap7";
+
+const logoType0BA7: string = "0BA7"
+const logoType0BA8: string = "0BA8"
+const logoType8SF4: string = "8.SF4"
 
 const switchType: string     = "switch";
 const blindType: string      = "blind";
 const garagedoorType: string = "garagedoor";
 const lightbulbType: string  = "lightbulb";
+
+const accessoryAnalogTimeOut = 500;
 
 export default function(homebridge: any) {
   Service = homebridge.hap.Service;
@@ -21,10 +33,21 @@ class LogoAccessory {
   name: string;
   interface: string;
   ip: string;
-  port: string;
+  port: number;
+  logoType: string;
   localTSAP: number;
   remoteTSAP: number;
   type: string;
+
+  // Runtime state.
+  logo: any;
+  lastBlindTargetPos: number;
+  lastBlindTargetPosTime: number;
+  lastBlindTargetPosTimerSet: boolean;
+  lastLightbulbOn: number;
+  lastLightbulbTargetBrightness: number;
+  lastLightbulbTargetBrightnessTime: number;
+  lastLightbulbTargetBrightnessTimerSet: boolean;
 
   // Services exposed.
   switchService: any;
@@ -35,12 +58,27 @@ class LogoAccessory {
   constructor(log: any, config: any) {
     this.log        = log;
     this.name       = config["name"];
-    this.interface  = config["interface"]  || "modbus";
+    this.interface  = config["interface"]  || modbusInterface;
     this.ip         = config["ip"];
     this.port       = config["port"]       || 505;
+    this.logoType   = config["logoType"]   || logoType8SF4;
     this.localTSAP  = config["localTSAP"]  || 0x1200;
     this.remoteTSAP = config["remoteTSAP"] || 0x2200;
     this.type       = config["type"]       || switchType;
+
+    if (this.interface == modbusInterface) {
+      this.logo = new ModBusLogo(this.ip, this.port);
+    } else {
+      this.logo = new Snap7Logo(this.logoType, this.ip, this.localTSAP, this.remoteTSAP);
+    }
+
+    this.lastBlindTargetPos                    = -1;
+    this.lastBlindTargetPosTime                = -1;
+    this.lastBlindTargetPosTimerSet            = false;
+    this.lastLightbulbOn                       = -1;
+    this.lastLightbulbTargetBrightness         = -1;
+    this.lastLightbulbTargetBrightnessTime     = -1;
+    this.lastLightbulbTargetBrightnessTimerSet = false;
 
     //
     // LOGO Switch Service
@@ -203,9 +241,12 @@ class LogoAccessory {
   };
 
   setBlindTargetPosition = async (pos: number) => {
-    this.log("Set BlindTargetPosition to", pos);
 
-    // await logoFunctionToSetOff();
+    this.lastBlindTargetPos = pos;
+    this.lastBlindTargetPosTime = + new Date();
+    if (!this.lastBlindTargetPosTimerSet) {
+      this.blindTargetPositionTimeout();
+    }
 
     // We succeeded, so update the "current" state as well.
     // We need to update the current state "later" because Siri can't
@@ -272,6 +313,7 @@ class LogoAccessory {
       Characteristic.CurrentDoorState,
       state
     );
+
   };
 
   getGarageDoorObstructionDetected = async () => {
@@ -297,13 +339,22 @@ class LogoAccessory {
   };
 
   setLightbulbOn = async (on: boolean) => {
-    this.log("Set Lightbulb to", on);
 
-    if (on) {
-      // await logoFunctionToSetOn();
-    } else {
-      // await logoFunctionToSetOff();
+    let new_on: number = on ? 1 : 0;
+
+    if ((this.lastLightbulbOn == -1) || (this.lastLightbulbOn != new_on)) {
+      
+      this.log("Set Lightbulb to", on);
+      this.lastLightbulbOn = new_on;
+
+      if (on) {
+        // await logoFunctionToSetOn();
+      } else {
+        // await logoFunctionToSetOff();
+      }
+
     }
+
   };
 
   getLightbulbBrightness = async () => {
@@ -316,9 +367,59 @@ class LogoAccessory {
   };
 
   setLightbulbBrightness = async (bright: number) => {
-    this.log("Set LightbulbBrightness to", bright);
 
-    // await logoFunctionToSetOff();
+    this.lastLightbulbTargetBrightness = bright;
+    this.lastLightbulbTargetBrightnessTime = + new Date();
+    if (!this.lastLightbulbTargetBrightnessTimerSet) {
+      this.lightbulbTargetBrightnessTimeout();
+    }
+
   };
+
+  //
+  // Helper Functions
+  //
+
+  blindTargetPositionTimeout() {
+    setTimeout(() => {
+
+        let now = + new Date();
+
+        if (now >= (this.lastBlindTargetPosTime + accessoryAnalogTimeOut)) {
+
+          this.log("Set BlindTargetPosition to", this.lastBlindTargetPos);
+          this.lastBlindTargetPosTimerSet = false;
+
+          // await logoFunctionToSetOff();
+
+        } else {
+
+          this.lastBlindTargetPosTimerSet = true;
+          this.blindTargetPositionTimeout();
+        }
+
+    }, 100);
+  }
+
+  lightbulbTargetBrightnessTimeout() {
+    setTimeout(() => {
+
+        let now = + new Date();
+
+        if (now >= (this.lastLightbulbTargetBrightnessTime + accessoryAnalogTimeOut)) {
+
+          this.log("Set LightbulbTargetBrightness to", this.lastLightbulbTargetBrightness);
+          this.lastLightbulbTargetBrightnessTimerSet = false;
+
+          // await logoFunctionToSetOff();
+
+        } else {
+
+          this.lastLightbulbTargetBrightnessTimerSet = true;
+          this.lightbulbTargetBrightnessTimeout();
+        }
+        
+    }, 100);
+  }
 
 }

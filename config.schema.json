@@ -11,7 +11,7 @@
 				"default": "Logo Accessory"
 			},
 			"interface": {
-				"title": "Interface to communicate with the LOGO. (modbus or snap7",
+				"title": "Interface to communicate with the LOGO. (modbus or snap7)",
 				"type": "string",
 				"required": true,
 				"default": "modbus"
@@ -23,27 +23,33 @@
 				"default": ""
 			},
 			"port": {
-				"title": "Modbus Port",
+				"title": "Modbus Port (required for Modbus)",
 				"type": "integer",
 				"required": false,
-				"default": 1
+				"default": 505
+			},
+			"logoType": {
+				"title": "LOGO! Type (required for Snap7 => 0BA7, 0BA8, 8.SF4)",
+				"type": "string",
+				"required": false,
+				"default": "8.SF4"
 			},
 			"localTSAP": {
-				"title": "Local TSAP",
+				"title": "Local TSAP (required for Snap7)",
 				"type": "integer",
 				"required": false,
 				"default": 4608,
 				"description": "0x1200 == 4608"
 			},
 			"remoteTSAP": {
-				"title": "Remote TSAP",
+				"title": "Remote TSAP (required for Snap7)",
 				"type": "integer",
 				"required": false,
 				"default": 8704,
 				"description": "0x2200 == 8704"
 			},
 			"type": {
-				"title": "Type of Accessory (switch, blind, garagedoor, lightbulb",
+				"title": "Type of Accessory (switch, blind, garagedoor, lightbulb)",
 				"type": "string",
 				"required": true,
 				"default": "switch"
