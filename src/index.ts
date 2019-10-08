@@ -39,6 +39,10 @@ class LogoAccessory {
   remoteTSAP: number;
   type: string;
 
+  switchGet: string;
+  switchSetOn: string;
+  switchSetOff: string;
+
   // Runtime state.
   logo: any;
   lastBlindTargetPos: number;
@@ -65,6 +69,10 @@ class LogoAccessory {
     this.localTSAP  = config["localTSAP"]  || 0x1200;
     this.remoteTSAP = config["remoteTSAP"] || 0x2200;
     this.type       = config["type"]       || switchType;
+
+    this.switchGet    = config["switchGet"]    || "Q1";
+    this.switchSetOn  = config["switchSetOn"]  || "V2.0";
+    this.switchSetOff = config["switchSetOff"] || "V3.0";
 
     if (this.interface == modbusInterface) {
       this.logo = new ModBusLogo(this.ip, this.port);
@@ -202,10 +210,22 @@ class LogoAccessory {
   getSwitchOn = async () => {
     // const return = await logoFunctionToGetOnOrOff();
 
-    const on = true;
+    this.logo.ReadLogo(this.switchGet, async (value: number) => {
 
-    this.log("Switch ?", on);
-    return on;
+      const on = value == 1 ? true : false;
+
+      this.log("Switch ?", on);
+      // return on;
+
+      await wait(1);
+      
+      this.switchService.updateCharacteristic(
+        Characteristic.On,
+        on
+      );
+
+    });
+
   };
 
   setSwitchOn = async (on: boolean) => {
@@ -213,8 +233,10 @@ class LogoAccessory {
 
     if (on) {
       // await logoFunctionToSetOn();
+      this.logo.WriteLogo(this.switchSetOn, 1, 1);
     } else {
       // await logoFunctionToSetOff();
+      this.logo.WriteLogo(this.switchSetOff, 1, 1);
     }
   };
 

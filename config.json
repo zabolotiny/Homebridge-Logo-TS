@@ -11,11 +11,27 @@
 "accessories": [
     {
         "accessory": "Logo-TS",
-        "name": "Test Switch",
+        "name": "Switch ModBus",
         "interface": "modbus",
         "ip": "192.168.1.166",
         "port": 505,
-        "type": "switch"
+        "type": "switch",
+        "switchGet": "Q1",
+        "switchSetOn": "V2.0",
+        "switchSetOff": "V3.0"
+    },
+    {
+        "accessory": "Logo-TS",
+        "name": "Switch Snap7",
+        "interface": "snap7",
+        "ip": "192.168.1.166",
+        "logoType": "8.SF4",
+        "localTSAP": 4608,
+        "remoteTSAP": 8704,
+        "type": "switch",
+        "switchGet": "Q2",
+        "switchSetOn": "V2.1",
+        "switchSetOff": "V3.1"
     },
     {
         "accessory": "Logo-TS",

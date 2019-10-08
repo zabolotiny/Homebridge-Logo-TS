@@ -299,14 +299,3 @@ export class ModBusLogo {
 const sleep = (milliseconds: number) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
-
-function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function sleepExample() {
-  console.log("Beforep: " + new Date().toString());
-  // Sleep thread for 3 seconds
-  await delay(3000);
-  console.log("Afterp:  " + new Date().toString());
-}
