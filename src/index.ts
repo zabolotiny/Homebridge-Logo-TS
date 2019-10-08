@@ -208,14 +208,11 @@ class LogoAccessory {
   //
 
   getSwitchOn = async () => {
-    // const return = await logoFunctionToGetOnOrOff();
 
     this.logo.ReadLogo(this.switchGet, async (value: number) => {
 
       const on = value == 1 ? true : false;
-
       this.log("Switch ?", on);
-      // return on;
 
       await wait(1);
       
@@ -232,10 +229,8 @@ class LogoAccessory {
     this.log("Set switch to", on);
 
     if (on) {
-      // await logoFunctionToSetOn();
       this.logo.WriteLogo(this.switchSetOn, 1, 1);
     } else {
-      // await logoFunctionToSetOff();
       this.logo.WriteLogo(this.switchSetOff, 1, 1);
     }
   };
