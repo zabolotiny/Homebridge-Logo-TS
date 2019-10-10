@@ -4,6 +4,8 @@ import callbackify from "./util/callbackify";
 import { ModBusLogo } from "./util/modbus-logo";
 import { Snap7Logo } from "./util/snap7-logo";
 
+const pjson   = require('../package.json');
+
 let Service: any, Characteristic: any;
 
 const modbusInterface: string = "modbus";
@@ -42,6 +44,8 @@ class LogoAccessory {
   switchGet: string;
   switchSetOn: string;
   switchSetOff: string;
+  switchValue: number;
+  switchPushButton: number;
 
   // Runtime state.
   logo: any;
@@ -61,18 +65,20 @@ class LogoAccessory {
 
   constructor(log: any, config: any) {
     this.log        = log;
-    this.name       = config["name"];
-    this.interface  = config["interface"]  || modbusInterface;
-    this.ip         = config["ip"];
-    this.port       = config["port"]       || 505;
-    this.logoType   = config["logoType"]   || logoType8SF4;
-    this.localTSAP  = config["localTSAP"]  || 0x1200;
-    this.remoteTSAP = config["remoteTSAP"] || 0x2200;
-    this.type       = config["type"]       || switchType;
+    this.name       =           config["name"];
+    this.interface  =           config["interface"]       || modbusInterface;
+    this.ip         =           config["ip"];
+    this.port       =           config["port"]            || 505;
+    this.logoType   =           config["logoType"]        || logoType8SF4;
+    this.localTSAP  = parseInt( config["localTSAP"], 16)  || 0x1200;
+    this.remoteTSAP = parseInt( config["remoteTSAP"], 16) || 0x2200;
+    this.type       =           config["type"]            || switchType;
 
-    this.switchGet    = config["switchGet"]    || "Q1";
-    this.switchSetOn  = config["switchSetOn"]  || "V2.0";
-    this.switchSetOff = config["switchSetOff"] || "V3.0";
+    this.switchGet        = config["switchGet"]        || "Q1";
+    this.switchSetOn      = config["switchSetOn"]      || "V2.0";
+    this.switchSetOff     = config["switchSetOff"]     || "V3.0";
+    this.switchValue      = config["switchValue"]      || 1;
+    this.switchPushButton = config["switchPushButton"] || 1;
 
     if (this.interface == modbusInterface) {
       this.logo = new ModBusLogo(this.ip, this.port);
@@ -87,6 +93,13 @@ class LogoAccessory {
     this.lastLightbulbTargetBrightness         = -1;
     this.lastLightbulbTargetBrightnessTime     = -1;
     this.lastLightbulbTargetBrightnessTimerSet = false;
+
+    // Characteristic "Manufacturer"      --> pjson.author.name 
+    // Characteristic "Model"             --> this.type
+    // Characteristic "Firmware Revision" --> pjson.version
+    // Characteristic "Hardware Revision" --> this.logoType
+    // Characteristic "Serial Number"     --> "0xDEADBEEF"
+    // Characteristic "Version"
 
     //
     // LOGO Switch Service
@@ -229,9 +242,9 @@ class LogoAccessory {
     this.log("Set switch to", on);
 
     if (on) {
-      this.logo.WriteLogo(this.switchSetOn, 1, 1);
+      this.logo.WriteLogo(this.switchSetOn, this.switchValue, this.switchPushButton);
     } else {
-      this.logo.WriteLogo(this.switchSetOff, 1, 1);
+      this.logo.WriteLogo(this.switchSetOff, this.switchValue, this.switchPushButton);
     }
   };
 

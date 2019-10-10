@@ -36,23 +36,58 @@
 			},
 			"localTSAP": {
 				"title": "Local TSAP (required for Snap7)",
-				"type": "integer",
+				"type": "string",
 				"required": false,
-				"default": 4608,
-				"description": "0x1200 == 4608"
+				"default": "0x1200",
+				"description": "0x1200 == TSAP 12.00 in LOGO!Soft Comfort"
 			},
 			"remoteTSAP": {
 				"title": "Remote TSAP (required for Snap7)",
-				"type": "integer",
+				"type": "string",
 				"required": false,
-				"default": 8704,
-				"description": "0x2200 == 8704"
+				"default": "0x2200",
+				"description": "0x2200 == TSAP 22.00 in LOGO!Soft Comfort"
 			},
 			"type": {
 				"title": "Type of Accessory (switch, blind, garagedoor, lightbulb)",
 				"type": "string",
 				"required": true,
 				"default": "switch"
+			},
+			"switchGet": {
+				"title": "Switch Get (required for a Switch Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "Q1",
+				"description": "Qn, Mn or Vn.n"
+			},
+			"switchSetOn": {
+				"title": "Switch Set On (required for a Switch Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "V2.0",
+				"description": "Mn or Vn.n"
+			},
+			"switchSetOff": {
+				"title": "Switch Set Off (required for a Switch Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "V3.0",
+				"description": "Mn or Vn.n"
+			},
+			"switchValue": {
+				"title": "Switch Value (required for a Switch Accessory)",
+				"type": "integer",
+				"required": false,
+				"default": 1,
+				"description": "Value for Switch Set On / Off"
+			},
+			"switchPushButton": {
+				"title": "Switch Push Button (required for a Switch Accessory)",
+				"type": "integer",
+				"required": false,
+				"default": 1,
+				"description": ""
 			}
 		}
 	}
