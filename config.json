@@ -56,11 +56,16 @@
     },
     {
         "accessory": "Logo-TS",
-        "name": "Test GarageDoor",
+        "name": "GarageDoor ModBus",
         "interface": "modbus",
         "ip": "192.168.1.166",
         "port": 505,
-        "type": "garagedoor"
+        "type": "garagedoor",
+        "garagedoorOpen": "V6.0",
+        "garagedoorClose": "V6.1",
+        "garagedoorState": "V6.2",
+        "garagedoorValue": 1,
+        "garagedoorPushButton": 1
     },
     {
         "accessory": "Logo-TS",

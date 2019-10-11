@@ -57,17 +57,18 @@ class LogoAccessory {
   blindValue: number;
   blindPushButton: number;
 
-  garageDoorOpen: string;
-  garageDoorClose: string;
-  garageDoorState: string;
-  garageDoorValue: number;
-  garageDoorPushButton: number;
+  garagedoorOpen: string;
+  garagedoorClose: string;
+  garagedoorState: string;
+  garagedoorValue: number;
+  garagedoorPushButton: number;
 
   // Runtime state.
   logo: any;
   lastBlindTargetPos: number;
   lastBlindTargetPosTime: number;
   lastBlindTargetPosTimerSet: boolean;
+  lastGaragedoorTargetState: number;
   lastLightbulbOn: number;
   lastLightbulbTargetBrightness: number;
   lastLightbulbTargetBrightnessTime: number;
@@ -99,6 +100,7 @@ class LogoAccessory {
     this.lastBlindTargetPos                    = -1;
     this.lastBlindTargetPosTime                = -1;
     this.lastBlindTargetPosTimerSet            = false;
+    this.lastGaragedoorTargetState             = -1;
     this.lastLightbulbOn                       = -1;
     this.lastLightbulbTargetBrightness         = -1;
     this.lastLightbulbTargetBrightnessTime     = -1;
@@ -179,11 +181,11 @@ class LogoAccessory {
     // LOGO GarageDoor Service
     //
 
-    this.garageDoorOpen       = config["garageDoorOpen"]       || "V6.0";
-    this.garageDoorClose      = config["garageDoorClose"]      || "V6.1";
-    this.garageDoorState      = config["garageDoorState"]      || "V6.2";
-    this.garageDoorValue      = config["garageDoorValue"]      || 1;
-    this.garageDoorPushButton = config["garageDoorPushButton"] || 1;
+    this.garagedoorOpen       = config["garagedoorOpen"]       || "V6.0";
+    this.garagedoorClose      = config["garagedoorClose"]      || "V6.1";
+    this.garagedoorState      = config["garagedoorState"]      || "V6.2";
+    this.garagedoorValue      = config["garagedoorValue"]      || 1;
+    this.garagedoorPushButton = config["garagedoorPushButton"] || 1;
 
     if (this.type == garagedoorType) {
       
@@ -387,31 +389,47 @@ class LogoAccessory {
   //
 
   getGarageDoorCurrentDoorState = async () => {
-    // 0 - open; 1 - closed; 2 - opening; 3 - closing; 4 - stopped
+    // 0 - OPEN; 1 - CLOSED; 2 - OPENING; 3 - CLOSING; 4 - STOPPED
 
-    // const return = await logoFunctionToGetOnOrOff();
+    this.logo.ReadLogo(this.garagedoorState, async (value: number) => {
+      // Logo return 1 for OPEN!
 
-    const state = 1;
+      const state = value == 1 ? 0 : 1;
+      this.log("GarageDoorCurrentDoorState ?", state);
 
-    this.log("GarageDoorCurrentDoorState ?", state);
-    return state;
+      await wait(1);
+      
+      this.garagedoorService.updateCharacteristic(
+        Characteristic.CurrentDoorState,
+        state
+      );
+
+    });
   };
 
   getGarageDoorTargetDoorState = async () => {
-    // 0 - open; 1 - closed
+    // 0 - OPEN; 1 - CLOSED
 
-    // const return = await logoFunctionToGetOnOrOff();
-
-    const state = 1;
-
-    this.log("GarageDoorTargetDoorState ?", state);
-    return state;
+    this.log("GarageDoorTargetDoorState ?", this.lastGaragedoorTargetState);
+    if (this.lastGaragedoorTargetState != -1) {
+      return this.lastGaragedoorTargetState;
+    } else {
+      return 1;
+    }
+  
   };
 
   setGarageDoorTargetDoorState = async (state: number) => {
-    this.log("Set GarageDoorTargetDoorState to", state);
+    // 0 - OPEN; 1 - CLOSED
 
-    // await logoFunctionToSetOff();
+    this.log("Set GarageDoorTargetDoorState to", state);
+    this.lastGaragedoorTargetState = state;
+
+    if (state == 0) {
+      this.logo.WriteLogo(this.garagedoorOpen, this.garagedoorValue, this.garagedoorPushButton);
+    } else {
+      this.logo.WriteLogo(this.garagedoorClose, this.garagedoorValue, this.garagedoorPushButton);
+    }
 
     // We succeeded, so update the "current" state as well.
     // We need to update the current state "later" because Siri can't
@@ -427,12 +445,10 @@ class LogoAccessory {
   };
 
   getGarageDoorObstructionDetected = async () => {
-    // const return = await logoFunctionToGetOnOrOff();
+    // true or false
 
-    const state = false;
-
-    this.log("GarageDoorObstructionDetected ?", state);
-    return state;
+    this.log("GarageDoorObstructionDetected ?", false);
+    return false;
   };
 
   //
