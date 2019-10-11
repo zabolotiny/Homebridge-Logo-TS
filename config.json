@@ -18,7 +18,9 @@
         "type": "switch",
         "switchGet": "Q1",
         "switchSetOn": "V2.0",
-        "switchSetOff": "V3.0"
+        "switchSetOff": "V3.0",
+        "switchValue": 1,
+        "switchPushButton": 1
     },
     {
         "accessory": "Logo-TS",
@@ -31,15 +33,26 @@
         "type": "switch",
         "switchGet": "Q2",
         "switchSetOn": "V2.1",
-        "switchSetOff": "V3.1"
+        "switchSetOff": "V3.1",
+        "switchValue": 1,
+        "switchPushButton": 1
     },
     {
         "accessory": "Logo-TS",
-        "name": "Test Blind",
+        "name": "Blind ModBus",
         "interface": "modbus",
         "ip": "192.168.1.166",
         "port": 505,
-        "type": "blind"
+        "type": "blind",
+        "blindSetPos": "VW50",
+        "blindGetPos": "VW52",
+        "blindGetState": "VW54",
+        "blindDigital": 0,
+        "blindSetUp": "V5.0",
+        "blindSetDown": "V5.1",
+        "blindGetUpDown": "V5.2",
+        "blindUpDownValue": 1,
+        "blindPushButton": 1
     },
     {
         "accessory": "Logo-TS",

@@ -47,6 +47,16 @@ class LogoAccessory {
   switchValue: number;
   switchPushButton: number;
 
+  blindSetPos: string;
+  blindGetPos: string;
+  blindGetState: string;
+  blindDigital: number;
+  blindSetUp: string;
+  blindSetDown: string;
+  blindGetUpDown: string;
+  blindUpDownValue: number;
+  blindPushButton: number;
+
   // Runtime state.
   logo: any;
   lastBlindTargetPos: number;
@@ -74,12 +84,6 @@ class LogoAccessory {
     this.remoteTSAP = parseInt( config["remoteTSAP"], 16) || 0x2200;
     this.type       =           config["type"]            || switchType;
 
-    this.switchGet        = config["switchGet"]        || "Q1";
-    this.switchSetOn      = config["switchSetOn"]      || "V2.0";
-    this.switchSetOff     = config["switchSetOff"]     || "V3.0";
-    this.switchValue      = config["switchValue"]      || 1;
-    this.switchPushButton = config["switchPushButton"] || 1;
-
     if (this.interface == modbusInterface) {
       this.logo = new ModBusLogo(this.ip, this.port);
     } else {
@@ -105,6 +109,12 @@ class LogoAccessory {
     // LOGO Switch Service
     //
 
+    this.switchGet        = config["switchGet"]        || "Q1";
+    this.switchSetOn      = config["switchSetOn"]      || "V2.0";
+    this.switchSetOff     = config["switchSetOff"]     || "V3.0";
+    this.switchValue      = config["switchValue"]      || 1;
+    this.switchPushButton = config["switchPushButton"] || 1;
+
     if (this.type == switchType) {
       
       const switchService = new Service.Switch(
@@ -124,6 +134,16 @@ class LogoAccessory {
     //
     // LOGO Blind Service
     //
+
+    this.blindSetPos      = config["blindSetPos"]      || "VW50";
+    this.blindGetPos      = config["blindGetPos"]      || "VW52";
+    this.blindGetState    = config["blindGetState"]    || "VW54";
+    this.blindDigital     = config["blindDigital"]     || 0;
+    this.blindSetUp       = config["blindSetUp"]       || "V5.0";
+    this.blindSetDown     = config["blindSetDown"]     || "V5.1";
+    this.blindGetUpDown   = config["blindGetUpDown"]   || "V5.2";
+    this.blindUpDownValue = config["blindUpDownValue"] || 1;
+    this.blindPushButton  = config["blindPushButton"]  || 1;
 
     if (this.type == blindType) {
       
@@ -253,21 +273,32 @@ class LogoAccessory {
   //
 
   getBlindCurrentPosition = async () => {
-    // const return = await logoFunctionToGetOnOrOff();
 
-    const pos = 100;
+    this.logo.ReadLogo(this.blindGetPos, async (value: number) => {
 
-    this.log("BlindCurrentPosition ?", pos);
-    return pos;
+      const pos = 100 - value;
+      this.log("BlindCurrentPosition ?", pos);
+
+      await wait(1);
+      
+      this.blindService.updateCharacteristic(
+        Characteristic.CurrentPosition,
+        pos
+      );
+
+    });
+
   };
 
   getBlindTargetPosition = async () => {
-    // const return = await logoFunctionToGetOnOrOff();
 
-    const pos = 100;
+    this.log("BlindTargetPosition ?", this.lastBlindTargetPos);
+    if (this.lastBlindTargetPos != -1) {
+      return this.lastBlindTargetPos;
+    } else {
+      return 100;
+    }
 
-    this.log("BlindTargetPosition ?", pos);
-    return pos;
   };
 
   setBlindTargetPosition = async (pos: number) => {
@@ -420,7 +451,7 @@ class LogoAccessory {
           this.log("Set BlindTargetPosition to", this.lastBlindTargetPos);
           this.lastBlindTargetPosTimerSet = false;
 
-          // await logoFunctionToSetOff();
+          this.logo.WriteLogo(this.blindSetPos, (100 - this.lastBlindTargetPos), 0);
 
         } else {
 

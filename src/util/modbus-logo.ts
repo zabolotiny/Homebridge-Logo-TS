@@ -114,10 +114,11 @@ export class ModBusLogo {
             client.setID(1);
             client.readDiscreteInputs(addr.addr, len, function(err: Error, data: ReadCoilResult) {
                 if (err) {
-                    return console.log(err);
+                    // return console.log(err);
+                    callBack(0);
+                } else {
+                    callBack((data.data[0] == true ? 1 : 0));
                 }
-    
-                callBack((data.data[0] == true ? 1 : 0));
                 client.close();
             });
         });
@@ -132,10 +133,11 @@ export class ModBusLogo {
             client.setID(1);
             client.readCoils(addr.addr, len, function(err: Error, data: ReadCoilResult) {
                 if (err) {
-                    return console.log(err);
+                    // return console.log(err);
+                    callBack(0);
+                } else {
+                    callBack((data.data[0] == true ? 1 : 0));
                 }
-
-                callBack((data.data[0] == true ? 1 : 0));
                 client.close();
             });
         });
@@ -150,10 +152,11 @@ export class ModBusLogo {
             client.setID(1);
             client.readInputRegisters(addr.addr, len, function(err: Error, data: ReadRegisterResult) {
                 if (err) {
-                    return console.log(err);
+                    // return console.log(err);
+                    callBack(0);
+                } else {
+                    callBack(data.data[0]);
                 }
-                
-                callBack(data.data[0]);
                 client.close();
             });
         });
@@ -168,22 +171,23 @@ export class ModBusLogo {
             client.setID(1);
             client.readHoldingRegisters(addr.addr, len, function(err: Error, data: ReadRegisterResult) {
                 if (err) {
-                    return console.log(err);
-                }
+                    // return console.log(err);
+                    callBack(0);
+                } else {
+                    switch (addr.wLen) {
 
-                switch (addr.wLen) {
-
-                    case WordLen.MBWLByte:
-                        callBack((data.data[0] & 0b1111111100000000) >> 8);
-                        break;
-
-                    case WordLen.MBWLWord:
-                        callBack(data.data[0]);
-                        break;
-
-                    case WordLen.MBWLDWord:
-                        callBack((data.data[0] << 16) | data.data[1]);
-                        break;
+                        case WordLen.MBWLByte:
+                            callBack((data.data[0] & 0b1111111100000000) >> 8);
+                            break;
+    
+                        case WordLen.MBWLWord:
+                            callBack(data.data[0]);
+                            break;
+    
+                        case WordLen.MBWLDWord:
+                            callBack((data.data[0] << 16) | data.data[1]);
+                            break;
+                    }
                 }
                 client.close();
             });
@@ -198,7 +202,7 @@ export class ModBusLogo {
             client.setID(1);
             client.writeCoil(addr, state, function(err: Error, data: WriteCoilResult) {
                 if (err) {
-                    return console.log(err);
+                    // return console.log(err);
                 }
 
                 client.close(); 
@@ -214,7 +218,7 @@ export class ModBusLogo {
             client.setID(1);
             client.writeRegister(addr, value, function(err: Error, data: WriteRegisterResult) {
                 if (err) {
-                    return console.log(err);
+                    // return console.log(err);
                 }
                 
                 client.close();
@@ -230,7 +234,7 @@ export class ModBusLogo {
             client.setID(1);
             client.writeRegisters(addr, value, function(err: Error, data: WriteRegisterResult) {
                 if (err) {
-                    return console.log(err);
+                    // return console.log(err);
                 }
                 
                 client.close();
