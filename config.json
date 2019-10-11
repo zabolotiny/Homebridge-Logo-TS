@@ -51,7 +51,7 @@
         "blindSetUp": "V5.0",
         "blindSetDown": "V5.1",
         "blindGetUpDown": "V5.2",
-        "blindUpDownValue": 1,
+        "blindValue": 1,
         "blindPushButton": 1
     },
     {

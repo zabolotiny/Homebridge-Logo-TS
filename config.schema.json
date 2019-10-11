@@ -80,10 +80,73 @@
 				"type": "integer",
 				"required": false,
 				"default": 1,
-				"description": "Value for Switch Set On / Off"
+				"description": "Value for Switch Set On and Off"
 			},
 			"switchPushButton": {
 				"title": "Switch Push Button (required for a Switch Accessory)",
+				"type": "integer",
+				"required": false,
+				"default": 1,
+				"description": ""
+			},
+			"blindSetPos": {
+				"title": "Blind Set Pos (required for a Blind Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "VW50",
+				"description": "AMn or VWn"
+			},
+			"blindGetPos": {
+				"title": "Blind Get Pos (required for a Blind Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "VW52",
+				"description": "AMn or VWn"
+			},
+			"blindGetState": {
+				"title": "Blind Get State (required for a Blind Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "VW54",
+				"description": "AMn or VWn"
+			},
+			"blindDigital": {
+				"title": "Blind Digital (required for a none Analog Blind Accessory)",
+				"type": "integer",
+				"required": false,
+				"default": 0,
+				"description": "0 for Analog Control, 1 for PushButton Control"
+			},
+			"blindSetUp": {
+				"title": "Blind Set Up (required for a none Analog Blind Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "V5.0",
+				"description": "Mn or Vn.n"
+			},
+			"blindSetDown": {
+				"title": "Blind Set Down (required for a none Analog Blind Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "V5.1",
+				"description": "Mn or Vn.n"
+			},
+			"blindGetUpDown": {
+				"title": "Blind Get Up or Down (required for a none Analog Blind Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "V5.2",
+				"description": "Return 1 for Up or 0 for Down"
+			},
+			"blindValue": {
+				"title": "Blind Value (required for a none Analog Blind Accessory)",
+				"type": "integer",
+				"required": false,
+				"default": 1,
+				"description": "Value for Blind Set Up and Down"
+			},
+			"blindPushButton": {
+				"title": "Blind Push Button (required for a none Analog Blind Accessory)",
 				"type": "integer",
 				"required": false,
 				"default": 1,

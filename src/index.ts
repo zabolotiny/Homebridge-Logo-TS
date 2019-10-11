@@ -54,8 +54,14 @@ class LogoAccessory {
   blindSetUp: string;
   blindSetDown: string;
   blindGetUpDown: string;
-  blindUpDownValue: number;
+  blindValue: number;
   blindPushButton: number;
+
+  garageDoorOpen: string;
+  garageDoorClose: string;
+  garageDoorState: string;
+  garageDoorValue: number;
+  garageDoorPushButton: number;
 
   // Runtime state.
   logo: any;
@@ -135,15 +141,15 @@ class LogoAccessory {
     // LOGO Blind Service
     //
 
-    this.blindSetPos      = config["blindSetPos"]      || "VW50";
-    this.blindGetPos      = config["blindGetPos"]      || "VW52";
-    this.blindGetState    = config["blindGetState"]    || "VW54";
-    this.blindDigital     = config["blindDigital"]     || 0;
-    this.blindSetUp       = config["blindSetUp"]       || "V5.0";
-    this.blindSetDown     = config["blindSetDown"]     || "V5.1";
-    this.blindGetUpDown   = config["blindGetUpDown"]   || "V5.2";
-    this.blindUpDownValue = config["blindUpDownValue"] || 1;
-    this.blindPushButton  = config["blindPushButton"]  || 1;
+    this.blindSetPos     = config["blindSetPos"]     || "VW50";
+    this.blindGetPos     = config["blindGetPos"]     || "VW52";
+    this.blindGetState   = config["blindGetState"]   || "VW54";
+    this.blindDigital    = config["blindDigital"]    || 0;
+    this.blindSetUp      = config["blindSetUp"]      || "V5.0";
+    this.blindSetDown    = config["blindSetDown"]    || "V5.1";
+    this.blindGetUpDown  = config["blindGetUpDown"]  || "V5.2";
+    this.blindValue      = config["blindValue"]      || 1;
+    this.blindPushButton = config["blindPushButton"] || 1;
 
     if (this.type == blindType) {
       
@@ -172,6 +178,12 @@ class LogoAccessory {
     //
     // LOGO GarageDoor Service
     //
+
+    this.garageDoorOpen       = config["garageDoorOpen"]       || "V6.0";
+    this.garageDoorClose      = config["garageDoorClose"]      || "V6.1";
+    this.garageDoorState      = config["garageDoorState"]      || "V6.2";
+    this.garageDoorValue      = config["garageDoorValue"]      || 1;
+    this.garageDoorPushButton = config["garageDoorPushButton"] || 1;
 
     if (this.type == garagedoorType) {
       
@@ -274,19 +286,39 @@ class LogoAccessory {
 
   getBlindCurrentPosition = async () => {
 
-    this.logo.ReadLogo(this.blindGetPos, async (value: number) => {
+    if (!this.blindDigital) {
 
-      const pos = 100 - value;
-      this.log("BlindCurrentPosition ?", pos);
+      this.logo.ReadLogo(this.blindGetPos, async (value: number) => {
 
-      await wait(1);
+        const pos = 100 - value;
+        this.log("BlindCurrentPosition ?", pos);
+  
+        await wait(1);
+        
+        this.blindService.updateCharacteristic(
+          Characteristic.CurrentPosition,
+          pos
+        );
+  
+      });
       
-      this.blindService.updateCharacteristic(
-        Characteristic.CurrentPosition,
-        pos
-      );
+    } else {
 
-    });
+      this.logo.ReadLogo(this.blindGetUpDown, async (value: number) => {
+
+        const pos = value == 1 ? 100 : 0;
+        this.log("BlindCurrentPosition ?", pos);
+  
+        await wait(1);
+        
+        this.blindService.updateCharacteristic(
+          Characteristic.CurrentPosition,
+          pos
+        );
+  
+      });
+      
+    }
 
   };
 
@@ -323,14 +355,31 @@ class LogoAccessory {
   };
 
   getBlindPositionState = async () => {
-    // 0 - decreasing; 1 - increasing; 2 - stopped
+    // 0 - DECREASING; 1 - INCREASING; 2 - STOPPED
 
-    // const return = await logoFunctionToGetOnOrOff();
+    if (!this.blindDigital) {
 
-    const state = 0;
+      this.logo.ReadLogo(this.blindGetState, async (value: number) => {
 
-    this.log("BlindPositionState ?", state);
-    return state;
+        const state = this.blindLogoStateToHomebridgeState(value);
+        this.log("BlindPositionState ?", state);
+  
+        await wait(1);
+        
+        this.blindService.updateCharacteristic(
+          Characteristic.PositionState,
+          state
+        );
+  
+      });
+      
+    } else {
+
+      this.log("BlindPositionState ? 2");
+      return 2;
+      
+    }
+
   };
 
   //
@@ -451,7 +500,19 @@ class LogoAccessory {
           this.log("Set BlindTargetPosition to", this.lastBlindTargetPos);
           this.lastBlindTargetPosTimerSet = false;
 
-          this.logo.WriteLogo(this.blindSetPos, (100 - this.lastBlindTargetPos), 0);
+          if (!this.blindDigital) {
+            
+            this.logo.WriteLogo(this.blindSetPos, (100 - this.lastBlindTargetPos), 0);
+
+          } else {
+
+            if (this.lastBlindTargetPos >= 50) {
+              this.logo.WriteLogo(this.blindSetUp, this.blindValue, this.blindPushButton);
+            } else {
+              this.logo.WriteLogo(this.blindSetDown, this.blindValue, this.blindPushButton);
+            }
+            
+          }
 
         } else {
 
@@ -460,6 +521,18 @@ class LogoAccessory {
         }
 
     }, 100);
+  }
+
+  blindLogoStateToHomebridgeState(value: number): number {
+    if (value == 0) {        // Logo Stop
+      return 2;              // Homebridge STOPPED
+    } else if (value == 1) { // Logo Up
+      return 0;              // Homebridge DECREASING
+    } else if (value == 2) { // Logo Down
+      return 1;              // Homebridge INCREASING
+    } else {
+      return 2;              // Homebridge STOPPED
+    }
   }
 
   lightbulbTargetBrightnessTimeout() {
