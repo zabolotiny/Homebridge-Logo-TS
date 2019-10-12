@@ -40,6 +40,7 @@ class LogoAccessory {
   localTSAP: number;
   remoteTSAP: number;
   type: string;
+  updateInterval: number;
 
   switchGet: string;
   switchSetOn: string;
@@ -63,6 +64,13 @@ class LogoAccessory {
   garagedoorValue: number;
   garagedoorPushButton: number;
 
+  lightbulbSetOn: string;
+  lightbulbSetOff: string;
+  lightbulbSetBrightness: string;
+  lightbulbGetBrightness: string;
+  lightbulbValue: number;
+  lightbulbPushButton: number;
+
   // Runtime state.
   logo: any;
   lastBlindTargetPos: number;
@@ -81,20 +89,36 @@ class LogoAccessory {
   lightbulbService: any;
 
   constructor(log: any, config: any) {
-    this.log        = log;
-    this.name       =           config["name"];
-    this.interface  =           config["interface"]       || modbusInterface;
-    this.ip         =           config["ip"];
-    this.port       =           config["port"]            || 505;
-    this.logoType   =           config["logoType"]        || logoType8SF4;
-    this.localTSAP  = parseInt( config["localTSAP"], 16)  || 0x1200;
-    this.remoteTSAP = parseInt( config["remoteTSAP"], 16) || 0x2200;
-    this.type       =           config["type"]            || switchType;
+    this.log            = log;
+    this.name           =           config["name"];
+    this.interface      =           config["interface"]       || modbusInterface;
+    this.ip             =           config["ip"];
+    this.port           =           config["port"]            || 505;
+    this.logoType       =           config["logoType"]        || logoType8SF4;
+    this.localTSAP      = parseInt( config["localTSAP"], 16)  || 0x1200;
+    this.remoteTSAP     = parseInt( config["remoteTSAP"], 16) || 0x2200;
+    this.type           =           config["type"]            || switchType;
+    this.updateInterval =           config["updateInterval"]  || 0;
 
     if (this.interface == modbusInterface) {
       this.logo = new ModBusLogo(this.ip, this.port);
     } else {
       this.logo = new Snap7Logo(this.logoType, this.ip, this.localTSAP, this.remoteTSAP);
+    }
+
+    if (this.updateInterval > 0) {
+      if (this.type == switchType) {
+        this.switchAutoUpdate();
+      }
+      if (this.type == blindType) {
+        this.blindAutoUpdate();
+      }
+      if (this.type == garagedoorType) {
+        this.garagedoorAutoUpdate();
+      }
+      if (this.type == lightbulbType) {
+        this.lightbulbAutoUpdate();
+      }
     }
 
     this.lastBlindTargetPos                    = -1;
@@ -214,6 +238,13 @@ class LogoAccessory {
     //
     // LOGO LightBulb Service
     //
+
+    this.lightbulbSetOn         = config["lightbulbSetOn"]         || "V7.0";
+    this.lightbulbSetOff        = config["lightbulbSetOff"]        || "V7.1";
+    this.lightbulbSetBrightness = config["lightbulbSetBrightness"] || "VW70";
+    this.lightbulbGetBrightness = config["lightbulbGetBrightness"] || "VW72";
+    this.lightbulbValue         = config["lightbulbValue"]         || 1;
+    this.lightbulbPushButton    = config["lightbulbPushButton"]    || 1;
 
     if (this.type == lightbulbType) {
       
@@ -456,12 +487,11 @@ class LogoAccessory {
   //
 
   getLightbulbOn = async () => {
-    // const return = await logoFunctionToGetOnOrOff();
 
-    const on = true;
-
+    const on = this.lastLightbulbOn == 1 ? true : false;
     this.log("Lightbulb ?", on);
     return on;
+
   };
 
   setLightbulbOn = async (on: boolean) => {
@@ -474,9 +504,9 @@ class LogoAccessory {
       this.lastLightbulbOn = new_on;
 
       if (on) {
-        // await logoFunctionToSetOn();
+        this.logo.WriteLogo(this.lightbulbSetOn, this.lightbulbValue, this.lightbulbPushButton);
       } else {
-        // await logoFunctionToSetOff();
+        this.logo.WriteLogo(this.lightbulbSetOff, this.lightbulbValue, this.lightbulbPushButton);
       }
 
     }
@@ -484,12 +514,28 @@ class LogoAccessory {
   };
 
   getLightbulbBrightness = async () => {
-    // const return = await logoFunctionToGetOnOrOff();
 
-    const bright = 100;
+    this.logo.ReadLogo(this.lightbulbGetBrightness, async (value: number) => {
 
-    this.log("LightbulbBrightness ?", bright);
-    return bright;
+      this.log("LightbulbBrightness ?", value);
+      this.lastLightbulbOn = value > 0 ? 1 : 0;
+
+      await wait(1);
+      
+      this.lightbulbService.updateCharacteristic(
+        Characteristic.On,
+        (value > 0 ? true : false)
+      );
+
+      await wait(1);
+      
+      this.lightbulbService.updateCharacteristic(
+        Characteristic.Brightness,
+        value
+      );
+
+    });
+
   };
 
   setLightbulbBrightness = async (bright: number) => {
@@ -561,7 +607,7 @@ class LogoAccessory {
           this.log("Set LightbulbTargetBrightness to", this.lastLightbulbTargetBrightness);
           this.lastLightbulbTargetBrightnessTimerSet = false;
 
-          // await logoFunctionToSetOff();
+          this.logo.WriteLogo(this.lightbulbSetBrightness, this.lastLightbulbTargetBrightness, 0);
 
         } else {
 
@@ -570,6 +616,50 @@ class LogoAccessory {
         }
         
     }, 100);
+  }
+
+  switchAutoUpdate() {
+
+    setTimeout(() => {
+
+      this.getSwitchOn();
+      this.switchAutoUpdate();
+
+    }, this.updateInterval + Math.floor(Math.random() * 10000));
+
+  }
+
+  blindAutoUpdate() {
+
+    setTimeout(() => {
+
+      this.getBlindCurrentPosition();
+      this.blindAutoUpdate();
+
+    }, this.updateInterval + Math.floor(Math.random() * 10000));
+
+  }
+
+  garagedoorAutoUpdate() {
+
+    setTimeout(() => {
+
+      this.getGarageDoorCurrentDoorState();
+      this.garagedoorAutoUpdate();
+
+    }, this.updateInterval + Math.floor(Math.random() * 10000));
+
+  }
+
+  lightbulbAutoUpdate() {
+
+    setTimeout(() => {
+
+      this.getLightbulbBrightness();
+      this.lightbulbAutoUpdate();
+
+    }, this.updateInterval + Math.floor(Math.random() * 10000));
+
   }
 
 }
