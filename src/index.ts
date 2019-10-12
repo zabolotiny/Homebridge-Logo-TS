@@ -39,14 +39,14 @@ class LogoAccessory {
   logoType: string;
   localTSAP: number;
   remoteTSAP: number;
-  type: string;
   updateInterval: number;
+  buttonValue: number;
+  pushButton: number;
+  type: string;
 
   switchGet: string;
   switchSetOn: string;
   switchSetOff: string;
-  switchValue: number;
-  switchPushButton: number;
 
   blindSetPos: string;
   blindGetPos: string;
@@ -55,21 +55,15 @@ class LogoAccessory {
   blindSetUp: string;
   blindSetDown: string;
   blindGetUpDown: string;
-  blindValue: number;
-  blindPushButton: number;
 
   garagedoorOpen: string;
   garagedoorClose: string;
   garagedoorState: string;
-  garagedoorValue: number;
-  garagedoorPushButton: number;
 
   lightbulbSetOn: string;
   lightbulbSetOff: string;
   lightbulbSetBrightness: string;
   lightbulbGetBrightness: string;
-  lightbulbValue: number;
-  lightbulbPushButton: number;
 
   // Runtime state.
   logo: any;
@@ -97,8 +91,10 @@ class LogoAccessory {
     this.logoType       =           config["logoType"]        || logoType8SF4;
     this.localTSAP      = parseInt( config["localTSAP"], 16)  || 0x1200;
     this.remoteTSAP     = parseInt( config["remoteTSAP"], 16) || 0x2200;
-    this.type           =           config["type"]            || switchType;
     this.updateInterval =           config["updateInterval"]  || 0;
+    this.buttonValue    =           config["buttonValue"]     || 1;
+    this.pushButton     =           config["pushButton"]      || 1;
+    this.type           =           config["type"]            || switchType;
 
     if (this.interface == modbusInterface) {
       this.logo = new ModBusLogo(this.ip, this.port);
@@ -144,8 +140,6 @@ class LogoAccessory {
     this.switchGet        = config["switchGet"]        || "Q1";
     this.switchSetOn      = config["switchSetOn"]      || "V2.0";
     this.switchSetOff     = config["switchSetOff"]     || "V3.0";
-    this.switchValue      = config["switchValue"]      || 1;
-    this.switchPushButton = config["switchPushButton"] || 1;
 
     if (this.type == switchType) {
       
@@ -174,8 +168,6 @@ class LogoAccessory {
     this.blindSetUp      = config["blindSetUp"]      || "V5.0";
     this.blindSetDown    = config["blindSetDown"]    || "V5.1";
     this.blindGetUpDown  = config["blindGetUpDown"]  || "V5.2";
-    this.blindValue      = config["blindValue"]      || 1;
-    this.blindPushButton = config["blindPushButton"] || 1;
 
     if (this.type == blindType) {
       
@@ -208,8 +200,6 @@ class LogoAccessory {
     this.garagedoorOpen       = config["garagedoorOpen"]       || "V6.0";
     this.garagedoorClose      = config["garagedoorClose"]      || "V6.1";
     this.garagedoorState      = config["garagedoorState"]      || "V6.2";
-    this.garagedoorValue      = config["garagedoorValue"]      || 1;
-    this.garagedoorPushButton = config["garagedoorPushButton"] || 1;
 
     if (this.type == garagedoorType) {
       
@@ -243,8 +233,6 @@ class LogoAccessory {
     this.lightbulbSetOff        = config["lightbulbSetOff"]        || "V7.1";
     this.lightbulbSetBrightness = config["lightbulbSetBrightness"] || "VW70";
     this.lightbulbGetBrightness = config["lightbulbGetBrightness"] || "VW72";
-    this.lightbulbValue         = config["lightbulbValue"]         || 1;
-    this.lightbulbPushButton    = config["lightbulbPushButton"]    || 1;
 
     if (this.type == lightbulbType) {
       
@@ -307,9 +295,9 @@ class LogoAccessory {
     this.log("Set switch to", on);
 
     if (on) {
-      this.logo.WriteLogo(this.switchSetOn, this.switchValue, this.switchPushButton);
+      this.logo.WriteLogo(this.switchSetOn, this.buttonValue, this.pushButton);
     } else {
-      this.logo.WriteLogo(this.switchSetOff, this.switchValue, this.switchPushButton);
+      this.logo.WriteLogo(this.switchSetOff, this.buttonValue, this.pushButton);
     }
   };
 
@@ -457,9 +445,9 @@ class LogoAccessory {
     this.lastGaragedoorTargetState = state;
 
     if (state == 0) {
-      this.logo.WriteLogo(this.garagedoorOpen, this.garagedoorValue, this.garagedoorPushButton);
+      this.logo.WriteLogo(this.garagedoorOpen, this.buttonValue, this.pushButton);
     } else {
-      this.logo.WriteLogo(this.garagedoorClose, this.garagedoorValue, this.garagedoorPushButton);
+      this.logo.WriteLogo(this.garagedoorClose, this.buttonValue, this.pushButton);
     }
 
     // We succeeded, so update the "current" state as well.
@@ -504,9 +492,9 @@ class LogoAccessory {
       this.lastLightbulbOn = new_on;
 
       if (on) {
-        this.logo.WriteLogo(this.lightbulbSetOn, this.lightbulbValue, this.lightbulbPushButton);
+        this.logo.WriteLogo(this.lightbulbSetOn, this.buttonValue, this.pushButton);
       } else {
-        this.logo.WriteLogo(this.lightbulbSetOff, this.lightbulbValue, this.lightbulbPushButton);
+        this.logo.WriteLogo(this.lightbulbSetOff, this.buttonValue, this.pushButton);
       }
 
     }
@@ -569,9 +557,9 @@ class LogoAccessory {
           } else {
 
             if (this.lastBlindTargetPos >= 50) {
-              this.logo.WriteLogo(this.blindSetUp, this.blindValue, this.blindPushButton);
+              this.logo.WriteLogo(this.blindSetUp, this.buttonValue, this.pushButton);
             } else {
-              this.logo.WriteLogo(this.blindSetDown, this.blindValue, this.blindPushButton);
+              this.logo.WriteLogo(this.blindSetDown, this.buttonValue, this.pushButton);
             }
             
           }

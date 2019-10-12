@@ -54,6 +54,27 @@
 				"required": true,
 				"default": "switch"
 			},
+			"updateInterval": {
+				"title": "Auto Update Interval",
+				"type": "integer",
+				"required": false,
+				"default": 0,
+				"description": "in MS, 0 = Off"
+			},
+			"buttonValue": {
+				"title": "Button Value",
+				"type": "integer",
+				"required": false,
+				"default": 1,
+				"description": "Value for Digital Buttons 1 or 0"
+			},
+			"pushButton": {
+				"title": "Push Button",
+				"type": "integer",
+				"required": false,
+				"default": 1,
+				"description": ""
+			},
 			"switchGet": {
 				"title": "Switch Get (required for a Switch Accessory)",
 				"type": "string",
@@ -74,20 +95,6 @@
 				"required": false,
 				"default": "V3.0",
 				"description": "Mn or Vn.n"
-			},
-			"switchValue": {
-				"title": "Switch Value (required for a Switch Accessory)",
-				"type": "integer",
-				"required": false,
-				"default": 1,
-				"description": "Value for Switch Set On and Off"
-			},
-			"switchPushButton": {
-				"title": "Switch Push Button (required for a Switch Accessory)",
-				"type": "integer",
-				"required": false,
-				"default": 1,
-				"description": ""
 			},
 			"blindSetPos": {
 				"title": "Blind Set Pos (required for a Blind Accessory)",
@@ -138,19 +145,54 @@
 				"default": "V5.2",
 				"description": "Return 1 for Up or 0 for Down"
 			},
-			"blindValue": {
-				"title": "Blind Value (required for a none Analog Blind Accessory)",
-				"type": "integer",
+			"garagedoorOpen": {
+				"title": "Garagedoor Open (required for a Garagedoor Accessory)",
+				"type": "string",
 				"required": false,
-				"default": 1,
-				"description": "Value for Blind Set Up and Down"
+				"default": "V6.0",
+				"description": "Mn or Vn.n"
 			},
-			"blindPushButton": {
-				"title": "Blind Push Button (required for a none Analog Blind Accessory)",
-				"type": "integer",
+			"garagedoorClose": {
+				"title": "Garagedoor Close (required for a Garagedoor Accessory)",
+				"type": "string",
 				"required": false,
-				"default": 1,
-				"description": ""
+				"default": "V6.1",
+				"description": "Mn or Vn.n"
+			},
+			"garagedoorState": {
+				"title": "Garagedoor State (required for a Garagedoor Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "V6.2",
+				"description": "Mn or Vn.n"
+			},
+			"lightbulbSetOn": {
+				"title": "Lightbulb Set On (required for a Lightbulb Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "V7.0",
+				"description": "Mn or Vn.n"
+			},
+			"lightbulbSetOff": {
+				"title": "Lightbulb Set Off (required for a Lightbulb Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "V7.1",
+				"description": "Mn or Vn.n"
+			},
+			"lightbulbSetBrightness": {
+				"title": "Lightbulb Set Brightness (required for a Lightbulb Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "VW70",
+				"description": "AMn or VWn"
+			},
+			"lightbulbGetBrightness": {
+				"title": "Lightbulb Get Brightness (required for a Lightbulb Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "VW72",
+				"description": "AMn or VWn"
 			}
 		}
 	}
