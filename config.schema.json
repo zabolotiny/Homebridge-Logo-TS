@@ -75,6 +75,13 @@
 				"default": 1,
 				"description": ""
 			},
+			"debugMsgLog": {
+				"title": "Debug Msg Log",
+				"type": "integer",
+				"required": false,
+				"default": 0,
+				"description": ""
+			},
 			"switchGet": {
 				"title": "Switch Get (required for a Switch Accessory)",
 				"type": "string",

@@ -42,6 +42,7 @@ class LogoAccessory {
   updateInterval: number;
   buttonValue: number;
   pushButton: number;
+  debugMsgLog: number;
   type: string;
 
   switchGet: string;
@@ -94,6 +95,7 @@ class LogoAccessory {
     this.updateInterval =           config["updateInterval"]  || 0;
     this.buttonValue    =           config["buttonValue"]     || 1;
     this.pushButton     =           config["pushButton"]      || 1;
+    this.debugMsgLog    =           config["debugMsgLog"]     || 0;
     this.type           =           config["type"]            || switchType;
 
     if (this.interface == modbusInterface) {
@@ -137,9 +139,9 @@ class LogoAccessory {
     // LOGO Switch Service
     //
 
-    this.switchGet        = config["switchGet"]        || "Q1";
-    this.switchSetOn      = config["switchSetOn"]      || "V2.0";
-    this.switchSetOff     = config["switchSetOff"]     || "V3.0";
+    this.switchGet        = config["switchGet"]    || "Q1";
+    this.switchSetOn      = config["switchSetOn"]  || "V2.0";
+    this.switchSetOff     = config["switchSetOff"] || "V3.0";
 
     if (this.type == switchType) {
       
@@ -161,13 +163,13 @@ class LogoAccessory {
     // LOGO Blind Service
     //
 
-    this.blindSetPos     = config["blindSetPos"]     || "VW50";
-    this.blindGetPos     = config["blindGetPos"]     || "VW52";
-    this.blindGetState   = config["blindGetState"]   || "VW54";
-    this.blindDigital    = config["blindDigital"]    || 0;
-    this.blindSetUp      = config["blindSetUp"]      || "V5.0";
-    this.blindSetDown    = config["blindSetDown"]    || "V5.1";
-    this.blindGetUpDown  = config["blindGetUpDown"]  || "V5.2";
+    this.blindSetPos     = config["blindSetPos"]    || "VW50";
+    this.blindGetPos     = config["blindGetPos"]    || "VW52";
+    this.blindGetState   = config["blindGetState"]  || "VW54";
+    this.blindDigital    = config["blindDigital"]   || 0;
+    this.blindSetUp      = config["blindSetUp"]     || "V5.0";
+    this.blindSetDown    = config["blindSetDown"]   || "V5.1";
+    this.blindGetUpDown  = config["blindGetUpDown"] || "V5.2";
 
     if (this.type == blindType) {
       
@@ -197,9 +199,9 @@ class LogoAccessory {
     // LOGO GarageDoor Service
     //
 
-    this.garagedoorOpen       = config["garagedoorOpen"]       || "V6.0";
-    this.garagedoorClose      = config["garagedoorClose"]      || "V6.1";
-    this.garagedoorState      = config["garagedoorState"]      || "V6.2";
+    this.garagedoorOpen       = config["garagedoorOpen"]  || "V6.0";
+    this.garagedoorClose      = config["garagedoorClose"] || "V6.1";
+    this.garagedoorState      = config["garagedoorState"] || "V6.2";
 
     if (this.type == garagedoorType) {
       
@@ -278,7 +280,7 @@ class LogoAccessory {
     this.logo.ReadLogo(this.switchGet, async (value: number) => {
 
       const on = value == 1 ? true : false;
-      this.log("Switch ?", on);
+      this.debugLogBool("Switch ?", on);
 
       await wait(1);
       
@@ -292,7 +294,7 @@ class LogoAccessory {
   };
 
   setSwitchOn = async (on: boolean) => {
-    this.log("Set switch to", on);
+    this.debugLogBool("Set switch to", on);
 
     if (on) {
       this.logo.WriteLogo(this.switchSetOn, this.buttonValue, this.pushButton);
@@ -313,7 +315,7 @@ class LogoAccessory {
 
         let pos = 100 - value;
         pos = this.blindCurrentPositionIsNearTargetPosition(pos, this.lastBlindTargetPos);
-        this.log("BlindCurrentPosition ?", pos);
+        this.debugLogNum("BlindCurrentPosition ?", pos);
   
         await wait(1);
         
@@ -347,7 +349,7 @@ class LogoAccessory {
       this.logo.ReadLogo(this.blindGetUpDown, async (value: number) => {
 
         const pos = value == 1 ? 100 : 0;
-        this.log("BlindCurrentPosition ?", pos);
+        this.debugLogNum("BlindCurrentPosition ?", pos);
   
         await wait(1);
         
@@ -371,7 +373,7 @@ class LogoAccessory {
 
   getBlindTargetPosition = async () => {
 
-    this.log("BlindTargetPosition ?", this.lastBlindTargetPos);
+    this.debugLogNum("BlindTargetPosition ?", this.lastBlindTargetPos);
     if (this.lastBlindTargetPos != -1) {
       return this.lastBlindTargetPos;
     } else {
@@ -409,7 +411,7 @@ class LogoAccessory {
       this.logo.ReadLogo(this.blindGetState, async (value: number) => {
 
         const state = this.blindLogoStateToHomebridgeState(value);
-        this.log("BlindPositionState ?", state);
+        this.debugLogNum("BlindPositionState ?", state);
   
         await wait(1);
         
@@ -422,7 +424,7 @@ class LogoAccessory {
       
     } else {
 
-      this.log("BlindPositionState ? 2");
+      this.debugLogNum("BlindPositionState ?", 2);
       return 2;
       
     }
@@ -440,7 +442,7 @@ class LogoAccessory {
       // Logo return 1 for OPEN!
 
       const state = value == 1 ? 0 : 1;
-      this.log("GarageDoorCurrentDoorState ?", state);
+      this.debugLogNum("GarageDoorCurrentDoorState ?", state);
 
       await wait(1);
       
@@ -466,7 +468,7 @@ class LogoAccessory {
   getGarageDoorTargetDoorState = async () => {
     // 0 - OPEN; 1 - CLOSED
 
-    this.log("GarageDoorTargetDoorState ?", this.lastGaragedoorTargetState);
+    this.debugLogNum("GarageDoorTargetDoorState ?", this.lastGaragedoorTargetState);
     if (this.lastGaragedoorTargetState != -1) {
       return this.lastGaragedoorTargetState;
     } else {
@@ -478,7 +480,7 @@ class LogoAccessory {
   setGarageDoorTargetDoorState = async (state: number) => {
     // 0 - OPEN; 1 - CLOSED
 
-    this.log("Set GarageDoorTargetDoorState to", state);
+    this.debugLogNum("Set GarageDoorTargetDoorState to", state);
     this.lastGaragedoorTargetState = state;
 
     if (state == 0) {
@@ -503,7 +505,7 @@ class LogoAccessory {
   getGarageDoorObstructionDetected = async () => {
     // true or false
 
-    this.log("GarageDoorObstructionDetected ?", false);
+    this.debugLogBool("GarageDoorObstructionDetected ?", false);
     return false;
   };
 
@@ -514,7 +516,7 @@ class LogoAccessory {
   getLightbulbOn = async () => {
 
     const on = this.lastLightbulbOn == 1 ? true : false;
-    this.log("Lightbulb ?", on);
+    this.debugLogBool("Lightbulb ?", on);
     return on;
 
   };
@@ -525,7 +527,7 @@ class LogoAccessory {
 
     if ((this.lastLightbulbOn == -1) || (this.lastLightbulbOn != new_on)) {
       
-      this.log("Set Lightbulb to", on);
+      this.debugLogBool("Set Lightbulb to", on);
       this.lastLightbulbOn = new_on;
 
       if (on) {
@@ -542,7 +544,7 @@ class LogoAccessory {
 
     this.logo.ReadLogo(this.lightbulbGetBrightness, async (value: number) => {
 
-      this.log("LightbulbBrightness ?", value);
+      this.debugLogNum("LightbulbBrightness ?", value);
       this.lastLightbulbOn = value > 0 ? 1 : 0;
 
       await wait(1);
@@ -577,6 +579,17 @@ class LogoAccessory {
   // Helper Functions
   //
 
+  debugLogNum(msg: string, num: number) {
+    if (this.debugMsgLog == 1) {
+      this.log(msg, num);
+    }
+  }
+  debugLogBool(msg: string, bool: boolean) {
+    if (this.debugMsgLog == 1) {
+      this.log(msg, bool);
+    }
+  }
+
   blindTargetPositionTimeout() {
     setTimeout(() => {
 
@@ -584,7 +597,7 @@ class LogoAccessory {
 
         if ((now >= (this.lastBlindTargetPosTime + accessoryAnalogTimeOut)) || (this.lastBlindTargetPos == 0) || (this.lastBlindTargetPos == 100)) {
 
-          this.log("Set BlindTargetPosition to", this.lastBlindTargetPos);
+          this.debugLogNum("Set BlindTargetPosition to", this.lastBlindTargetPos);
           this.lastBlindTargetPosTimerSet = false;
 
           if (!this.blindDigital) {
@@ -642,7 +655,7 @@ class LogoAccessory {
 
         if ((now >= (this.lastLightbulbTargetBrightnessTime + accessoryAnalogTimeOut)) || (this.lastLightbulbTargetBrightness == 0) || (this.lastLightbulbTargetBrightness == 100)) {
 
-          this.log("Set LightbulbTargetBrightness to", this.lastLightbulbTargetBrightness);
+          this.debugLogNum("Set LightbulbTargetBrightness to", this.lastLightbulbTargetBrightness);
           this.lastLightbulbTargetBrightnessTimerSet = false;
 
           this.logo.WriteLogo(this.lightbulbSetBrightness, this.lastLightbulbTargetBrightness, 0);
