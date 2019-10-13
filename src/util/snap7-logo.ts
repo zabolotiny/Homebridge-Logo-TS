@@ -40,7 +40,7 @@ export class Snap7Logo {
 
         s7client.Connect(function(err: Error) {
             if(err) {
-            return console.log(' >> Connection failed. Code #' + err + ' - ' + s7client.ErrorText(err));
+                return console.log(' >> Connection failed. Code #' + err + ' - ' + s7client.ErrorText(err));
             }
         });
     }
@@ -69,7 +69,8 @@ export class Snap7Logo {
         
         s7client.DBRead(this.target_db, target.addr, target_len, function(err: Error, res: [number]) {
             if(err) {
-            return console.log(' >> DBRead failed. Code #' + err + ' - ' + s7client.ErrorText(err));
+                callBack(-1);
+                // return console.log(' >> DBRead failed. Code #' + err + ' - ' + s7client.ErrorText(err));
             }
             var buffer = Buffer.from(res);
 
@@ -124,9 +125,10 @@ export class Snap7Logo {
         
         s7client.DBWrite(this.target_db, target.addr, target_len, buffer_on, function(err: Error) {
             if(err) {
-            return console.log(' >> DBWrite failed. Code #' + err + ' - ' + s7client.ErrorText(err));
+                return -1;
+                // return console.log(' >> DBWrite failed. Code #' + err + ' - ' + s7client.ErrorText(err));
             }
-            return 0;
+            return 1;
         });
         
         if (pushButton == 1) {
@@ -135,10 +137,11 @@ export class Snap7Logo {
                 var buffer_off = Buffer.from([0]);
             
                 s7client.DBWrite(this.target_db, target.addr, target_len, buffer_off, function(err: Error) {
-                if(err) {
-                    return console.log(' >> DBWrite failed. Code #' + err + ' - ' + s7client.ErrorText(err));
-                }
-                return 0;
+                    if(err) {
+                        return -1;
+                        return console.log(' >> DBWrite failed. Code #' + err + ' - ' + s7client.ErrorText(err));
+                    }
+                    return 1;
                 });
             
             });

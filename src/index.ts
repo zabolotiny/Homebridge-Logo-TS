@@ -279,15 +279,19 @@ class LogoAccessory {
 
     this.logo.ReadLogo(this.switchGet, async (value: number) => {
 
-      const on = value == 1 ? true : false;
-      this.debugLogBool("Switch ?", on);
+      if (value != -1) {
 
-      await wait(1);
-      
-      this.switchService.updateCharacteristic(
-        Characteristic.On,
-        on
-      );
+        const on = value == 1 ? true : false;
+        this.debugLogBool("Switch ?", on);
+
+        await wait(1);
+        
+        this.switchService.updateCharacteristic(
+          Characteristic.On,
+          on
+        );
+
+      }
 
     });
 
@@ -313,33 +317,37 @@ class LogoAccessory {
 
       this.logo.ReadLogo(this.blindGetPos, async (value: number) => {
 
-        let pos = 100 - value;
-        pos = this.blindCurrentPositionIsNearTargetPosition(pos, this.lastBlindTargetPos);
-        this.debugLogNum("BlindCurrentPosition ?", pos);
-  
-        await wait(1);
-        
-        this.blindService.updateCharacteristic(
-          Characteristic.CurrentPosition,
-          pos
-        );
+        if (value != -1) {
 
-        await wait(1);
-        
-        this.blindService.updateCharacteristic(
-          Characteristic.PositionState,
-          2
-        );
-
-        if (pos != this.lastBlindTargetPos) {
-          this.lastBlindTargetPos = pos;
-
+          let pos = 100 - value;
+          pos = this.blindCurrentPositionIsNearTargetPosition(pos, this.lastBlindTargetPos);
+          this.debugLogNum("BlindCurrentPosition ?", pos);
+    
           await wait(1);
-        
+          
           this.blindService.updateCharacteristic(
-            Characteristic.TargetPosition,
+            Characteristic.CurrentPosition,
             pos
           );
+
+          await wait(1);
+          
+          this.blindService.updateCharacteristic(
+            Characteristic.PositionState,
+            2
+          );
+
+          if (pos != this.lastBlindTargetPos) {
+            this.lastBlindTargetPos = pos;
+
+            await wait(1);
+          
+            this.blindService.updateCharacteristic(
+              Characteristic.TargetPosition,
+              pos
+            );
+          }
+          
         }
   
       });
@@ -348,22 +356,26 @@ class LogoAccessory {
 
       this.logo.ReadLogo(this.blindGetUpDown, async (value: number) => {
 
-        const pos = value == 1 ? 100 : 0;
-        this.debugLogNum("BlindCurrentPosition ?", pos);
-  
-        await wait(1);
-        
-        this.blindService.updateCharacteristic(
-          Characteristic.CurrentPosition,
-          pos
-        );
+        if (value != -1) {
 
-        await wait(1);
-        
-        this.blindService.updateCharacteristic(
-          Characteristic.PositionState,
-          2
-        );
+          const pos = value == 1 ? 100 : 0;
+          this.debugLogNum("BlindCurrentPosition ?", pos);
+    
+          await wait(1);
+          
+          this.blindService.updateCharacteristic(
+            Characteristic.CurrentPosition,
+            pos
+          );
+
+          await wait(1);
+          
+          this.blindService.updateCharacteristic(
+            Characteristic.PositionState,
+            2
+          );
+          
+        }
   
       });
       
@@ -410,15 +422,19 @@ class LogoAccessory {
 
       this.logo.ReadLogo(this.blindGetState, async (value: number) => {
 
-        const state = this.blindLogoStateToHomebridgeState(value);
-        this.debugLogNum("BlindPositionState ?", state);
-  
-        await wait(1);
-        
-        this.blindService.updateCharacteristic(
-          Characteristic.PositionState,
-          state
-        );
+        if (value != -1) {
+
+          const state = this.blindLogoStateToHomebridgeState(value);
+          this.debugLogNum("BlindPositionState ?", state);
+    
+          await wait(1);
+          
+          this.blindService.updateCharacteristic(
+            Characteristic.PositionState,
+            state
+          );
+          
+        }
   
       });
       
@@ -441,26 +457,29 @@ class LogoAccessory {
     this.logo.ReadLogo(this.garagedoorState, async (value: number) => {
       // Logo return 1 for OPEN!
 
-      const state = value == 1 ? 0 : 1;
-      this.debugLogNum("GarageDoorCurrentDoorState ?", state);
+      if (value != -1) {
 
-      await wait(1);
-      
-      this.garagedoorService.updateCharacteristic(
-        Characteristic.CurrentDoorState,
-        state
-      );
+        const state = value == 1 ? 0 : 1;
+        this.debugLogNum("GarageDoorCurrentDoorState ?", state);
 
-      if (state != this.lastGaragedoorTargetState) {
-        this.lastGaragedoorTargetState = state;
         await wait(1);
-      
+        
         this.garagedoorService.updateCharacteristic(
-          Characteristic.TargetDoorState,
+          Characteristic.CurrentDoorState,
           state
         );
+
+        if (state != this.lastGaragedoorTargetState) {
+          this.lastGaragedoorTargetState = state;
+          await wait(1);
+        
+          this.garagedoorService.updateCharacteristic(
+            Characteristic.TargetDoorState,
+            state
+          );
+        }
+          
       }
-      
 
     });
   };
@@ -544,22 +563,26 @@ class LogoAccessory {
 
     this.logo.ReadLogo(this.lightbulbGetBrightness, async (value: number) => {
 
-      this.debugLogNum("LightbulbBrightness ?", value);
-      this.lastLightbulbOn = value > 0 ? 1 : 0;
+      if (value != -1) {
 
-      await wait(1);
-      
-      this.lightbulbService.updateCharacteristic(
-        Characteristic.On,
-        (value > 0 ? true : false)
-      );
+        this.debugLogNum("LightbulbBrightness ?", value);
+        this.lastLightbulbOn = value > 0 ? 1 : 0;
 
-      await wait(1);
-      
-      this.lightbulbService.updateCharacteristic(
-        Characteristic.Brightness,
-        value
-      );
+        await wait(1);
+        
+        this.lightbulbService.updateCharacteristic(
+          Characteristic.On,
+          (value > 0 ? true : false)
+        );
+
+        await wait(1);
+        
+        this.lightbulbService.updateCharacteristic(
+          Characteristic.Brightness,
+          value
+        );
+          
+      }
 
     });
 

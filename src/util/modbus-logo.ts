@@ -115,7 +115,7 @@ export class ModBusLogo {
             client.readDiscreteInputs(addr.addr, len, function(err: Error, data: ReadCoilResult) {
                 if (err) {
                     // return console.log(err);
-                    callBack(0);
+                    callBack(-1);
                 } else {
                     callBack((data.data[0] == true ? 1 : 0));
                 }
@@ -134,7 +134,7 @@ export class ModBusLogo {
             client.readCoils(addr.addr, len, function(err: Error, data: ReadCoilResult) {
                 if (err) {
                     // return console.log(err);
-                    callBack(0);
+                    callBack(-1);
                 } else {
                     callBack((data.data[0] == true ? 1 : 0));
                 }
@@ -153,7 +153,7 @@ export class ModBusLogo {
             client.readInputRegisters(addr.addr, len, function(err: Error, data: ReadRegisterResult) {
                 if (err) {
                     // return console.log(err);
-                    callBack(0);
+                    callBack(-1);
                 } else {
                     callBack(data.data[0]);
                 }
@@ -172,7 +172,7 @@ export class ModBusLogo {
             client.readHoldingRegisters(addr.addr, len, function(err: Error, data: ReadRegisterResult) {
                 if (err) {
                     // return console.log(err);
-                    callBack(0);
+                    callBack(-1);
                 } else {
                     switch (addr.wLen) {
 
