@@ -311,7 +311,8 @@ class LogoAccessory {
 
       this.logo.ReadLogo(this.blindGetPos, async (value: number) => {
 
-        const pos = 100 - value;
+        let pos = 100 - value;
+        pos = this.blindCurrentPositionIsNearTargetPosition(pos, this.lastBlindTargetPos);
         this.log("BlindCurrentPosition ?", pos);
   
         await wait(1);
@@ -320,6 +321,24 @@ class LogoAccessory {
           Characteristic.CurrentPosition,
           pos
         );
+
+        await wait(1);
+        
+        this.blindService.updateCharacteristic(
+          Characteristic.PositionState,
+          2
+        );
+
+        if (pos != this.lastBlindTargetPos) {
+          this.lastBlindTargetPos = pos;
+
+          await wait(1);
+        
+          this.blindService.updateCharacteristic(
+            Characteristic.TargetPosition,
+            pos
+          );
+        }
   
       });
       
@@ -335,6 +354,13 @@ class LogoAccessory {
         this.blindService.updateCharacteristic(
           Characteristic.CurrentPosition,
           pos
+        );
+
+        await wait(1);
+        
+        this.blindService.updateCharacteristic(
+          Characteristic.PositionState,
+          2
         );
   
       });
@@ -422,6 +448,17 @@ class LogoAccessory {
         Characteristic.CurrentDoorState,
         state
       );
+
+      if (state != this.lastGaragedoorTargetState) {
+        this.lastGaragedoorTargetState = state;
+        await wait(1);
+      
+        this.garagedoorService.updateCharacteristic(
+          Characteristic.TargetDoorState,
+          state
+        );
+      }
+      
 
     });
   };
@@ -582,6 +619,19 @@ class LogoAccessory {
       return 1;              // Homebridge INCREASING
     } else {
       return 2;              // Homebridge STOPPED
+    }
+  }
+
+  blindCurrentPositionIsNearTargetPosition(current: number, target: number) {
+    if (target != -1) {
+      const near = target - current;
+      if ( (near >= -5) && (near <= 5) ) {
+        return target;
+      } else {
+        return current;
+      }
+    } else {
+      return current;
     }
   }
 
