@@ -99,9 +99,9 @@ class LogoAccessory {
     this.type           =           config["type"]            || switchType;
 
     if (this.interface == modbusInterface) {
-      this.logo = new ModBusLogo(this.ip, this.port);
+      this.logo = new ModBusLogo(this.ip, this.port, this.debugMsgLog, this.log);
     } else {
-      this.logo = new Snap7Logo(this.logoType, this.ip, this.localTSAP, this.remoteTSAP);
+      this.logo = new Snap7Logo(this.logoType, this.ip, this.localTSAP, this.remoteTSAP, this.debugMsgLog, this.log);
     }
 
     if (this.updateInterval > 0) {

@@ -18,16 +18,22 @@ export class LogoAddress {
 
 export class Snap7Logo {
 
-    target_type = "0BA7";
-    target_db = 1;
+    target_type: string = "0BA7";
+    target_db: number = 1;
+    debugMsgLog: number = 0;
+    log: Function;
 
     constructor(
         public type: string,
         public ipAddr: string,
         public local_TSAP: number,
-        public remote_TSAP: number
+        public remote_TSAP: number,
+        public debug: number,
+        public logFunction: any
     ) {
         this.target_type = type;
+        this.debugMsgLog = debug;
+        this.log         = logFunction;
         s7client.SetConnectionParams(ipAddr, local_TSAP, remote_TSAP);
     }
 
@@ -36,11 +42,13 @@ export class Snap7Logo {
         s7client.SetConnectionParams(target_ip, target_local_TSAP, target_remote_TSAP);
     }
 
-    ConnectLogo() {
+    ConnectLogo(debugLog: number, log: any) {
 
         s7client.Connect(function(err: Error) {
             if(err) {
-                return console.log(' >> Connection failed. Code #' + err + ' - ' + s7client.ErrorText(err));
+                if (debugLog == 1) {
+                    log(' >> Connection failed. Code #' + err + ' - ' + s7client.ErrorText(err));
+                }
             }
         });
     }
@@ -53,8 +61,11 @@ export class Snap7Logo {
 
     ReadLogo(item: string, callBack: (value: number) => any) {
 
+        var debugLog: number = this.debugMsgLog;
+        var log: any         = this.log;
+
         if (s7client.Connected() == false) {
-            this.ConnectLogo();
+            this.ConnectLogo(debugLog, log);
         }
 
         var target = this.getAddressAndBit(item);
@@ -69,8 +80,10 @@ export class Snap7Logo {
         
         s7client.DBRead(this.target_db, target.addr, target_len, function(err: Error, res: [number]) {
             if(err) {
+                if (debugLog == 1) {
+                    log(' >> DBRead failed. Code #' + err + ' - ' + s7client.ErrorText(err));
+                }
                 callBack(-1);
-                // return console.log(' >> DBRead failed. Code #' + err + ' - ' + s7client.ErrorText(err));
             }
             var buffer = Buffer.from(res);
 
@@ -92,10 +105,13 @@ export class Snap7Logo {
         });
     }
 
-    WriteLogo(item: string, value: number, pushButton = 0) {
+    WriteLogo(item: string, value: number, pushButton: number) {
+
+        var debugLog: number = this.debugMsgLog;
+        var log: any         = this.log;
 
         if (s7client.Connected() == false) {
-            this.ConnectLogo();
+            this.ConnectLogo(debugLog, log);
         }
 
         var target = this.getAddressAndBit(item);
@@ -125,8 +141,10 @@ export class Snap7Logo {
         
         s7client.DBWrite(this.target_db, target.addr, target_len, buffer_on, function(err: Error) {
             if(err) {
+                if (debugLog == 1) {
+                    log(' >> DBWrite failed. Code #' + err + ' - ' + s7client.ErrorText(err));
+                }
                 return -1;
-                // return console.log(' >> DBWrite failed. Code #' + err + ' - ' + s7client.ErrorText(err));
             }
             return 1;
         });
@@ -138,8 +156,10 @@ export class Snap7Logo {
             
                 s7client.DBWrite(this.target_db, target.addr, target_len, buffer_off, function(err: Error) {
                     if(err) {
+                        if (debugLog == 1) {
+                            log(' >> DBWrite failed. Code #' + err + ' - ' + s7client.ErrorText(err));
+                        }
                         return -1;
-                        return console.log(' >> DBWrite failed. Code #' + err + ' - ' + s7client.ErrorText(err));
                     }
                     return 1;
                 });

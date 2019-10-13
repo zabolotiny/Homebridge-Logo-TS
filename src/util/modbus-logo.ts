@@ -30,13 +30,19 @@ export class ModBusLogo {
     client = new ModbusRTU();
     target_ip: string;
     target_port: number;
+    debugMsgLog: number;
+    log: Function;
 
     constructor(
         public ip: string,
-        public port: number
+        public port: number,
+        public debug: number,
+        public logFunction: any
     ) {
         this.target_ip   = ip;
         this.target_port = port;
+        this.debugMsgLog = debug;
+        this.log         = logFunction;
     }
 
     ReadLogo(item: string, callBack: (value: number) => any) {
@@ -45,19 +51,19 @@ export class ModBusLogo {
 
         switch (addr.type) {
             case AddressType.MBATDiscreteInput:
-                    this.readDiscreteInput(addr, callBack);
+                    this.readDiscreteInput(addr, callBack, this.debugMsgLog, this.log);
                 break;
 
             case AddressType.MBATCoil:
-                    this.readCoil(addr, callBack);
+                    this.readCoil(addr, callBack, this.debugMsgLog, this.log);
                 break;
 
             case AddressType.MBATInputRegister:
-                    this.readInputRegister(addr, callBack);
+                    this.readInputRegister(addr, callBack, this.debugMsgLog, this.log);
                 break;
 
             case AddressType.MBATHoldingRegister:
-                    this.readHoldingRegister(addr, callBack);
+                    this.readHoldingRegister(addr, callBack, this.debugMsgLog, this.log);
                 break;
         }
     }
@@ -72,10 +78,10 @@ export class ModBusLogo {
 
                 if (pushButton == 1) {
 
-                    this.wiriteCoil(addr.addr, true); 
+                    this.wiriteCoil(addr.addr, true, this.debugMsgLog, this.log); 
                 } else {
 
-                    this.wiriteCoil(addr.addr, (value == 1 ? true : false)); 
+                    this.wiriteCoil(addr.addr, (value == 1 ? true : false), this.debugMsgLog, this.log); 
                 }
             }
 
@@ -83,15 +89,15 @@ export class ModBusLogo {
 
                 switch (addr.wLen) {
                     case WordLen.MBWLByte:
-                            this.writeRegister(addr.addr, ((value & 0b11111111) << 8));
+                            this.writeRegister(addr.addr, ((value & 0b11111111) << 8), this.debugMsgLog, this.log);
                         break;
 
                     case WordLen.MBWLWord:
-                            this.writeRegister(addr.addr, value);
+                            this.writeRegister(addr.addr, value, this.debugMsgLog, this.log);
                         break;
 
                     case WordLen.MBWLDWord:
-                            this.writeRegisters(addr.addr, [((value & 0b11111111111111110000000000000000) >> 16), (value & 0b00000000000000001111111111111111)]);
+                            this.writeRegisters(addr.addr, [((value & 0b11111111111111110000000000000000) >> 16), (value & 0b00000000000000001111111111111111)], this.debugMsgLog, this.log);
                         break;
                 }
             }
@@ -99,22 +105,24 @@ export class ModBusLogo {
             if (pushButton == 1) {
 
                 sleep(200).then(() => {
-                    this.wiriteCoil(addr.addr, false); 
+                    this.wiriteCoil(addr.addr, false, this.debugMsgLog, this.log); 
                 });
             }
         }
     }
 
-    readDiscreteInput(addr: LogoAddress, callBack: (value: number) => any) {
+    readDiscreteInput(addr: LogoAddress, callBack: (value: number) => any, debugLog: number, log: any) {
         let len = 1;
 
         let client = new ModbusRTU();
         client.connectTcpRTUBuffered(this.target_ip, { port: this.target_port }, function() {
-            client.setTimeout(500);
+            client.setTimeout(2000);
             client.setID(1);
             client.readDiscreteInputs(addr.addr, len, function(err: Error, data: ReadCoilResult) {
                 if (err) {
-                    // return console.log(err);
+                    if (debugLog == 1) {
+                        log(err);
+                    }
                     callBack(-1);
                 } else {
                     callBack((data.data[0] == true ? 1 : 0));
@@ -124,16 +132,18 @@ export class ModBusLogo {
         });
     }
 
-    readCoil(addr: LogoAddress, callBack: (value: number) => any) {
+    readCoil(addr: LogoAddress, callBack: (value: number) => any, debugLog: number, log: any) {
         let len = 1;
 
         let client = new ModbusRTU();
         client.connectTcpRTUBuffered(this.target_ip, { port: this.target_port }, function() {
-            client.setTimeout(500);
+            client.setTimeout(2000);
             client.setID(1);
             client.readCoils(addr.addr, len, function(err: Error, data: ReadCoilResult) {
                 if (err) {
-                    // return console.log(err);
+                    if (debugLog == 1) {
+                        log(err);
+                    }
                     callBack(-1);
                 } else {
                     callBack((data.data[0] == true ? 1 : 0));
@@ -143,16 +153,18 @@ export class ModBusLogo {
         });
     }
 
-    readInputRegister(addr: LogoAddress, callBack: (value: number) => any) {
+    readInputRegister(addr: LogoAddress, callBack: (value: number) => any, debugLog: number, log: any) {
         let len = 1;
 
         let client = new ModbusRTU();
         client.connectTcpRTUBuffered(this.target_ip, { port: this.target_port }, function() {
-            client.setTimeout(500);
+            client.setTimeout(2000);
             client.setID(1);
             client.readInputRegisters(addr.addr, len, function(err: Error, data: ReadRegisterResult) {
                 if (err) {
-                    // return console.log(err);
+                    if (debugLog == 1) {
+                        log(err);
+                    }
                     callBack(-1);
                 } else {
                     callBack(data.data[0]);
@@ -162,16 +174,18 @@ export class ModBusLogo {
         });
     }
 
-    readHoldingRegister(addr: LogoAddress, callBack: (value: number) => any) {
+    readHoldingRegister(addr: LogoAddress, callBack: (value: number) => any, debugLog: number, log: any) {
         let len = (addr.wLen == WordLen.MBWLDWord ? 2 : 1);
 
         let client = new ModbusRTU();
         client.connectTcpRTUBuffered(this.target_ip, { port: this.target_port }, function() {
-            client.setTimeout(500);
+            client.setTimeout(2000);
             client.setID(1);
             client.readHoldingRegisters(addr.addr, len, function(err: Error, data: ReadRegisterResult) {
                 if (err) {
-                    // return console.log(err);
+                    if (debugLog == 1) {
+                        log(err);
+                    }
                     callBack(-1);
                 } else {
                     switch (addr.wLen) {
@@ -194,15 +208,17 @@ export class ModBusLogo {
         });
     }
 
-    wiriteCoil(addr: number, state: Boolean) {
+    wiriteCoil(addr: number, state: Boolean, debugLog: number, log: any) {
 
         let client = new ModbusRTU();
         client.connectTcpRTUBuffered(this.target_ip, { port: this.target_port }, function() {
-            client.setTimeout(500);
+            client.setTimeout(2000);
             client.setID(1);
             client.writeCoil(addr, state, function(err: Error, data: WriteCoilResult) {
                 if (err) {
-                    // return console.log(err);
+                    if (debugLog == 1) {
+                        log(err);
+                    }
                 }
 
                 client.close(); 
@@ -210,15 +226,17 @@ export class ModBusLogo {
         });
     }
 
-    writeRegister(addr: number, value: number) {
+    writeRegister(addr: number, value: number, debugLog: number, log: any) {
 
         let client = new ModbusRTU();
         client.connectTcpRTUBuffered(this.target_ip, { port: this.target_port }, function() {
-            client.setTimeout(500);
+            client.setTimeout(2000);
             client.setID(1);
             client.writeRegister(addr, value, function(err: Error, data: WriteRegisterResult) {
                 if (err) {
-                    // return console.log(err);
+                    if (debugLog == 1) {
+                        log(err);
+                    }
                 }
                 
                 client.close();
@@ -226,15 +244,17 @@ export class ModBusLogo {
         });
     }
 
-    writeRegisters(addr: number, value: number[]) {
+    writeRegisters(addr: number, value: number[], debugLog: number, log: any) {
 
         let client = new ModbusRTU();
         client.connectTcpRTUBuffered(this.target_ip, { port: this.target_port }, function() {
-            client.setTimeout(500);
+            client.setTimeout(2000);
             client.setID(1);
             client.writeRegisters(addr, value, function(err: Error, data: WriteRegisterResult) {
                 if (err) {
-                    // return console.log(err);
+                    if (debugLog == 1) {
+                        log(err);
+                    }
                 }
                 
                 client.close();
