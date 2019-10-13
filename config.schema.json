@@ -7,11 +7,10 @@
 			"name": {
 				"title": "Name",
 				"type": "string",
-				"required": true,
-				"default": "Logo Accessory"
+				"required": true
 			},
 			"interface": {
-				"title": "Interface to communicate with the LOGO. (modbus or snap7)",
+				"title": "Interface to communicate with the LOGO. [modbus, snap7]",
 				"type": "string",
 				"required": true,
 				"default": "modbus"
@@ -19,8 +18,7 @@
 			"ip": {
 				"title": "IP Address",
 				"type": "string",
-				"required": true,
-				"default": ""
+				"required": true
 			},
 			"port": {
 				"title": "Modbus Port (required for Modbus)",
@@ -29,7 +27,7 @@
 				"default": 505
 			},
 			"logoType": {
-				"title": "LOGO! Type (required for Snap7 => 0BA7, 0BA8, 8.SF4)",
+				"title": "LOGO! Type (required for Snap7) [0BA7, 0BA8, 8.SF4]",
 				"type": "string",
 				"required": false,
 				"default": "8.SF4"
@@ -49,7 +47,7 @@
 				"description": "0x2200 == TSAP 22.00 in LOGO!Soft Comfort"
 			},
 			"type": {
-				"title": "Type of Accessory (switch, blind, garagedoor, lightbulb)",
+				"title": "Type of Accessory [switch, blind, garagedoor, lightbulb]",
 				"type": "string",
 				"required": true,
 				"default": "switch"
@@ -59,28 +57,28 @@
 				"type": "integer",
 				"required": false,
 				"default": 0,
-				"description": "in MS, 0 = Off"
+				"description": "in milliseconds, 0 = Off"
 			},
 			"buttonValue": {
-				"title": "Button Value",
+				"title": "Button Value [0, 1]",
 				"type": "integer",
 				"required": false,
 				"default": 1,
-				"description": "Value for Digital Buttons 1 or 0"
+				"description": "Value for Digital Buttons"
 			},
 			"pushButton": {
-				"title": "Push Button",
+				"title": "Push Button [0, 1]",
 				"type": "integer",
 				"required": false,
 				"default": 1,
-				"description": ""
+				"description": "If e.g. the network input in the LOGO! a hardware button on the LOGO! simulated."
 			},
 			"debugMsgLog": {
 				"title": "Debug Msg Log",
 				"type": "integer",
 				"required": false,
 				"default": 0,
-				"description": ""
+				"description": "1 - Displays messages of accessories in the log."
 			},
 			"switchGet": {
 				"title": "Switch Get (required for a Switch Accessory)",
@@ -129,7 +127,7 @@
 				"type": "integer",
 				"required": false,
 				"default": 0,
-				"description": "0 for Analog Control, 1 for PushButton Control"
+				"description": "0 for Analog Control, 1 for Button Control"
 			},
 			"blindSetUp": {
 				"title": "Blind Set Up (required for a none Analog Blind Accessory)",
