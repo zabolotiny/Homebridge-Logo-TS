@@ -116,7 +116,7 @@ export class ModBusLogo {
 
         let client = new ModbusRTU();
         client.connectTcpRTUBuffered(this.target_ip, { port: this.target_port }, function() {
-            client.setTimeout(2000);
+            client.setTimeout(5000);
             client.setID(1);
             client.readDiscreteInputs(addr.addr, len, function(err: Error, data: ReadCoilResult) {
                 if (err) {
@@ -137,7 +137,7 @@ export class ModBusLogo {
 
         let client = new ModbusRTU();
         client.connectTcpRTUBuffered(this.target_ip, { port: this.target_port }, function() {
-            client.setTimeout(2000);
+            client.setTimeout(5000);
             client.setID(1);
             client.readCoils(addr.addr, len, function(err: Error, data: ReadCoilResult) {
                 if (err) {
@@ -158,7 +158,7 @@ export class ModBusLogo {
 
         let client = new ModbusRTU();
         client.connectTcpRTUBuffered(this.target_ip, { port: this.target_port }, function() {
-            client.setTimeout(2000);
+            client.setTimeout(5000);
             client.setID(1);
             client.readInputRegisters(addr.addr, len, function(err: Error, data: ReadRegisterResult) {
                 if (err) {
@@ -179,7 +179,7 @@ export class ModBusLogo {
 
         let client = new ModbusRTU();
         client.connectTcpRTUBuffered(this.target_ip, { port: this.target_port }, function() {
-            client.setTimeout(2000);
+            client.setTimeout(5000);
             client.setID(1);
             client.readHoldingRegisters(addr.addr, len, function(err: Error, data: ReadRegisterResult) {
                 if (err) {
@@ -212,7 +212,7 @@ export class ModBusLogo {
 
         let client = new ModbusRTU();
         client.connectTcpRTUBuffered(this.target_ip, { port: this.target_port }, function() {
-            client.setTimeout(2000);
+            client.setTimeout(5000);
             client.setID(1);
             client.writeCoil(addr, state, function(err: Error, data: WriteCoilResult) {
                 if (err) {
@@ -230,7 +230,7 @@ export class ModBusLogo {
 
         let client = new ModbusRTU();
         client.connectTcpRTUBuffered(this.target_ip, { port: this.target_port }, function() {
-            client.setTimeout(2000);
+            client.setTimeout(5000);
             client.setID(1);
             client.writeRegister(addr, value, function(err: Error, data: WriteRegisterResult) {
                 if (err) {
@@ -248,7 +248,7 @@ export class ModBusLogo {
 
         let client = new ModbusRTU();
         client.connectTcpRTUBuffered(this.target_ip, { port: this.target_port }, function() {
-            client.setTimeout(2000);
+            client.setTimeout(5000);
             client.setID(1);
             client.writeRegisters(addr, value, function(err: Error, data: WriteRegisterResult) {
                 if (err) {

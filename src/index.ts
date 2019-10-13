@@ -76,6 +76,10 @@ class LogoAccessory {
   lastLightbulbTargetBrightness: number;
   lastLightbulbTargetBrightnessTime: number;
   lastLightbulbTargetBrightnessTimerSet: boolean;
+  switchTimer: any;
+  blindTimer: any;
+  garagedoorTimer: any;
+  lightbulbTimer: any;
 
   // Services exposed.
   switchService: any;
@@ -277,6 +281,13 @@ class LogoAccessory {
 
   getSwitchOn = async () => {
 
+    // Cancel timer if the call came from the Home-App and not from the update interval.
+    // To avoid duplicate queries at the same time.
+    if (this.updateInterval > 0) {
+      clearTimeout(this.switchTimer);
+      this.switchTimer = 0;
+    }
+
     this.logo.ReadLogo(this.switchGet, async (value: number) => {
 
       if (value != -1) {
@@ -291,6 +302,10 @@ class LogoAccessory {
           on
         );
 
+      }
+
+      if (this.updateInterval > 0) {
+        this.switchAutoUpdate();
       }
 
     });
@@ -312,6 +327,13 @@ class LogoAccessory {
   //
 
   getBlindCurrentPosition = async () => {
+
+    // Cancel timer if the call came from the Home-App and not from the update interval.
+    // To avoid duplicate queries at the same time.
+    if (this.updateInterval > 0) {
+      clearTimeout(this.blindTimer);
+      this.blindTimer = 0;
+    }
 
     if (!this.blindDigital) {
 
@@ -349,6 +371,10 @@ class LogoAccessory {
           }
           
         }
+
+        if (this.updateInterval > 0) {
+          this.blindAutoUpdate();
+        }
   
       });
       
@@ -375,6 +401,10 @@ class LogoAccessory {
             2
           );
           
+        }
+
+        if (this.updateInterval > 0) {
+          this.blindAutoUpdate();
         }
   
       });
@@ -454,6 +484,13 @@ class LogoAccessory {
   getGarageDoorCurrentDoorState = async () => {
     // 0 - OPEN; 1 - CLOSED; 2 - OPENING; 3 - CLOSING; 4 - STOPPED
 
+    // Cancel timer if the call came from the Home-App and not from the update interval.
+    // To avoid duplicate queries at the same time.
+    if (this.updateInterval > 0) {
+      clearTimeout(this.garagedoorTimer);
+      this.garagedoorTimer = 0;
+    }
+
     this.logo.ReadLogo(this.garagedoorState, async (value: number) => {
       // Logo return 1 for OPEN!
 
@@ -481,7 +518,12 @@ class LogoAccessory {
           
       }
 
+      if (this.updateInterval > 0) {
+        this.garagedoorAutoUpdate();
+      }
+
     });
+
   };
 
   getGarageDoorTargetDoorState = async () => {
@@ -561,6 +603,13 @@ class LogoAccessory {
 
   getLightbulbBrightness = async () => {
 
+    // Cancel timer if the call came from the Home-App and not from the update interval.
+    // To avoid duplicate queries at the same time.
+    if (this.updateInterval > 0) {
+      clearTimeout(this.lightbulbTimer);
+      this.lightbulbTimer = 0;
+    }
+
     this.logo.ReadLogo(this.lightbulbGetBrightness, async (value: number) => {
 
       if (value != -1) {
@@ -582,6 +631,10 @@ class LogoAccessory {
           value
         );
           
+      }
+
+      if (this.updateInterval > 0) {
+        this.lightbulbAutoUpdate();
       }
 
     });
@@ -694,10 +747,9 @@ class LogoAccessory {
 
   switchAutoUpdate() {
 
-    setTimeout(() => {
+    this.switchTimer = setTimeout(() => {
 
       this.getSwitchOn();
-      this.switchAutoUpdate();
 
     }, this.updateInterval + Math.floor(Math.random() * 10000));
 
@@ -705,10 +757,9 @@ class LogoAccessory {
 
   blindAutoUpdate() {
 
-    setTimeout(() => {
+    this.blindTimer = setTimeout(() => {
 
       this.getBlindCurrentPosition();
-      this.blindAutoUpdate();
 
     }, this.updateInterval + Math.floor(Math.random() * 10000));
 
@@ -716,10 +767,9 @@ class LogoAccessory {
 
   garagedoorAutoUpdate() {
 
-    setTimeout(() => {
+    this.garagedoorTimer = setTimeout(() => {
 
       this.getGarageDoorCurrentDoorState();
-      this.garagedoorAutoUpdate();
 
     }, this.updateInterval + Math.floor(Math.random() * 10000));
 
@@ -727,10 +777,9 @@ class LogoAccessory {
 
   lightbulbAutoUpdate() {
 
-    setTimeout(() => {
+    this.lightbulbTimer = setTimeout(() => {
 
       this.getLightbulbBrightness();
-      this.lightbulbAutoUpdate();
 
     }, this.updateInterval + Math.floor(Math.random() * 10000));
 
