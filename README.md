@@ -1,7 +1,7 @@
 Homebridge-Logo-TS
 ==================
 
-<img src="Standartraum.png" align="right" alt="Unlocking Door">
+<img src="Standardraum.png" align="right" alt="Unlocking Door">
 
 Use a Siemens LOGO! PLC for switch on whatever you want.  
 Communicate with LOGO! 8.SF4 over Modbus and with LOGO! 0BA7 / 0BA8 over Snap7.  
