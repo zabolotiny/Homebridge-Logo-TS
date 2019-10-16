@@ -2,8 +2,8 @@ Homebridge-Logo-TS
 ==================
 
 Use a Siemens LOGO! PLC for switch on whatever you want.  
-Communicate with LOGO 8.SF4 over Modbus and with LOGO! 0BA7 / 0BA8 over Snap7.  
-Type of Accessory: Switch, Blind, Garagedoor and Lightbulb.  
+Communicate with LOGO! 8.SF4 over Modbus and with LOGO! 0BA7 / 0BA8 over Snap7.  
+Type of Accessory: Switch, Blind, Garage Door and Lightbulb.  
 
 - The plugin that this one is based on: [homebridge-tesla](https://github.com/nfarina/homebridge-tesla).  
 
@@ -14,7 +14,7 @@ Type of Accessory: Switch, Blind, Garagedoor and Lightbulb.
 1. Download or clone Homebridge-Logo-TS.
 2. Install: $ npm install
 3. Build:   $ npm run build
-4. Run:     $ /usr/local/bin/homebridge -D -P /home/pi/Homebridge-Logo-TS/
+4. Run:     $ /usr/local/bin/homebridge -D -P ~/Homebridge-Logo-TS/
 
 <!--## Installation
 
