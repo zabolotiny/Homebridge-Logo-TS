@@ -35,30 +35,6 @@ export class Snap7Logo {
         this.log         = logFunction;
     }
 
-    /*
-    SetLogoConnectionParams(target_ip: string, target_local_TSAP: number, target_remote_TSAP: number) {
-
-        this.s7client.SetConnectionParams(target_ip, target_local_TSAP, target_remote_TSAP);
-    }
-
-    ConnectLogo(debugLog: number, log: any) {
-
-        this.s7client.Connect(function(err: Error) {
-            if(err) {
-                if (debugLog == 1) {
-                    log(' >> Connection failed. Code #' + err + ' - ' + this.s7client.ErrorText(err));
-                }
-            }
-        });
-    }
-
-    DisconnectLogo(): number {
-
-        return s7client.Disconnect();
-
-    }
-    */
-
     ReadLogo(item: string, callBack: (value: number) => any) {
 
         var debugLog: number = this.debugMsgLog;
@@ -183,7 +159,7 @@ export class Snap7Logo {
                                 }
                                 return -1;
                             }
-                            
+
                             s7client.Disconnect();
                         });
                     

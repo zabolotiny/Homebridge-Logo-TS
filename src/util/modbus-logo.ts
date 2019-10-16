@@ -27,7 +27,6 @@ export class LogoAddress {
 
 export class ModBusLogo {
 
-    // client = new ModbusRTU();
     target_ip: string;
     target_port: number;
     debugMsgLog: number;
