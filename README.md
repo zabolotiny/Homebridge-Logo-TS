@@ -5,7 +5,22 @@ Homebridge-Logo-TS
 
 Use a Siemens LOGO! PLC for switch on whatever you want.  
 Communicate with LOGO! 8.SF4 over Modbus and with LOGO! 0BA7 / 0BA8 over Snap7.  
-Type of Accessory: Switch, Blind, Garage Door and Lightbulb.  
+
+Type of Accessory:
+- Switch
+- Blind
+- Garage Door
+- Lightbulb
+
+Type of Sensor Accessory:
+- Light Sensor
+- Motion Sensor
+- Contact Sensor
+- Temperature Sensor
+- Humidity Sensor
+- Carbon Dioxide Sensor
+- Air Quality Sensor
+
 
 - The plugin that this one is based on: [homebridge-tesla](https://github.com/nfarina/homebridge-tesla).  
 
