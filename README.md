@@ -19,12 +19,11 @@ Type of Sensor Accessory:
 - Temperature Sensor
 - Humidity Sensor
 - Carbon Dioxide Sensor
-- Air Quality Sensor
+- Air Quality Sensor  
 
 
-- The plugin that this one is based on: [homebridge-tesla](https://github.com/nfarina/homebridge-tesla).  
-
-- If you use Homebridge-Logo-TS please donate: [PayPal.Me/Sinclair81](https://www.PayPal.Me/Sinclair81) !!  
+The plugin that this one is based on: [homebridge-tesla](https://github.com/nfarina/homebridge-tesla).  
+If you use Homebridge-Logo-TS please donate: [PayPal.Me/Sinclair81](https://www.PayPal.Me/Sinclair81) !!  
 
 
 ## Beta Test
