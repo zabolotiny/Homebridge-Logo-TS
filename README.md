@@ -60,6 +60,14 @@ Name                     | Value               | Required | Option for | Notes
 `lightbulbSetOff`        | "V7.1"              | no       | "lightbulb" | Lightbulb Set Off - Mn or Vn.n
 `lightbulbSetBrightness` | "VW70"              | no       | "lightbulb" | Lightbulb Set Brightness - AMn or VWn
 `lightbulbGetBrightness` | "VW72"              | no       | "lightbulb" | Lightbulb Get Brightness - AMn or VWn
+`lightLevel`             | "AM3"               | no       | "lightSensor"         | Light Sensor for Current Ambient Light Level in Lux
+`motionDetected`         | "M9"                | no       | "motionSensor"        | Motion Sensor
+`contactDetected`        | "M15"               | no       | "contactSensor"       | Contact Sensor
+`temperature`            | "AM2"               | no       | "temperatureSensor"   | Temperature Sensor for Current Temperature in °C
+`humidity`               | "AM1"               | no       | "humiditySensor"      | Humidity Sensor for Current Relative Humidity in %
+`carbonDioxideLevel`     | "AM3"               | no       | "carbonDioxideSensor" | Carbon Dioxide Sensor for Carbon Dioxide Level
+`carbonDioxideLimit`     | 1000                | no       | "carbonDioxideSensor" | Carbon Dioxide Sensor for Carbon Dioxide Peak Level
+`carbonDioxideLevel`     | "AM3"               | no       | "airQualitySensor"    | Air Quality Sensor for Air Quality (Carbon Dioxide Level)
 
 
 ## Configuration
@@ -191,6 +199,88 @@ Name                     | Value               | Required | Option for | Notes
         "lightbulbSetOff": "V7.1",
         "lightbulbSetBrightness": "VW70",
         "lightbulbGetBrightness": "VW72"
+    },
+    {
+        "accessory": "Logo-TS",
+        "name": "Light Sensor",
+        "interface": "snap7",
+        "ip": "10.0.0.200",
+        "logoType": "0BA7",
+        "localTSAP": "0x1200",
+        "remoteTSAP": "0x2200",
+        "updateInterval": 30000,
+        "debugMsgLog": 1,
+        "type": "lightSensor",
+        "lightLevel": "AM3"
+    },
+    {
+        "accessory": "Logo-TS",
+        "name": "Motion Sensor",
+        "interface": "snap7",
+        "ip": "10.0.0.200",
+        "logoType": "0BA7",
+        "localTSAP": "0x1200",
+        "remoteTSAP": "0x2200",
+        "updateInterval": 30000,
+        "debugMsgLog": 1,
+        "type": "motionSensor",
+        "motionDetected": "M9"
+    },
+    {
+        "accessory": "Logo-TS",
+        "name": "Contact Sensor",
+        "interface": "modbus",
+        "ip": "10.0.0.100",
+        "port": 505,
+        "updateInterval": 30000,
+        "debugMsgLog": 1,
+        "type": "contactSensor",
+        "contactDetected": "M15"
+    },
+    {
+        "accessory": "Logo-TS",
+        "name": "Temperature Sensor",
+        "interface": "modbus",
+        "ip": "10.0.0.100",
+        "port": 505,
+        "updateInterval": 30000,
+        "debugMsgLog": 1,
+        "type": "temperatureSensor",
+        "temperature": "AM2"
+    },
+    {
+        "accessory": "Logo-TS",
+        "name": "Humidity Sensor",
+        "interface": "modbus",
+        "ip": "10.0.0.100",
+        "port": 505,
+        "updateInterval": 30000,
+        "debugMsgLog": 1,
+        "type": "humiditySensor",
+        "humidity": "AM1"
+    },
+    {
+        "accessory": "Logo-TS",
+        "name": "Carbon Dioxide Sensor",
+        "interface": "modbus",
+        "ip": "10.0.0.100",
+        "port": 505,
+        "updateInterval": 30000,
+        "debugMsgLog": 1,
+        "type": "carbonDioxideSensor",
+        "carbonDioxideLevel": "AM3",
+        "carbonDioxideLimit": 1000
+    },
+    {
+        "accessory": "Logo-TS",
+        "name": "Air Quality Sensor",
+        "interface": "modbus",
+        "ip": "10.0.0.100",
+        "port": 505,
+        "updateInterval": 30000,
+        "debugMsgLog": 1,
+        "type": "airQualitySensor",
+        "carbonDioxideLevel": "AM3"
     }
 ]
 ```

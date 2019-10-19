@@ -15,10 +15,18 @@ const logoType0BA7: string = "0BA7"
 const logoType0BA8: string = "0BA8"
 const logoType8SF4: string = "8.SF4"
 
-const switchType: string     = "switch";
-const blindType: string      = "blind";
-const garagedoorType: string = "garagedoor";
-const lightbulbType: string  = "lightbulb";
+const switchType: string              = "switch";
+const blindType: string               = "blind";
+const garagedoorType: string          = "garagedoor";
+const lightbulbType: string           = "lightbulb";
+
+const lightSensorType: string         = "lightSensor";
+const motionSensorType: string        = "motionSensor";
+const contactSensorType: string       = "contactSensor";
+const temperatureSensorType: string   = "temperatureSensor";
+const humiditySensorType: string      = "humiditySensor";
+const carbonDioxideSensorType: string = "carbonDioxideSensor";
+const airQualitySensorType: string    = "airQualitySensor";
 
 const accessoryAnalogTimeOut = 500;
 
@@ -66,6 +74,14 @@ class LogoAccessory {
   lightbulbSetBrightness: string;
   lightbulbGetBrightness: string;
 
+  lightLevel: string;
+  motionDetected: string;
+  contactDetected: string;
+  temperature: string;
+  humidity: string;
+  carbonDioxideLevel: string;
+  carbonDioxideLimit: number;
+
   // Runtime state.
   logo: any;
   lastBlindTargetPos: number;
@@ -76,16 +92,24 @@ class LogoAccessory {
   lastLightbulbTargetBrightness: number;
   lastLightbulbTargetBrightnessTime: number;
   lastLightbulbTargetBrightnessTimerSet: boolean;
-  switchTimer: any;
-  blindTimer: any;
-  garagedoorTimer: any;
-  lightbulbTimer: any;
+  lastCarbonDioxideDetected: boolean;
+  lastCarbonDioxideLevel: number;
+  lastCarbonDioxidePeakLevel: number;
+  lastAirQuality: number;
+  updateTimer: any;
 
   // Services exposed.
   switchService: any;
   blindService: any;
   garagedoorService: any;
   lightbulbService: any;
+  lightSensorService: any;
+  motionSensorService: any;
+  contactSensorService: any;
+  temperatureSensorService: any;
+  humiditySensorService: any;
+  carbonDioxideSensorService: any;
+  airQualitySensorService: any;
 
   constructor(log: any, config: any) {
     this.log            = log;
@@ -121,6 +145,24 @@ class LogoAccessory {
       if (this.type == lightbulbType) {
         this.lightbulbAutoUpdate();
       }
+      if (this.type == lightSensorType) {
+        this.lightSensorAutoUpdate();
+      }
+      if (this.type == motionSensorType) {
+        this.motionSensorAutoUpdate();
+      }
+      if (this.type == contactSensorType) {
+        this.contactSensorAutoUpdate();
+      }
+      if (this.type == temperatureSensorType) {
+        this.temperatureSensorAutoUpdate();
+      }
+      if (this.type == humiditySensorType) {
+        this.humiditySensorAutoUpdate();
+      }
+      if (this.type == carbonDioxideSensorType || this.type == airQualitySensorType) {
+        this.carbonDioxideSensorAutoUpdate();
+      }
     }
 
     this.lastBlindTargetPos                    = -1;
@@ -131,8 +173,12 @@ class LogoAccessory {
     this.lastLightbulbTargetBrightness         = -1;
     this.lastLightbulbTargetBrightnessTime     = -1;
     this.lastLightbulbTargetBrightnessTimerSet = false;
+    this.lastCarbonDioxideDetected             = false;
+    this.lastCarbonDioxideLevel                = -1;
+    this.lastCarbonDioxidePeakLevel            = -1;
+    this.lastAirQuality                        = 0; // UNKNOWN = 0;
 
-    // Characteristic "Manufacturer"      --> pjson.author.name 
+    // Characteristic "Manufacturer"      --> pjson.author.name
     // Characteristic "Model"             --> this.type
     // Characteristic "Firmware Revision" --> pjson.version
     // Characteristic "Hardware Revision" --> this.logoType
@@ -140,7 +186,7 @@ class LogoAccessory {
     // Characteristic "Version"
 
     //
-    // LOGO Switch Service
+    // LOGO! Switch Service
     //
 
     this.switchGet        = config["switchGet"]    || "Q1";
@@ -148,7 +194,7 @@ class LogoAccessory {
     this.switchSetOff     = config["switchSetOff"] || "V3.0";
 
     if (this.type == switchType) {
-      
+
       const switchService = new Service.Switch(
         this.name,
         "switch",
@@ -164,7 +210,7 @@ class LogoAccessory {
     }
 
     //
-    // LOGO Blind Service
+    // LOGO! Blind Service
     //
 
     this.blindSetPos     = config["blindSetPos"]    || "VW50";
@@ -176,7 +222,7 @@ class LogoAccessory {
     this.blindGetUpDown  = config["blindGetUpDown"] || "V5.2";
 
     if (this.type == blindType) {
-      
+
       const blindService = new Service.WindowCovering(
         this.name,
         "blind",
@@ -200,7 +246,7 @@ class LogoAccessory {
     }
 
     //
-    // LOGO GarageDoor Service
+    // LOGO! GarageDoor Service
     //
 
     this.garagedoorOpen       = config["garagedoorOpen"]  || "V6.0";
@@ -208,7 +254,7 @@ class LogoAccessory {
     this.garagedoorState      = config["garagedoorState"] || "V6.2";
 
     if (this.type == garagedoorType) {
-      
+
       const garagedoorService = new Service.GarageDoorOpener(
         this.name,
         "garagedoor",
@@ -232,7 +278,7 @@ class LogoAccessory {
     }
 
     //
-    // LOGO LightBulb Service
+    // LOGO! LightBulb Service
     //
 
     this.lightbulbSetOn         = config["lightbulbSetOn"]         || "V7.0";
@@ -241,7 +287,7 @@ class LogoAccessory {
     this.lightbulbGetBrightness = config["lightbulbGetBrightness"] || "VW72";
 
     if (this.type == lightbulbType) {
-      
+
       const lightbulbService = new Service.Lightbulb(
         this.name,
         "lightbulb",
@@ -261,22 +307,239 @@ class LogoAccessory {
 
     }
 
+    //
+    // LOGO! Light Sensor Service
+    //
+
+    this.lightLevel = config["lightLevel"] || "AM3";
+
+    if (this.type == lightSensorType) {
+
+      const lightSensorService = new Service.LightSensor(
+        this.name,
+        "lightSensor",
+      );
+
+      lightSensorService
+        .getCharacteristic(Characteristic.StatusActive)
+        .on("get", callbackify(this.getStatusActive));
+
+      lightSensorService
+        .getCharacteristic(Characteristic.CurrentAmbientLightLevel)
+        .on("get", callbackify(this.getCurrentAmbientLightLevel));
+
+      this.lightSensorService = lightSensorService;
+
+    }
+
+    //
+    // LOGO! Motion Sensor Service
+    //
+
+    this.motionDetected = config["motionDetected"] || "M9";
+
+    if (this.type == motionSensorType) {
+
+      const motionSensorService = new Service.MotionSensor(
+        this.name,
+        "motionSensor",
+      );
+
+      motionSensorService
+        .getCharacteristic(Characteristic.StatusActive)
+        .on("get", callbackify(this.getStatusActive));
+
+      motionSensorService
+        .getCharacteristic(Characteristic.MotionDetected)
+        .on("get", callbackify(this.getMotionDetected));
+
+      this.motionSensorService = motionSensorService;
+
+    }
+
+    //
+    // LOGO! Contact Sensor Service
+    //
+
+    this.contactDetected = config["contactDetected"] || "M15";
+
+    if (this.type == contactSensorType) {
+
+      const contactSensorService = new Service.ContactSensor(
+        this.name,
+        "contactSensor",
+      );
+
+      contactSensorService
+        .getCharacteristic(Characteristic.StatusActive)
+        .on("get", callbackify(this.getStatusActive));
+
+      contactSensorService
+        .getCharacteristic(Characteristic.ContactSensorState)
+        .on("get", callbackify(this.getContactSensorState));
+
+      this.contactSensorService = contactSensorService;
+
+    }
+
+    //
+    // LOGO! Temperature Sensor Service
+    //
+
+    this.temperature = config["temperature"] || "AM2";
+
+    if (this.type == temperatureSensorType) {
+
+      const temperatureSensorService = new Service.TemperatureSensor(
+        this.name,
+        "temperatureSensor",
+      );
+
+      temperatureSensorService
+        .getCharacteristic(Characteristic.StatusActive)
+        .on("get", callbackify(this.getStatusActive));
+
+      temperatureSensorService
+        .getCharacteristic(Characteristic.CurrentTemperature)
+        .on("get", callbackify(this.getCurrentTemperature));
+
+      this.temperatureSensorService = temperatureSensorService;
+
+    }
+
+    //
+    // LOGO! Humidity Sensor Service
+    //
+
+    this.humidity = config["humidity"] || "AM1";
+
+    if (this.type == humiditySensorType) {
+
+      const humiditySensorService = new Service.HumiditySensor(
+        this.name,
+        "humiditySensor",
+      );
+
+      humiditySensorService
+        .getCharacteristic(Characteristic.StatusActive)
+        .on("get", callbackify(this.getStatusActive));
+
+      humiditySensorService
+        .getCharacteristic(Characteristic.CurrentRelativeHumidity)
+        .on("get", callbackify(this.getCurrentRelativeHumidity));
+
+      this.humiditySensorService = humiditySensorService;
+
+    }
+
+    //
+    // LOGO! Carbon Dioxide Sensor Service
+    //
+    // 1000ppm CO2 (CO2 in Air 0.04% = ~400ppm)
+
+    this.carbonDioxideLevel = config["carbonDioxideLevel"] || "AM3";
+    this.carbonDioxideLimit = config["carbonDioxideLimit"] || 1000;
+
+    if (this.type == carbonDioxideSensorType) {
+
+      const carbonDioxideSensorService = new Service.CarbonDioxideSensor(
+        this.name,
+        "carbonDioxideSensor",
+      );
+
+      carbonDioxideSensorService
+        .getCharacteristic(Characteristic.StatusActive)
+        .on("get", callbackify(this.getStatusActive));
+
+      carbonDioxideSensorService
+        .getCharacteristic(Characteristic.CarbonDioxideDetected)
+        .on("get", callbackify(this.getCarbonDioxideDetected));
+
+      carbonDioxideSensorService
+        .getCharacteristic(Characteristic.CarbonDioxideLevel)
+        .on("get", callbackify(this.getCarbonDioxideLevel));
+
+      carbonDioxideSensorService
+        .getCharacteristic(Characteristic.CarbonDioxidePeakLevel)
+        .on("get", callbackify(this.getCarbonDioxidePeakLevel));
+
+      this.carbonDioxideSensorService = carbonDioxideSensorService;
+
+    }
+
+    //
+    // LOGO! Air Quality Sensor Service
+    //
+    // IDA1: < 800
+    // IDA2: > 800  - 1000
+    // IDA3: > 1000 - 1400
+    // IDA4: > 1400
+
+    // --> this.carbonDioxideLevel from LOGO! Carbon Dioxide Sensor Service
+
+    if (this.type == airQualitySensorType) {
+
+      const airQualitySensorService = new Service.AirQualitySensor(
+        this.name,
+        "airQualitySensor",
+      );
+
+      airQualitySensorService
+        .getCharacteristic(Characteristic.StatusActive)
+        .on("get", callbackify(this.getStatusActive));
+
+      airQualitySensorService
+        .getCharacteristic(Characteristic.AirQuality)
+        .on("get", callbackify(this.getAirQuality));
+
+      airQualitySensorService
+        .getCharacteristic(Characteristic.CarbonDioxideLevel)
+        .on("get", callbackify(this.getCarbonDioxideLevel));
+
+      this.airQualitySensorService = airQualitySensorService;
+
+    }
+  
   }
 
   getServices() {
     if (this.type == blindType) {
       return [ this.blindService ];
+
     } else if (this.type == garagedoorType) {
       return [ this.garagedoorService ];
+
     } else if (this.type == lightbulbType) {
       return [ this.lightbulbService ];
+
+    } else if (this.type == lightSensorType) {
+      return [ this.lightSensorService ];
+
+    } else if (this.type == motionSensorType) {
+      return [ this.motionSensorService ];
+
+    } else if (this.type == contactSensorType) {
+      return [ this.contactSensorService ];
+
+    } else if (this.type == temperatureSensorType) {
+      return [ this.temperatureSensorService ];
+
+    } else if (this.type == humiditySensorType) {
+      return [ this.humiditySensorService ];
+
+    } else if (this.type == carbonDioxideSensorType) {
+      return [ this.carbonDioxideSensorService ];
+
+    } else if (this.type == airQualitySensorType) {
+      return [ this.airQualitySensorService ];
+
     } else {
       return [ this.switchService ];
     }
   }
 
   //
-  // LOGO Switch Service
+  // LOGO! Switch Service
   //
 
   getSwitchOn = async () => {
@@ -284,8 +547,8 @@ class LogoAccessory {
     // Cancel timer if the call came from the Home-App and not from the update interval.
     // To avoid duplicate queries at the same time.
     if (this.updateInterval > 0) {
-      clearTimeout(this.switchTimer);
-      this.switchTimer = 0;
+      clearTimeout(this.updateTimer);
+      this.updateTimer = 0;
     }
 
     this.logo.ReadLogo(this.switchGet, async (value: number) => {
@@ -296,7 +559,7 @@ class LogoAccessory {
         this.debugLogBool("Switch ?", on);
 
         await wait(1);
-        
+
         this.switchService.updateCharacteristic(
           Characteristic.On,
           on
@@ -323,7 +586,7 @@ class LogoAccessory {
   };
 
   //
-  // LOGO Blind Service
+  // LOGO! Blind Service
   //
 
   getBlindCurrentPosition = async () => {
@@ -331,8 +594,8 @@ class LogoAccessory {
     // Cancel timer if the call came from the Home-App and not from the update interval.
     // To avoid duplicate queries at the same time.
     if (this.updateInterval > 0) {
-      clearTimeout(this.blindTimer);
-      this.blindTimer = 0;
+      clearTimeout(this.updateTimer);
+      this.updateTimer = 0;
     }
 
     if (!this.blindDigital) {
@@ -344,16 +607,16 @@ class LogoAccessory {
           let pos = 100 - value;
           pos = this.blindCurrentPositionIsNearTargetPosition(pos, this.lastBlindTargetPos);
           this.debugLogNum("BlindCurrentPosition ?", pos);
-    
+
           await wait(1);
-          
+
           this.blindService.updateCharacteristic(
             Characteristic.CurrentPosition,
             pos
           );
 
           await wait(1);
-          
+
           this.blindService.updateCharacteristic(
             Characteristic.PositionState,
             2
@@ -363,21 +626,21 @@ class LogoAccessory {
             this.lastBlindTargetPos = pos;
 
             await wait(1);
-          
+
             this.blindService.updateCharacteristic(
               Characteristic.TargetPosition,
               pos
             );
           }
-          
+
         }
 
         if (this.updateInterval > 0) {
           this.blindAutoUpdate();
         }
-  
+
       });
-      
+
     } else {
 
       this.logo.ReadLogo(this.blindGetUpDown, async (value: number) => {
@@ -386,29 +649,29 @@ class LogoAccessory {
 
           const pos = value == 1 ? 100 : 0;
           this.debugLogNum("BlindCurrentPosition ?", pos);
-    
+
           await wait(1);
-          
+
           this.blindService.updateCharacteristic(
             Characteristic.CurrentPosition,
             pos
           );
 
           await wait(1);
-          
+
           this.blindService.updateCharacteristic(
             Characteristic.PositionState,
             2
           );
-          
+
         }
 
         if (this.updateInterval > 0) {
           this.blindAutoUpdate();
         }
-  
+
       });
-      
+
     }
 
   };
@@ -456,29 +719,29 @@ class LogoAccessory {
 
           const state = this.blindLogoStateToHomebridgeState(value);
           this.debugLogNum("BlindPositionState ?", state);
-    
+
           await wait(1);
-          
+
           this.blindService.updateCharacteristic(
             Characteristic.PositionState,
             state
           );
-          
+
         }
-  
+
       });
-      
+
     } else {
 
       this.debugLogNum("BlindPositionState ?", 2);
       return 2;
-      
+
     }
 
   };
 
   //
-  // LOGO GarageDoor Service
+  // LOGO! GarageDoor Service
   //
 
   getGarageDoorCurrentDoorState = async () => {
@@ -487,8 +750,8 @@ class LogoAccessory {
     // Cancel timer if the call came from the Home-App and not from the update interval.
     // To avoid duplicate queries at the same time.
     if (this.updateInterval > 0) {
-      clearTimeout(this.garagedoorTimer);
-      this.garagedoorTimer = 0;
+      clearTimeout(this.updateTimer);
+      this.updateTimer = 0;
     }
 
     this.logo.ReadLogo(this.garagedoorState, async (value: number) => {
@@ -500,7 +763,7 @@ class LogoAccessory {
         this.debugLogNum("GarageDoorCurrentDoorState ?", state);
 
         await wait(1);
-        
+
         this.garagedoorService.updateCharacteristic(
           Characteristic.CurrentDoorState,
           state
@@ -509,13 +772,13 @@ class LogoAccessory {
         if (state != this.lastGaragedoorTargetState) {
           this.lastGaragedoorTargetState = state;
           await wait(1);
-        
+
           this.garagedoorService.updateCharacteristic(
             Characteristic.TargetDoorState,
             state
           );
         }
-          
+
       }
 
       if (this.updateInterval > 0) {
@@ -535,7 +798,7 @@ class LogoAccessory {
     } else {
       return 1;
     }
-  
+
   };
 
   setGarageDoorTargetDoorState = async (state: number) => {
@@ -571,7 +834,7 @@ class LogoAccessory {
   };
 
   //
-  // LOGO LightBulb Service
+  // LOGO! LightBulb Service
   //
 
   getLightbulbOn = async () => {
@@ -587,7 +850,7 @@ class LogoAccessory {
     let new_on: number = on ? 1 : 0;
 
     if ((this.lastLightbulbOn == -1) || (this.lastLightbulbOn != new_on)) {
-      
+
       this.debugLogBool("Set Lightbulb to", on);
       this.lastLightbulbOn = new_on;
 
@@ -606,8 +869,8 @@ class LogoAccessory {
     // Cancel timer if the call came from the Home-App and not from the update interval.
     // To avoid duplicate queries at the same time.
     if (this.updateInterval > 0) {
-      clearTimeout(this.lightbulbTimer);
-      this.lightbulbTimer = 0;
+      clearTimeout(this.updateTimer);
+      this.updateTimer = 0;
     }
 
     this.logo.ReadLogo(this.lightbulbGetBrightness, async (value: number) => {
@@ -618,19 +881,19 @@ class LogoAccessory {
         this.lastLightbulbOn = value > 0 ? 1 : 0;
 
         await wait(1);
-        
+
         this.lightbulbService.updateCharacteristic(
           Characteristic.On,
           (value > 0 ? true : false)
         );
 
         await wait(1);
-        
+
         this.lightbulbService.updateCharacteristic(
           Characteristic.Brightness,
           value
         );
-          
+
       }
 
       if (this.updateInterval > 0) {
@@ -648,6 +911,331 @@ class LogoAccessory {
     if (!this.lastLightbulbTargetBrightnessTimerSet) {
       this.lightbulbTargetBrightnessTimeout();
     }
+
+  };
+
+  //
+  // LOGO! Sensor Service's
+  //
+
+  getStatusActive = async () => {
+    return true;
+  };
+
+  //
+  // LOGO! Light Sensor Service
+  //
+
+  getCurrentAmbientLightLevel = async () => {
+
+    // Cancel timer if the call came from the Home-App and not from the update interval.
+    // To avoid duplicate queries at the same time.
+    if (this.updateInterval > 0) {
+      clearTimeout(this.updateTimer);
+      this.updateTimer = 0;
+    }
+
+    this.logo.ReadLogo(this.lightLevel, async (value: number) => {
+
+      if (value != -1) {
+
+        this.debugLogNum("CurrentAmbientLightLevel ?", value);
+
+        await wait(1);
+
+        this.lightSensorService.updateCharacteristic(
+          Characteristic.CurrentAmbientLightLevel,
+          value
+        );
+
+      }
+
+      if (this.updateInterval > 0) {
+        this.lightSensorAutoUpdate();
+      }
+
+    });
+
+  };
+
+  //
+  // LOGO! Motion Sensor Service
+  //
+
+  getMotionDetected = async () => {
+
+    // Cancel timer if the call came from the Home-App and not from the update interval.
+    // To avoid duplicate queries at the same time.
+    if (this.updateInterval > 0) {
+      clearTimeout(this.updateTimer);
+      this.updateTimer = 0;
+    }
+
+    this.logo.ReadLogo(this.motionDetected, async (value: number) => {
+
+      if (value != -1) {
+
+        const state = value == 1 ? true : false;
+        this.debugLogBool("MotionDetected ?", state);
+
+        await wait(1);
+
+        this.motionSensorService.updateCharacteristic(
+          Characteristic.MotionDetected,
+          state
+        );
+
+      }
+
+      if (this.updateInterval > 0) {
+        this.motionSensorAutoUpdate();
+      }
+
+    });
+
+  };
+
+  //
+  // LOGO! Contact Sensor Service
+  //
+
+  getContactSensorState = async () => {
+    // CONTACT_DETECTED = 0; CONTACT_NOT_DETECTED = 1;
+
+    // Cancel timer if the call came from the Home-App and not from the update interval.
+    // To avoid duplicate queries at the same time.
+    if (this.updateInterval > 0) {
+      clearTimeout(this.updateTimer);
+      this.updateTimer = 0;
+    }
+
+    this.logo.ReadLogo(this.contactDetected, async (value: number) => {
+      // LOGO! return 1 for contact / close
+
+      if (value != -1) {
+
+        const state = value == 1 ? 0 : 1;
+        this.debugLogNum("ContactSensorState ?", state);
+
+        await wait(1);
+
+        this.contactSensorService.updateCharacteristic(
+          Characteristic.ContactSensorState,
+          state
+        );
+
+      }
+
+      if (this.updateInterval > 0) {
+        this.contactSensorAutoUpdate();
+      }
+
+    });
+
+  };
+
+  //
+  // LOGO! Temperature Sensor Service
+  //
+
+  getCurrentTemperature = async () => {
+
+    // Cancel timer if the call came from the Home-App and not from the update interval.
+    // To avoid duplicate queries at the same time.
+    if (this.updateInterval > 0) {
+      clearTimeout(this.updateTimer);
+      this.updateTimer = 0;
+    }
+
+    this.logo.ReadLogo(this.temperature, async (value: number) => {
+
+      if (value != -1) {
+
+        let temp = value / 10;
+        this.debugLogNum("CurrentTemperature ?", temp);
+
+        await wait(1);
+
+        this.temperatureSensorService.updateCharacteristic(
+          Characteristic.CurrentTemperature,
+          temp
+        );
+
+      }
+
+      if (this.updateInterval > 0) {
+        this.temperatureSensorAutoUpdate();
+      }
+
+    });
+
+  };
+
+  //
+  // LOGO! Humidity Sensor Service
+  //
+
+  getCurrentRelativeHumidity = async () => {
+
+    // Cancel timer if the call came from the Home-App and not from the update interval.
+    // To avoid duplicate queries at the same time.
+    if (this.updateInterval > 0) {
+      clearTimeout(this.updateTimer);
+      this.updateTimer = 0;
+    }
+
+    this.logo.ReadLogo(this.humidity, async (value: number) => {
+
+      if (value != -1) {
+
+        let humi = value / 10;
+        this.debugLogNum("CurrentRelativeHumidity ?", humi);
+
+        await wait(1);
+
+        this.humiditySensorService.updateCharacteristic(
+          Characteristic.CurrentRelativeHumidity,
+          humi
+        );
+
+      }
+
+      if (this.updateInterval > 0) {
+        this.humiditySensorAutoUpdate();
+      }
+
+    });
+
+  };
+
+  //
+  // LOGO! Carbon Dioxide Sensor Service
+  //
+  // 1000ppm CO2 (CO2 in Air 0.04% = ~400ppm)
+
+  getCarbonDioxideDetected = async () => {
+    // CO2_LEVELS_NORMAL = 0; CO2_LEVELS_ABNORMAL = 1;
+
+    let state = this.lastCarbonDioxideDetected == true ? 1 : 0;
+    this.debugLogNum("CarbonDioxideDetected ?", state);
+    return state;
+
+  };
+
+  getCarbonDioxideLevel = async () => {
+
+    // Cancel timer if the call came from the Home-App and not from the update interval.
+    // To avoid duplicate queries at the same time.
+    if (this.updateInterval > 0) {
+      clearTimeout(this.updateTimer);
+      this.updateTimer = 0;
+    }
+
+    this.logo.ReadLogo(this.carbonDioxideLevel, async (value: number) => {
+
+      if (value != -1) {
+
+        this.lastCarbonDioxideLevel = value;
+        this.debugLogNum("CarbonDioxideLevel ?", value);
+
+        if (this.type == carbonDioxideSensorType) {
+
+          await wait(1);
+
+          this.carbonDioxideSensorService.updateCharacteristic(
+            Characteristic.CarbonDioxideLevel,
+            value
+          );
+
+          let newCarbonDioxideDetected = value > this.carbonDioxideLimit ? true : false;
+
+          if (newCarbonDioxideDetected != this.lastCarbonDioxideDetected) {
+
+            this.lastCarbonDioxideDetected = newCarbonDioxideDetected;
+
+            // CO2_LEVELS_NORMAL = 0; CO2_LEVELS_ABNORMAL = 1;
+            let state = newCarbonDioxideDetected == true ? 1 : 0;
+
+            await wait(1);
+
+            this.carbonDioxideSensorService.updateCharacteristic(
+              Characteristic.CarbonDioxideDetected,
+              state
+            );
+          }
+
+          if (value > this.lastCarbonDioxidePeakLevel) {
+            this.lastCarbonDioxidePeakLevel = value;
+            
+            await wait(1);
+
+            this.carbonDioxideSensorService.updateCharacteristic(
+              Characteristic.CarbonDioxidePeakLevel,
+              value
+            );
+          }
+
+        }
+
+        if (this.type == airQualitySensorType) {
+
+          await wait(1);
+
+          this.airQualitySensorService.updateCharacteristic(
+            Characteristic.CarbonDioxideLevel,
+            value
+          );
+
+          let newAirQuality = this.airQuality(value);
+
+          if (newAirQuality != this.lastAirQuality) {
+
+            this.lastAirQuality = newAirQuality;
+
+            await wait(1);
+
+            this.airQualitySensorService.updateCharacteristic(
+              Characteristic.AirQuality,
+              newAirQuality
+            );
+            
+          }
+          
+        }
+
+      }
+
+      if (this.updateInterval > 0) {
+        this.carbonDioxideSensorAutoUpdate();
+      }
+
+    });
+
+  };
+
+  getCarbonDioxidePeakLevel = async () => {
+    
+    this.debugLogNum("CarbonDioxidePeakLevel ?", this.lastCarbonDioxidePeakLevel);
+    return this.lastCarbonDioxidePeakLevel;
+
+  };
+
+  //
+  // LOGO! Air Quality Sensor Service
+  //
+
+  // --> this.carbonDioxideLevel from LOGO! Carbon Dioxide Sensor Service
+
+  getAirQuality = async () => {
+    // UNKNOWN = 0;
+    // EXCELLENT = 1; // CO2 <  800ppm      (IDA 1)
+    // GOOD = 2;      // CO2 >  800-1000ppm (IDA 2)
+    // FAIR = 3;      // CO2 > 1000-1400ppm (IDA 3)
+    // INFERIOR = 4;  // CO2 > 1400-1800ppm (IDA 4)
+    // POOR = 5;      // CO2 > 1800ppm
+    
+    this.debugLogNum("AirQuality ?", this.lastAirQuality);
+    return this.lastAirQuality;
 
   };
 
@@ -677,7 +1265,7 @@ class LogoAccessory {
           this.lastBlindTargetPosTimerSet = false;
 
           if (!this.blindDigital) {
-            
+
             this.logo.WriteLogo(this.blindSetPos, (100 - this.lastBlindTargetPos), 0);
 
           } else {
@@ -687,7 +1275,7 @@ class LogoAccessory {
             } else {
               this.logo.WriteLogo(this.blindSetDown, this.buttonValue, this.pushButton);
             }
-            
+
           }
 
         } else {
@@ -700,11 +1288,11 @@ class LogoAccessory {
   }
 
   blindLogoStateToHomebridgeState(value: number): number {
-    if (value == 0) {        // Logo Stop
+    if (value == 0) {        // LOGO! Stop
       return 2;              // Homebridge STOPPED
-    } else if (value == 1) { // Logo Up
+    } else if (value == 1) { // LOGO! Up
       return 0;              // Homebridge DECREASING
-    } else if (value == 2) { // Logo Down
+    } else if (value == 2) { // LOGO! Down
       return 1;              // Homebridge INCREASING
     } else {
       return 2;              // Homebridge STOPPED
@@ -741,13 +1329,29 @@ class LogoAccessory {
           this.lastLightbulbTargetBrightnessTimerSet = true;
           this.lightbulbTargetBrightnessTimeout();
         }
-        
+
     }, 100);
+  }
+
+  airQuality(value: number): number {
+    let airQuality = 0;                           // UNKNOWN = 0;
+    if (value < 800) {
+      airQuality = 1;                             // EXCELLENT = 1; // CO2 <  800ppm      (IDA 1)
+    } else if (value >= 800 && value < 1000 ) {
+      airQuality = 2;                             // GOOD = 2;      // CO2 >  800-1000ppm (IDA 2)
+    } else if (value >= 1000 && value < 1400 ) {
+      airQuality = 3;                             // FAIR = 3;      // CO2 > 1000-1400ppm (IDA 3)
+    } else if (value >= 1400 && value < 1800 ) {
+      airQuality = 4;                             // INFERIOR = 4;  // CO2 > 1400-1800ppm (IDA 4)
+    } else if (value >= 1800 ) {
+      airQuality = 5;                             // POOR = 5;      // CO2 > 1800ppm
+    }
+    return airQuality;
   }
 
   switchAutoUpdate() {
 
-    this.switchTimer = setTimeout(() => {
+    this.updateTimer = setTimeout(() => {
 
       this.getSwitchOn();
 
@@ -757,7 +1361,7 @@ class LogoAccessory {
 
   blindAutoUpdate() {
 
-    this.blindTimer = setTimeout(() => {
+    this.updateTimer = setTimeout(() => {
 
       this.getBlindCurrentPosition();
 
@@ -767,7 +1371,7 @@ class LogoAccessory {
 
   garagedoorAutoUpdate() {
 
-    this.garagedoorTimer = setTimeout(() => {
+    this.updateTimer = setTimeout(() => {
 
       this.getGarageDoorCurrentDoorState();
 
@@ -777,9 +1381,69 @@ class LogoAccessory {
 
   lightbulbAutoUpdate() {
 
-    this.lightbulbTimer = setTimeout(() => {
+    this.updateTimer = setTimeout(() => {
 
       this.getLightbulbBrightness();
+
+    }, this.updateInterval + Math.floor(Math.random() * 10000));
+
+  }
+
+  lightSensorAutoUpdate() {
+
+    this.updateTimer = setTimeout(() => {
+
+      this.getCurrentAmbientLightLevel();
+
+    }, this.updateInterval + Math.floor(Math.random() * 10000));
+
+  }
+
+  motionSensorAutoUpdate() {
+
+    this.updateTimer = setTimeout(() => {
+
+      this.getMotionDetected();
+
+    }, this.updateInterval + Math.floor(Math.random() * 10000));
+
+  }
+
+  contactSensorAutoUpdate() {
+
+    this.updateTimer = setTimeout(() => {
+
+      this.getContactSensorState();
+
+    }, this.updateInterval + Math.floor(Math.random() * 10000));
+
+  }
+
+  temperatureSensorAutoUpdate() {
+
+    this.updateTimer = setTimeout(() => {
+
+      this.getCurrentTemperature();
+
+    }, this.updateInterval + Math.floor(Math.random() * 10000));
+
+  }
+
+  humiditySensorAutoUpdate() {
+
+    this.updateTimer = setTimeout(() => {
+
+      this.getCurrentRelativeHumidity();
+
+    }, this.updateInterval + Math.floor(Math.random() * 10000));
+
+  }
+
+  carbonDioxideSensorAutoUpdate() {
+
+    this.updateTimer = setTimeout(() => {
+
+      this.getCarbonDioxideLevel();
 
     }, this.updateInterval + Math.floor(Math.random() * 10000));
 
