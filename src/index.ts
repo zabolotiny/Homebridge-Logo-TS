@@ -11,6 +11,7 @@ import { LightbulbAccessory } from "./util/accessories/LightbulbAccessory"
 import { LightSensor } from "./util/accessories/LightSensor"
 import { MotionSensor } from "./util/accessories/MotionSensor"
 import { ContactSensor } from "./util/accessories/ContactSensor"
+import { SmokeSensor } from "./util/accessories/SmokeSensor"
 import { TemperatureSensor } from "./util/accessories/TemperatureSensor"
 import { HumiditySensor } from "./util/accessories/HumiditySensor"
 import { CarbonDioxideSensor } from "./util/accessories/CarbonDioxideSensor"
@@ -61,6 +62,7 @@ class LogoAccessory {
   lightSensorService:         any;
   motionSensorService:        any;
   contactSensorService:       any;
+  smokeSensorService:         any;
   temperatureSensorService:   any;
   humiditySensorService:      any;
   carbonDioxideSensorService: any;
@@ -73,6 +75,7 @@ class LogoAccessory {
   lightSensor:         LightSensor         | undefined;
   motionSensor:        MotionSensor        | undefined;
   contactSensor:       ContactSensor       | undefined;
+  smokeSensor:         SmokeSensor         | undefined;
   temperatureSensor:   TemperatureSensor   | undefined;
   humiditySensor:      HumiditySensor      | undefined;
   carbonDioxideSensor: CarbonDioxideSensor | undefined;
@@ -325,6 +328,34 @@ class LogoAccessory {
     }
 
     //
+    // LOGO! Smoke Sensor Service
+    //
+
+    if (this.type == SmokeSensor.smokeSensorType) {
+
+      this.smokeSensor = new SmokeSensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
+
+      const smokeSensorService = new Service.SmokeSensor(
+        this.name,
+        SmokeSensor.smokeSensorType,
+      );
+
+      smokeSensorService
+        .getCharacteristic(Characteristic.StatusActive)
+        .on("get", callbackify(this.smokeSensor.getStatusActive));
+
+        smokeSensorService
+        .getCharacteristic(Characteristic.SmokeDetected)
+        .on("get", callbackify(this.smokeSensor.getSmokeDetected));
+
+      this.smokeSensorService = smokeSensorService;
+
+      this.smokeSensor.smokeSensorService = this.smokeSensorService;
+      this.smokeSensor.smokeDetected      = config["smokeDetected"] || "M12";
+
+    }
+
+    //
     // LOGO! Temperature Sensor Service
     //
 
@@ -470,6 +501,9 @@ class LogoAccessory {
 
     } else if (this.type == ContactSensor.contactSensorType) {
       return [ this.contactSensorService ];
+
+    } else if (this.type == SmokeSensor.smokeSensorType) {
+      return [ this.smokeSensorService ];
 
     } else if (this.type == TemperatureSensor.temperatureSensorType) {
       return [ this.temperatureSensorService ];
