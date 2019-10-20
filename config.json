@@ -174,6 +174,17 @@
         },
         {
             "accessory": "Logo-TS",
+            "name": "Smoke Sensor",
+            "interface": "modbus",
+            "ip": "10.0.0.100",
+            "port": 505,
+            "updateInterval": 30000,
+            "debugMsgLog": 1,
+            "type": "smokeSensor",
+            "smokeDetected": "M12"
+        },
+        {
+            "accessory": "Logo-TS",
             "name": "Temperature Sensor",
             "interface": "modbus",
             "ip": "10.0.0.100",

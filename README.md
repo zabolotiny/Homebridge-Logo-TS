@@ -16,6 +16,7 @@ Type of Sensor Accessory:
 - Light Sensor
 - Motion Sensor
 - Contact Sensor
+- Smoke Sensor
 - Temperature Sensor
 - Humidity Sensor
 - Carbon Dioxide Sensor
@@ -52,7 +53,7 @@ Name                     | Value               | Required | Option for | Notes
 `logoType`               | "8.SF4"             | no       | "snap7"    | Must be set to the type of your LOGO! PLC, default is: "8.SF4".
 `localTSAP`              | "0x1200"            | no       | "snap7"    | Must be set to the localTSAP of your LOGO! PLC, default is: 0x1200.
 `remoteTSAP`             | "0x2200"            | no       | "snap7"    | Must be set to the remoteTSAP of your LOGO! PLC, default is: 0x2200.
-`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "garagedoor", "lightbulb" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
+`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "garagedoor", "lightbulb" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
 `updateInterval`         | 0                   | no       | all        | Auto Update Interval in milliseconds, 0 = Off
 `buttonValue`            | 1                   | no       | all        | Value for Digital Button
 `pushButton`             | 1                   | no       | all        | If e.g. the network input in the LOGO! a hardware button on the LOGO! simulated.
@@ -77,6 +78,7 @@ Name                     | Value               | Required | Option for | Notes
 `lightLevel`             | "AM3"               | no       | "lightSensor"         | Light Sensor for Current Ambient Light Level in Lux
 `motionDetected`         | "M9"                | no       | "motionSensor"        | Motion Sensor
 `contactDetected`        | "M15"               | no       | "contactSensor"       | Contact Sensor
+`smokeDetected`          | "M12"               | no       | "smokeSensor"         | Smoke Sensor
 `temperature`            | "AM2"               | no       | "temperatureSensor"   | Temperature Sensor for Current Temperature in °C
 `humidity`               | "AM1"               | no       | "humiditySensor"      | Humidity Sensor for Current Relative Humidity in %
 `carbonDioxideLevel`     | "AM3"               | no       | "carbonDioxideSensor" | Carbon Dioxide Sensor for Carbon Dioxide Level in ppm
@@ -250,6 +252,17 @@ Name                     | Value               | Required | Option for | Notes
         "debugMsgLog": 1,
         "type": "contactSensor",
         "contactDetected": "M15"
+    },
+    {
+        "accessory": "Logo-TS",
+        "name": "Smoke Sensor",
+        "interface": "modbus",
+        "ip": "10.0.0.100",
+        "port": 505,
+        "updateInterval": 30000,
+        "debugMsgLog": 1,
+        "type": "smokeSensor",
+        "smokeDetected": "M12"
     },
     {
         "accessory": "Logo-TS",
