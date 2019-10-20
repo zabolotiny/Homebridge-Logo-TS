@@ -4,8 +4,6 @@ import callbackify from "./util/callbackify";
 import { ModBusLogo } from "./util/modbus-logo";
 import { Snap7Logo } from "./util/snap7-logo";
 
-import { AirQualitySensor } from "./util/accessories/AirQualitySensor";
-
 const pjson   = require('../package.json');
 
 let Service: any, Characteristic: any;
@@ -28,6 +26,7 @@ const contactSensorType: string       = "contactSensor";
 const temperatureSensorType: string   = "temperatureSensor";
 const humiditySensorType: string      = "humiditySensor";
 const carbonDioxideSensorType: string = "carbonDioxideSensor";
+const airQualitySensorType: string    = "airQualitySensor";
 
 const accessoryAnalogTimeOut = 500;
 
@@ -96,6 +95,7 @@ class LogoAccessory {
   lastCarbonDioxideDetected: boolean;
   lastCarbonDioxideLevel: number;
   lastCarbonDioxidePeakLevel: number;
+  lastAirQuality: number;
   updateTimer: any;
 
   // Services exposed.
@@ -109,10 +109,7 @@ class LogoAccessory {
   temperatureSensorService: any;
   humiditySensorService: any;
   carbonDioxideSensorService: any;
-
-
   airQualitySensorService: any;
-  airQualitySensor: AirQualitySensor | undefined;
 
   constructor(log: any, config: any) {
     this.log            = log;
@@ -163,7 +160,7 @@ class LogoAccessory {
       if (this.type == humiditySensorType) {
         this.humiditySensorAutoUpdate();
       }
-      if (this.type == carbonDioxideSensorType) {
+      if (this.type == carbonDioxideSensorType || this.type == airQualitySensorType) {
         this.carbonDioxideSensorAutoUpdate();
       }
     }
@@ -179,6 +176,7 @@ class LogoAccessory {
     this.lastCarbonDioxideDetected             = false;
     this.lastCarbonDioxideLevel                = -1;
     this.lastCarbonDioxidePeakLevel            = -1;
+    this.lastAirQuality                        = 0; // UNKNOWN = 0;
 
     // Characteristic "Manufacturer"      --> pjson.author.name
     // Characteristic "Model"             --> this.type
@@ -472,32 +470,33 @@ class LogoAccessory {
     //
     // LOGO! Air Quality Sensor Service
     //
+    // IDA1: < 800
+    // IDA2: > 800  - 1000
+    // IDA3: > 1000 - 1400
+    // IDA4: > 1400
 
-    if (this.type == AirQualitySensor.airQualitySensorType) {
+    // --> this.carbonDioxideLevel from LOGO! Carbon Dioxide Sensor Service
 
-      this.airQualitySensor = new AirQualitySensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
+    if (this.type == airQualitySensorType) {
 
       const airQualitySensorService = new Service.AirQualitySensor(
         this.name,
-        AirQualitySensor.airQualitySensorType,
+        "airQualitySensor",
       );
 
       airQualitySensorService
         .getCharacteristic(Characteristic.StatusActive)
-        .on("get", callbackify(this.airQualitySensor.getStatusActive));
+        .on("get", callbackify(this.getStatusActive));
 
       airQualitySensorService
         .getCharacteristic(Characteristic.AirQuality)
-        .on("get", callbackify(this.airQualitySensor.getAirQuality));
+        .on("get", callbackify(this.getAirQuality));
 
       airQualitySensorService
         .getCharacteristic(Characteristic.CarbonDioxideLevel)
-        .on("get", callbackify(this.airQualitySensor.getCarbonDioxideLevel));
+        .on("get", callbackify(this.getCarbonDioxideLevel));
 
       this.airQualitySensorService = airQualitySensorService;
-
-      this.airQualitySensor.airQualitySensorService = this.airQualitySensorService;
-      this.airQualitySensor.carbonDioxideLevel      = this.carbonDioxideLevel;  // LOGO! Carbon Dioxide Sensor Service
 
     }
   
@@ -531,7 +530,7 @@ class LogoAccessory {
     } else if (this.type == carbonDioxideSensorType) {
       return [ this.carbonDioxideSensorService ];
 
-    } else if (this.type == AirQualitySensor.airQualitySensorType) {
+    } else if (this.type == airQualitySensorType) {
       return [ this.airQualitySensorService ];
 
     } else {
@@ -1178,6 +1177,32 @@ class LogoAccessory {
 
         }
 
+        if (this.type == airQualitySensorType) {
+
+          await wait(1);
+
+          this.airQualitySensorService.updateCharacteristic(
+            Characteristic.CarbonDioxideLevel,
+            value
+          );
+
+          let newAirQuality = this.airQuality(value);
+
+          if (newAirQuality != this.lastAirQuality) {
+
+            this.lastAirQuality = newAirQuality;
+
+            await wait(1);
+
+            this.airQualitySensorService.updateCharacteristic(
+              Characteristic.AirQuality,
+              newAirQuality
+            );
+            
+          }
+          
+        }
+
       }
 
       if (this.updateInterval > 0) {
@@ -1192,6 +1217,25 @@ class LogoAccessory {
     
     this.debugLogNum("CarbonDioxidePeakLevel ?", this.lastCarbonDioxidePeakLevel);
     return this.lastCarbonDioxidePeakLevel;
+
+  };
+
+  //
+  // LOGO! Air Quality Sensor Service
+  //
+
+  // --> this.carbonDioxideLevel from LOGO! Carbon Dioxide Sensor Service
+
+  getAirQuality = async () => {
+    // UNKNOWN = 0;
+    // EXCELLENT = 1; // CO2 <  800ppm      (IDA 1)
+    // GOOD = 2;      // CO2 >  800-1000ppm (IDA 2)
+    // FAIR = 3;      // CO2 > 1000-1400ppm (IDA 3)
+    // INFERIOR = 4;  // CO2 > 1400-1800ppm (IDA 4)
+    // POOR = 5;      // CO2 > 1800ppm
+    
+    this.debugLogNum("AirQuality ?", this.lastAirQuality);
+    return this.lastAirQuality;
 
   };
 
@@ -1287,6 +1331,22 @@ class LogoAccessory {
         }
 
     }, 100);
+  }
+
+  airQuality(value: number): number {
+    let airQuality = 0;                           // UNKNOWN = 0;
+    if (value < 800) {
+      airQuality = 1;                             // EXCELLENT = 1; // CO2 <  800ppm      (IDA 1)
+    } else if (value >= 800 && value < 1000 ) {
+      airQuality = 2;                             // GOOD = 2;      // CO2 >  800-1000ppm (IDA 2)
+    } else if (value >= 1000 && value < 1400 ) {
+      airQuality = 3;                             // FAIR = 3;      // CO2 > 1000-1400ppm (IDA 3)
+    } else if (value >= 1400 && value < 1800 ) {
+      airQuality = 4;                             // INFERIOR = 4;  // CO2 > 1400-1800ppm (IDA 4)
+    } else if (value >= 1800 ) {
+      airQuality = 5;                             // POOR = 5;      // CO2 > 1800ppm
+    }
+    return airQuality;
   }
 
   switchAutoUpdate() {
