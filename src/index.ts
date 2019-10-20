@@ -4,10 +4,10 @@ import callbackify from "./util/callbackify";
 import { ModBusLogo } from "./util/modbus-logo";
 import { Snap7Logo } from "./util/snap7-logo";
 
-
 import { SwitchAccessory } from "./util/accessories/SwitchAccessory"
-
-
+import { BlindAccessory } from "./util/accessories/BlindAccessory"
+import { GaragedoorAccessory } from "./util/accessories/GaragedoorAccessory"
+import { LightbulbAccessory } from "./util/accessories/LightbulbAccessory"
 import { LightSensor } from "./util/accessories/LightSensor"
 import { MotionSensor } from "./util/accessories/MotionSensor"
 import { ContactSensor } from "./util/accessories/ContactSensor"
@@ -26,13 +26,6 @@ const snap7Interface: string  = "snap7";
 const logoType0BA7: string = "0BA7"
 const logoType0BA8: string = "0BA8"
 const logoType8SF4: string = "8.SF4"
-
-const blindType: string               = "blind";
-const garagedoorType: string          = "garagedoor";
-const lightbulbType: string           = "lightbulb";
-
-
-const accessoryAnalogTimeOut = 500;
 
 export default function(homebridge: any) {
   Service = homebridge.hap.Service;
@@ -57,46 +50,14 @@ class LogoAccessory {
   debugMsgLog: number;
   type: string;
 
-  blindSetPos: string;
-  blindGetPos: string;
-  blindGetState: string;
-  blindDigital: number;
-  blindSetUp: string;
-  blindSetDown: string;
-  blindGetUpDown: string;
-
-  garagedoorOpen: string;
-  garagedoorClose: string;
-  garagedoorState: string;
-
-  lightbulbSetOn: string;
-  lightbulbSetOff: string;
-  lightbulbSetBrightness: string;
-  lightbulbGetBrightness: string;
-  
-
   // Runtime state.
   logo: any;
-  lastBlindTargetPos: number;
-  lastBlindTargetPosTime: number;
-  lastBlindTargetPosTimerSet: boolean;
-  lastGaragedoorTargetState: number;
-  lastLightbulbOn: number;
-  lastLightbulbTargetBrightness: number;
-  lastLightbulbTargetBrightnessTime: number;
-  lastLightbulbTargetBrightnessTimerSet: boolean;
-  
-  updateTimer: any;
 
   // Services exposed.
-  
-  blindService: any;
-  garagedoorService: any;
-  lightbulbService: any;
-
-
   switchService:              any;
-
+  blindService:               any;
+  garagedoorService:          any;
+  lightbulbService:           any;
   lightSensorService:         any;
   motionSensorService:        any;
   contactSensorService:       any;
@@ -106,7 +67,9 @@ class LogoAccessory {
   airQualitySensorService:    any;
 
   switchAccessory:     SwitchAccessory     | undefined;
-  
+  blindAccessory:      BlindAccessory      | undefined;
+  garagedoorAccessory: GaragedoorAccessory | undefined;
+  lightbulbAccessory:  LightbulbAccessory  | undefined;
   lightSensor:         LightSensor         | undefined;
   motionSensor:        MotionSensor        | undefined;
   contactSensor:       ContactSensor       | undefined;
@@ -135,30 +98,7 @@ class LogoAccessory {
     } else {
       this.logo = new Snap7Logo(this.logoType, this.ip, this.localTSAP, this.remoteTSAP, this.debugMsgLog, this.log);
     }
-
-    if (this.updateInterval > 0) {
-      if (this.type == blindType) {
-        this.blindAutoUpdate();
-      }
-      if (this.type == garagedoorType) {
-        this.garagedoorAutoUpdate();
-      }
-      if (this.type == lightbulbType) {
-        this.lightbulbAutoUpdate();
-      }
-   
-    }
-
-    this.lastBlindTargetPos                    = -1;
-    this.lastBlindTargetPosTime                = -1;
-    this.lastBlindTargetPosTimerSet            = false;
-    this.lastGaragedoorTargetState             = -1;
-    this.lastLightbulbOn                       = -1;
-    this.lastLightbulbTargetBrightness         = -1;
-    this.lastLightbulbTargetBrightnessTime     = -1;
-    this.lastLightbulbTargetBrightnessTimerSet = false;
     
-
     // Characteristic "Manufacturer"      --> pjson.author.name
     // Characteristic "Model"             --> this.type
     // Characteristic "Firmware Revision" --> pjson.version
@@ -197,35 +137,38 @@ class LogoAccessory {
     // LOGO! Blind Service
     //
 
-    this.blindSetPos     = config["blindSetPos"]    || "VW50";
-    this.blindGetPos     = config["blindGetPos"]    || "VW52";
-    this.blindGetState   = config["blindGetState"]  || "VW54";
-    this.blindDigital    = config["blindDigital"]   || 0;
-    this.blindSetUp      = config["blindSetUp"]     || "V5.0";
-    this.blindSetDown    = config["blindSetDown"]   || "V5.1";
-    this.blindGetUpDown  = config["blindGetUpDown"] || "V5.2";
+    if (this.type == BlindAccessory.blindType) {
 
-    if (this.type == blindType) {
+      this.blindAccessory = new BlindAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const blindService = new Service.WindowCovering(
         this.name,
-        "blind",
+        BlindAccessory.blindType,
       );
 
       blindService
         .getCharacteristic(Characteristic.CurrentPosition)
-        .on("get", callbackify(this.getBlindCurrentPosition));
+        .on("get", callbackify(this.blindAccessory.getBlindCurrentPosition));
 
       blindService
         .getCharacteristic(Characteristic.TargetPosition)
-        .on("get", callbackify(this.getBlindTargetPosition))
-        .on("set", callbackify(this.setBlindTargetPosition));
+        .on("get", callbackify(this.blindAccessory.getBlindTargetPosition))
+        .on("set", callbackify(this.blindAccessory.setBlindTargetPosition));
 
       blindService
         .getCharacteristic(Characteristic.PositionState)
-        .on("get", callbackify(this.getBlindPositionState));
+        .on("get", callbackify(this.blindAccessory.getBlindPositionState));
 
       this.blindService = blindService;
+
+      this.blindAccessory.blindService    = this.blindService;
+      this.blindAccessory.blindSetPos     = config["blindSetPos"]    || "VW50";
+      this.blindAccessory.blindGetPos     = config["blindGetPos"]    || "VW52";
+      this.blindAccessory.blindGetState   = config["blindGetState"]  || "VW54";
+      this.blindAccessory.blindDigital    = config["blindDigital"]   || 0;
+      this.blindAccessory.blindSetUp      = config["blindSetUp"]     || "V5.0";
+      this.blindAccessory.blindSetDown    = config["blindSetDown"]   || "V5.1";
+      this.blindAccessory.blindGetUpDown  = config["blindGetUpDown"] || "V5.2";
 
     }
 
@@ -233,31 +176,34 @@ class LogoAccessory {
     // LOGO! GarageDoor Service
     //
 
-    this.garagedoorOpen       = config["garagedoorOpen"]  || "V6.0";
-    this.garagedoorClose      = config["garagedoorClose"] || "V6.1";
-    this.garagedoorState      = config["garagedoorState"] || "V6.2";
+    if (this.type == GaragedoorAccessory.garagedoorType) {
 
-    if (this.type == garagedoorType) {
+      this.garagedoorAccessory = new GaragedoorAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const garagedoorService = new Service.GarageDoorOpener(
         this.name,
-        "garagedoor",
+        GaragedoorAccessory.garagedoorType,
       );
 
       garagedoorService
         .getCharacteristic(Characteristic.CurrentDoorState)
-        .on("get", callbackify(this.getGarageDoorCurrentDoorState));
+        .on("get", callbackify(this.garagedoorAccessory.getGarageDoorCurrentDoorState));
 
       garagedoorService
         .getCharacteristic(Characteristic.TargetDoorState)
-        .on("get", callbackify(this.getGarageDoorTargetDoorState))
-        .on("set", callbackify(this.setGarageDoorTargetDoorState));
+        .on("get", callbackify(this.garagedoorAccessory.getGarageDoorTargetDoorState))
+        .on("set", callbackify(this.garagedoorAccessory.setGarageDoorTargetDoorState));
 
       garagedoorService
         .getCharacteristic(Characteristic.ObstructionDetected)
-        .on("get", callbackify(this.getGarageDoorObstructionDetected));
+        .on("get", callbackify(this.garagedoorAccessory.getGarageDoorObstructionDetected));
 
       this.garagedoorService = garagedoorService;
+
+      this.garagedoorAccessory.garagedoorService = this.garagedoorService;
+      this.garagedoorAccessory.garagedoorOpen    = config["garagedoorOpen"]  || "V6.0";
+      this.garagedoorAccessory.garagedoorClose   = config["garagedoorClose"] || "V6.1";
+      this.garagedoorAccessory.garagedoorState   = config["garagedoorState"] || "V6.2";
 
     }
 
@@ -265,29 +211,32 @@ class LogoAccessory {
     // LOGO! LightBulb Service
     //
 
-    this.lightbulbSetOn         = config["lightbulbSetOn"]         || "V7.0";
-    this.lightbulbSetOff        = config["lightbulbSetOff"]        || "V7.1";
-    this.lightbulbSetBrightness = config["lightbulbSetBrightness"] || "VW70";
-    this.lightbulbGetBrightness = config["lightbulbGetBrightness"] || "VW72";
+    if (this.type == LightbulbAccessory.lightbulbType) {
 
-    if (this.type == lightbulbType) {
+      this.lightbulbAccessory = new LightbulbAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const lightbulbService = new Service.Lightbulb(
         this.name,
-        "lightbulb",
+        LightbulbAccessory.lightbulbType,
       );
 
       lightbulbService
         .getCharacteristic(Characteristic.On)
-        .on("get", callbackify(this.getLightbulbOn))
-        .on("set", callbackify(this.setLightbulbOn));
+        .on("get", callbackify(this.lightbulbAccessory.getLightbulbOn))
+        .on("set", callbackify(this.lightbulbAccessory.setLightbulbOn));
 
       lightbulbService
         .getCharacteristic(Characteristic.Brightness)
-        .on("get", callbackify(this.getLightbulbBrightness))
-        .on("set", callbackify(this.setLightbulbBrightness));
+        .on("get", callbackify(this.lightbulbAccessory.getLightbulbBrightness))
+        .on("set", callbackify(this.lightbulbAccessory.setLightbulbBrightness));
 
       this.lightbulbService = lightbulbService;
+
+      this.lightbulbAccessory.lightbulbService       = this.lightbulbService;
+      this.lightbulbAccessory.lightbulbSetOn         = config["lightbulbSetOn"]         || "V7.0";
+      this.lightbulbAccessory.lightbulbSetOff        = config["lightbulbSetOff"]        || "V7.1";
+      this.lightbulbAccessory.lightbulbSetBrightness = config["lightbulbSetBrightness"] || "VW70";
+      this.lightbulbAccessory.lightbulbGetBrightness = config["lightbulbGetBrightness"] || "VW72";
 
     }
 
@@ -504,13 +453,13 @@ class LogoAccessory {
   }
 
   getServices() {
-    if (this.type == blindType) {
+    if (this.type == BlindAccessory.blindType) {
       return [ this.blindService ];
 
-    } else if (this.type == garagedoorType) {
+    } else if (this.type == GaragedoorAccessory.garagedoorType) {
       return [ this.garagedoorService ];
 
-    } else if (this.type == lightbulbType) {
+    } else if (this.type == LightbulbAccessory.lightbulbType) {
       return [ this.lightbulbService ];
 
     } else if (this.type == LightSensor.lightSensorType) {
@@ -540,335 +489,6 @@ class LogoAccessory {
   }
 
   //
-  // LOGO! Blind Service
-  //
-
-  getBlindCurrentPosition = async () => {
-
-    // Cancel timer if the call came from the Home-App and not from the update interval.
-    // To avoid duplicate queries at the same time.
-    if (this.updateInterval > 0) {
-      clearTimeout(this.updateTimer);
-      this.updateTimer = 0;
-    }
-
-    if (!this.blindDigital) {
-
-      this.logo.ReadLogo(this.blindGetPos, async (value: number) => {
-
-        if (value != -1) {
-
-          let pos = 100 - value;
-          pos = this.blindCurrentPositionIsNearTargetPosition(pos, this.lastBlindTargetPos);
-          this.debugLogNum("BlindCurrentPosition ?", pos);
-
-          await wait(1);
-
-          this.blindService.updateCharacteristic(
-            Characteristic.CurrentPosition,
-            pos
-          );
-
-          await wait(1);
-
-          this.blindService.updateCharacteristic(
-            Characteristic.PositionState,
-            2
-          );
-
-          if (pos != this.lastBlindTargetPos) {
-            this.lastBlindTargetPos = pos;
-
-            await wait(1);
-
-            this.blindService.updateCharacteristic(
-              Characteristic.TargetPosition,
-              pos
-            );
-          }
-
-        }
-
-        if (this.updateInterval > 0) {
-          this.blindAutoUpdate();
-        }
-
-      });
-
-    } else {
-
-      this.logo.ReadLogo(this.blindGetUpDown, async (value: number) => {
-
-        if (value != -1) {
-
-          const pos = value == 1 ? 100 : 0;
-          this.debugLogNum("BlindCurrentPosition ?", pos);
-
-          await wait(1);
-
-          this.blindService.updateCharacteristic(
-            Characteristic.CurrentPosition,
-            pos
-          );
-
-          await wait(1);
-
-          this.blindService.updateCharacteristic(
-            Characteristic.PositionState,
-            2
-          );
-
-        }
-
-        if (this.updateInterval > 0) {
-          this.blindAutoUpdate();
-        }
-
-      });
-
-    }
-
-  };
-
-  getBlindTargetPosition = async () => {
-
-    this.debugLogNum("BlindTargetPosition ?", this.lastBlindTargetPos);
-    if (this.lastBlindTargetPos != -1) {
-      return this.lastBlindTargetPos;
-    } else {
-      return 100;
-    }
-
-  };
-
-  setBlindTargetPosition = async (pos: number) => {
-
-    this.lastBlindTargetPos = pos;
-    this.lastBlindTargetPosTime = + new Date();
-    if (!this.lastBlindTargetPosTimerSet) {
-      this.blindTargetPositionTimeout();
-    }
-
-    // We succeeded, so update the "current" state as well.
-    // We need to update the current state "later" because Siri can't
-    // handle receiving the change event inside the same "set target state"
-    // response.
-    await wait(1);
-
-    this.blindService.setCharacteristic(
-      Characteristic.CurrentPosition,
-      pos
-    );
-
-  };
-
-  getBlindPositionState = async () => {
-    // 0 - DECREASING; 1 - INCREASING; 2 - STOPPED
-
-    if (!this.blindDigital) {
-
-      this.logo.ReadLogo(this.blindGetState, async (value: number) => {
-
-        if (value != -1) {
-
-          const state = this.blindLogoStateToHomebridgeState(value);
-          this.debugLogNum("BlindPositionState ?", state);
-
-          await wait(1);
-
-          this.blindService.updateCharacteristic(
-            Characteristic.PositionState,
-            state
-          );
-
-        }
-
-      });
-
-    } else {
-
-      this.debugLogNum("BlindPositionState ?", 2);
-      return 2;
-
-    }
-
-  };
-
-  //
-  // LOGO! GarageDoor Service
-  //
-
-  getGarageDoorCurrentDoorState = async () => {
-    // 0 - OPEN; 1 - CLOSED; 2 - OPENING; 3 - CLOSING; 4 - STOPPED
-
-    // Cancel timer if the call came from the Home-App and not from the update interval.
-    // To avoid duplicate queries at the same time.
-    if (this.updateInterval > 0) {
-      clearTimeout(this.updateTimer);
-      this.updateTimer = 0;
-    }
-
-    this.logo.ReadLogo(this.garagedoorState, async (value: number) => {
-      // Logo return 1 for OPEN!
-
-      if (value != -1) {
-
-        const state = value == 1 ? 0 : 1;
-        this.debugLogNum("GarageDoorCurrentDoorState ?", state);
-
-        await wait(1);
-
-        this.garagedoorService.updateCharacteristic(
-          Characteristic.CurrentDoorState,
-          state
-        );
-
-        if (state != this.lastGaragedoorTargetState) {
-          this.lastGaragedoorTargetState = state;
-          await wait(1);
-
-          this.garagedoorService.updateCharacteristic(
-            Characteristic.TargetDoorState,
-            state
-          );
-        }
-
-      }
-
-      if (this.updateInterval > 0) {
-        this.garagedoorAutoUpdate();
-      }
-
-    });
-
-  };
-
-  getGarageDoorTargetDoorState = async () => {
-    // 0 - OPEN; 1 - CLOSED
-
-    this.debugLogNum("GarageDoorTargetDoorState ?", this.lastGaragedoorTargetState);
-    if (this.lastGaragedoorTargetState != -1) {
-      return this.lastGaragedoorTargetState;
-    } else {
-      return 1;
-    }
-
-  };
-
-  setGarageDoorTargetDoorState = async (state: number) => {
-    // 0 - OPEN; 1 - CLOSED
-
-    this.debugLogNum("Set GarageDoorTargetDoorState to", state);
-    this.lastGaragedoorTargetState = state;
-
-    if (state == 0) {
-      this.logo.WriteLogo(this.garagedoorOpen, this.buttonValue, this.pushButton);
-    } else {
-      this.logo.WriteLogo(this.garagedoorClose, this.buttonValue, this.pushButton);
-    }
-
-    // We succeeded, so update the "current" state as well.
-    // We need to update the current state "later" because Siri can't
-    // handle receiving the change event inside the same "set target state"
-    // response.
-    await wait(1);
-
-    this.garagedoorService.setCharacteristic(
-      Characteristic.CurrentDoorState,
-      state
-    );
-
-  };
-
-  getGarageDoorObstructionDetected = async () => {
-    // true or false
-
-    this.debugLogBool("GarageDoorObstructionDetected ?", false);
-    return false;
-  };
-
-  //
-  // LOGO! LightBulb Service
-  //
-
-  getLightbulbOn = async () => {
-
-    const on = this.lastLightbulbOn == 1 ? true : false;
-    this.debugLogBool("Lightbulb ?", on);
-    return on;
-
-  };
-
-  setLightbulbOn = async (on: boolean) => {
-
-    let new_on: number = on ? 1 : 0;
-
-    if ((this.lastLightbulbOn == -1) || (this.lastLightbulbOn != new_on)) {
-
-      this.debugLogBool("Set Lightbulb to", on);
-      this.lastLightbulbOn = new_on;
-
-      if (on) {
-        this.logo.WriteLogo(this.lightbulbSetOn, this.buttonValue, this.pushButton);
-      } else {
-        this.logo.WriteLogo(this.lightbulbSetOff, this.buttonValue, this.pushButton);
-      }
-
-    }
-
-  };
-
-  getLightbulbBrightness = async () => {
-
-    // Cancel timer if the call came from the Home-App and not from the update interval.
-    // To avoid duplicate queries at the same time.
-    if (this.updateInterval > 0) {
-      clearTimeout(this.updateTimer);
-      this.updateTimer = 0;
-    }
-
-    this.logo.ReadLogo(this.lightbulbGetBrightness, async (value: number) => {
-
-      if (value != -1) {
-
-        this.debugLogNum("LightbulbBrightness ?", value);
-        this.lastLightbulbOn = value > 0 ? 1 : 0;
-
-        await wait(1);
-
-        this.lightbulbService.updateCharacteristic(
-          Characteristic.On,
-          (value > 0 ? true : false)
-        );
-
-        await wait(1);
-
-        this.lightbulbService.updateCharacteristic(
-          Characteristic.Brightness,
-          value
-        );
-
-      }
-
-      if (this.updateInterval > 0) {
-        this.lightbulbAutoUpdate();
-      }
-
-    });
-
-  };
-
-  setLightbulbBrightness = async (bright: number) => {
-
-    this.lastLightbulbTargetBrightness = bright;
-    this.lastLightbulbTargetBrightnessTime = + new Date();
-    if (!this.lastLightbulbTargetBrightnessTimerSet) {
-      this.lightbulbTargetBrightnessTimeout();
-    }
-
-  };
-
-  //
   // Helper Functions
   //
 
@@ -881,115 +501,6 @@ class LogoAccessory {
     if (this.debugMsgLog == 1) {
       this.log(msg, bool);
     }
-  }
-
-  blindTargetPositionTimeout() {
-    setTimeout(() => {
-
-        let now = + new Date();
-
-        if ((now >= (this.lastBlindTargetPosTime + accessoryAnalogTimeOut)) || (this.lastBlindTargetPos == 0) || (this.lastBlindTargetPos == 100)) {
-
-          this.debugLogNum("Set BlindTargetPosition to", this.lastBlindTargetPos);
-          this.lastBlindTargetPosTimerSet = false;
-
-          if (!this.blindDigital) {
-
-            this.logo.WriteLogo(this.blindSetPos, (100 - this.lastBlindTargetPos), 0);
-
-          } else {
-
-            if (this.lastBlindTargetPos >= 50) {
-              this.logo.WriteLogo(this.blindSetUp, this.buttonValue, this.pushButton);
-            } else {
-              this.logo.WriteLogo(this.blindSetDown, this.buttonValue, this.pushButton);
-            }
-
-          }
-
-        } else {
-
-          this.lastBlindTargetPosTimerSet = true;
-          this.blindTargetPositionTimeout();
-        }
-
-    }, 100);
-  }
-
-  blindLogoStateToHomebridgeState(value: number): number {
-    if (value == 0) {        // LOGO! Stop
-      return 2;              // Homebridge STOPPED
-    } else if (value == 1) { // LOGO! Up
-      return 0;              // Homebridge DECREASING
-    } else if (value == 2) { // LOGO! Down
-      return 1;              // Homebridge INCREASING
-    } else {
-      return 2;              // Homebridge STOPPED
-    }
-  }
-
-  blindCurrentPositionIsNearTargetPosition(current: number, target: number) {
-    if (target != -1) {
-      const near = target - current;
-      if ( (near >= -5) && (near <= 5) ) {
-        return target;
-      } else {
-        return current;
-      }
-    } else {
-      return current;
-    }
-  }
-
-  lightbulbTargetBrightnessTimeout() {
-    setTimeout(() => {
-
-        let now = + new Date();
-
-        if ((now >= (this.lastLightbulbTargetBrightnessTime + accessoryAnalogTimeOut)) || (this.lastLightbulbTargetBrightness == 0) || (this.lastLightbulbTargetBrightness == 100)) {
-
-          this.debugLogNum("Set LightbulbTargetBrightness to", this.lastLightbulbTargetBrightness);
-          this.lastLightbulbTargetBrightnessTimerSet = false;
-
-          this.logo.WriteLogo(this.lightbulbSetBrightness, this.lastLightbulbTargetBrightness, 0);
-
-        } else {
-
-          this.lastLightbulbTargetBrightnessTimerSet = true;
-          this.lightbulbTargetBrightnessTimeout();
-        }
-
-    }, 100);
-  }
-
-  blindAutoUpdate() {
-
-    this.updateTimer = setTimeout(() => {
-
-      this.getBlindCurrentPosition();
-
-    }, this.updateInterval + Math.floor(Math.random() * 10000));
-
-  }
-
-  garagedoorAutoUpdate() {
-
-    this.updateTimer = setTimeout(() => {
-
-      this.getGarageDoorCurrentDoorState();
-
-    }, this.updateInterval + Math.floor(Math.random() * 10000));
-
-  }
-
-  lightbulbAutoUpdate() {
-
-    this.updateTimer = setTimeout(() => {
-
-      this.getLightbulbBrightness();
-
-    }, this.updateInterval + Math.floor(Math.random() * 10000));
-
   }
 
 }
