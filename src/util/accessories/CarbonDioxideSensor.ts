@@ -42,7 +42,7 @@ export class CarbonDioxideSensor {
 
   }
 
-   //
+  //
   // LOGO! Carbon Dioxide Sensor Service
   //
   // 1000ppm CO2 (CO2 in Air 0.04% = ~400ppm)
