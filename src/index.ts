@@ -4,6 +4,10 @@ import callbackify from "./util/callbackify";
 import { ModBusLogo } from "./util/modbus-logo";
 import { Snap7Logo } from "./util/snap7-logo";
 
+
+import { SwitchAccessory } from "./util/accessories/SwitchAccessory"
+
+
 import { LightSensor } from "./util/accessories/LightSensor"
 import { MotionSensor } from "./util/accessories/MotionSensor"
 import { ContactSensor } from "./util/accessories/ContactSensor"
@@ -23,7 +27,6 @@ const logoType0BA7: string = "0BA7"
 const logoType0BA8: string = "0BA8"
 const logoType8SF4: string = "8.SF4"
 
-const switchType: string              = "switch";
 const blindType: string               = "blind";
 const garagedoorType: string          = "garagedoor";
 const lightbulbType: string           = "lightbulb";
@@ -53,10 +56,6 @@ class LogoAccessory {
   pushButton: number;
   debugMsgLog: number;
   type: string;
-
-  switchGet: string;
-  switchSetOn: string;
-  switchSetOff: string;
 
   blindSetPos: string;
   blindGetPos: string;
@@ -90,11 +89,13 @@ class LogoAccessory {
   updateTimer: any;
 
   // Services exposed.
-  switchService: any;
+  
   blindService: any;
   garagedoorService: any;
   lightbulbService: any;
 
+
+  switchService:              any;
 
   lightSensorService:         any;
   motionSensorService:        any;
@@ -103,6 +104,8 @@ class LogoAccessory {
   humiditySensorService:      any;
   carbonDioxideSensorService: any;
   airQualitySensorService:    any;
+
+  switchAccessory:     SwitchAccessory     | undefined;
   
   lightSensor:         LightSensor         | undefined;
   motionSensor:        MotionSensor        | undefined;
@@ -125,7 +128,7 @@ class LogoAccessory {
     this.buttonValue    =           config["buttonValue"]     || 1;
     this.pushButton     =           config["pushButton"]      || 1;
     this.debugMsgLog    =           config["debugMsgLog"]     || 0;
-    this.type           =           config["type"]            || switchType;
+    this.type           =           config["type"]            || SwitchAccessory.switchType;
 
     if (this.interface == modbusInterface) {
       this.logo = new ModBusLogo(this.ip, this.port, this.debugMsgLog, this.log);
@@ -134,9 +137,6 @@ class LogoAccessory {
     }
 
     if (this.updateInterval > 0) {
-      if (this.type == switchType) {
-        this.switchAutoUpdate();
-      }
       if (this.type == blindType) {
         this.blindAutoUpdate();
       }
@@ -170,23 +170,26 @@ class LogoAccessory {
     // LOGO! Switch Service
     //
 
-    this.switchGet        = config["switchGet"]    || "Q1";
-    this.switchSetOn      = config["switchSetOn"]  || "V2.0";
-    this.switchSetOff     = config["switchSetOff"] || "V3.0";
+    if (this.type == SwitchAccessory.switchType) {
 
-    if (this.type == switchType) {
+      this.switchAccessory = new SwitchAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const switchService = new Service.Switch(
         this.name,
-        "switch",
+        SwitchAccessory.switchType,
       );
 
       switchService
         .getCharacteristic(Characteristic.On)
-        .on("get", callbackify(this.getSwitchOn))
-        .on("set", callbackify(this.setSwitchOn));
+        .on("get", callbackify(this.switchAccessory.getSwitchOn))
+        .on("set", callbackify(this.switchAccessory.setSwitchOn));
 
       this.switchService = switchService;
+
+      this.switchAccessory.switchService = this.switchService;
+      this.switchAccessory.switchGet     = config["switchGet"]    || "Q1";
+      this.switchAccessory.switchSetOn   = config["switchSetOn"]  || "V2.0";
+      this.switchAccessory.switchSetOff  = config["switchSetOff"] || "V3.0";
 
     }
 
@@ -303,7 +306,7 @@ class LogoAccessory {
 
       lightSensorService
         .getCharacteristic(Characteristic.StatusActive)
-        .on("get", callbackify(this.getStatusActive));
+        .on("get", callbackify(this.lightSensor.getStatusActive));
 
       lightSensorService
         .getCharacteristic(Characteristic.CurrentAmbientLightLevel)
@@ -535,53 +538,6 @@ class LogoAccessory {
       return [ this.switchService ];
     }
   }
-
-  //
-  // LOGO! Switch Service
-  //
-
-  getSwitchOn = async () => {
-
-    // Cancel timer if the call came from the Home-App and not from the update interval.
-    // To avoid duplicate queries at the same time.
-    if (this.updateInterval > 0) {
-      clearTimeout(this.updateTimer);
-      this.updateTimer = 0;
-    }
-
-    this.logo.ReadLogo(this.switchGet, async (value: number) => {
-
-      if (value != -1) {
-
-        const on = value == 1 ? true : false;
-        this.debugLogBool("Switch ?", on);
-
-        await wait(1);
-
-        this.switchService.updateCharacteristic(
-          Characteristic.On,
-          on
-        );
-
-      }
-
-      if (this.updateInterval > 0) {
-        this.switchAutoUpdate();
-      }
-
-    });
-
-  };
-
-  setSwitchOn = async (on: boolean) => {
-    this.debugLogBool("Set switch to", on);
-
-    if (on) {
-      this.logo.WriteLogo(this.switchSetOn, this.buttonValue, this.pushButton);
-    } else {
-      this.logo.WriteLogo(this.switchSetOff, this.buttonValue, this.pushButton);
-    }
-  };
 
   //
   // LOGO! Blind Service
@@ -913,14 +869,6 @@ class LogoAccessory {
   };
 
   //
-  // LOGO! Sensor Service's
-  //
-
-  getStatusActive = async () => {
-    return true;
-  };
-
-  //
   // Helper Functions
   //
 
@@ -1012,16 +960,6 @@ class LogoAccessory {
         }
 
     }, 100);
-  }
-
-  switchAutoUpdate() {
-
-    this.updateTimer = setTimeout(() => {
-
-      this.getSwitchOn();
-
-    }, this.updateInterval + Math.floor(Math.random() * 10000));
-
   }
 
   blindAutoUpdate() {
