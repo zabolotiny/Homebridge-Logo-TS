@@ -4,7 +4,7 @@ import callbackify from "./util/callbackify";
 import { ModBusLogo } from "./util/modbus-logo";
 import { Snap7Logo } from "./util/snap7-logo";
 
-
+import { TemperatureSensor } from "./util/accessories/TemperatureSensor"
 import { HumiditySensor } from "./util/accessories/HumiditySensor"
 import { CarbonDioxideSensor } from "./util/accessories/CarbonDioxideSensor"
 import { AirQualitySensor } from "./util/accessories/AirQualitySensor";
@@ -28,7 +28,6 @@ const lightbulbType: string           = "lightbulb";
 const lightSensorType: string         = "lightSensor";
 const motionSensorType: string        = "motionSensor";
 const contactSensorType: string       = "contactSensor";
-const temperatureSensorType: string   = "temperatureSensor";
 
 
 const accessoryAnalogTimeOut = 500;
@@ -80,7 +79,6 @@ class LogoAccessory {
   lightLevel: string;
   motionDetected: string;
   contactDetected: string;
-  temperature: string;
   
 
   // Runtime state.
@@ -104,16 +102,17 @@ class LogoAccessory {
   lightSensorService: any;
   motionSensorService: any;
   contactSensorService: any;
-  temperatureSensorService: any;
 
 
-  humiditySensorService: any;
+  temperatureSensorService:   any;
+  humiditySensorService:      any;
   carbonDioxideSensorService: any;
-  airQualitySensorService: any;
+  airQualitySensorService:    any;
   
-  humiditySensor: HumiditySensor | undefined;
+  temperatureSensor:   TemperatureSensor   | undefined;
+  humiditySensor:      HumiditySensor      | undefined;
   carbonDioxideSensor: CarbonDioxideSensor | undefined;
-  airQualitySensor: AirQualitySensor | undefined;
+  airQualitySensor:    AirQualitySensor    | undefined;
 
   constructor(log: any, config: any) {
     this.log            = log;
@@ -157,9 +156,6 @@ class LogoAccessory {
       }
       if (this.type == contactSensorType) {
         this.contactSensorAutoUpdate();
-      }
-      if (this.type == temperatureSensorType) {
-        this.temperatureSensorAutoUpdate();
       }
    
     }
@@ -382,24 +378,27 @@ class LogoAccessory {
     // LOGO! Temperature Sensor Service
     //
 
-    this.temperature = config["temperature"] || "AM2";
+    if (this.type == TemperatureSensor.temperatureSensorType) {
 
-    if (this.type == temperatureSensorType) {
+      this.temperatureSensor = new TemperatureSensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
 
       const temperatureSensorService = new Service.TemperatureSensor(
         this.name,
-        "temperatureSensor",
+        TemperatureSensor.temperatureSensorType,
       );
 
       temperatureSensorService
         .getCharacteristic(Characteristic.StatusActive)
-        .on("get", callbackify(this.getStatusActive));
+        .on("get", callbackify(this.temperatureSensor.getStatusActive));
 
       temperatureSensorService
         .getCharacteristic(Characteristic.CurrentTemperature)
-        .on("get", callbackify(this.getCurrentTemperature));
+        .on("get", callbackify(this.temperatureSensor.getCurrentTemperature));
 
       this.temperatureSensorService = temperatureSensorService;
+
+      this.temperatureSensor.temperatureSensorService = this.temperatureSensorService;
+      this.temperatureSensor.temperature              = config["temperature"] || "AM2";
 
     }
 
@@ -413,7 +412,7 @@ class LogoAccessory {
 
       const humiditySensorService = new Service.HumiditySensor(
         this.name,
-        "humiditySensor",
+        HumiditySensor.humiditySensorType,
       );
 
       humiditySensorService
@@ -442,7 +441,7 @@ class LogoAccessory {
 
       const carbonDioxideSensorService = new Service.CarbonDioxideSensor(
         this.name,
-        "carbonDioxideSensor",
+        CarbonDioxideSensor.carbonDioxideSensorType,
       );
 
       carbonDioxideSensorService
@@ -522,7 +521,7 @@ class LogoAccessory {
     } else if (this.type == contactSensorType) {
       return [ this.contactSensorService ];
 
-    } else if (this.type == temperatureSensorType) {
+    } else if (this.type == TemperatureSensor.temperatureSensorType) {
       return [ this.temperatureSensorService ];
 
     } else if (this.type == HumiditySensor.humiditySensorType) {
@@ -1036,43 +1035,6 @@ class LogoAccessory {
   };
 
   //
-  // LOGO! Temperature Sensor Service
-  //
-
-  getCurrentTemperature = async () => {
-
-    // Cancel timer if the call came from the Home-App and not from the update interval.
-    // To avoid duplicate queries at the same time.
-    if (this.updateInterval > 0) {
-      clearTimeout(this.updateTimer);
-      this.updateTimer = 0;
-    }
-
-    this.logo.ReadLogo(this.temperature, async (value: number) => {
-
-      if (value != -1) {
-
-        let temp = value / 10;
-        this.debugLogNum("CurrentTemperature ?", temp);
-
-        await wait(1);
-
-        this.temperatureSensorService.updateCharacteristic(
-          Characteristic.CurrentTemperature,
-          temp
-        );
-
-      }
-
-      if (this.updateInterval > 0) {
-        this.temperatureSensorAutoUpdate();
-      }
-
-    });
-
-  };
-
-  //
   // Helper Functions
   //
 
@@ -1231,16 +1193,6 @@ class LogoAccessory {
     this.updateTimer = setTimeout(() => {
 
       this.getContactSensorState();
-
-    }, this.updateInterval + Math.floor(Math.random() * 10000));
-
-  }
-
-  temperatureSensorAutoUpdate() {
-
-    this.updateTimer = setTimeout(() => {
-
-      this.getCurrentTemperature();
 
     }, this.updateInterval + Math.floor(Math.random() * 10000));
 
