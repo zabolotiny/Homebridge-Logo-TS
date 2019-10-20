@@ -4,6 +4,8 @@ import callbackify from "./util/callbackify";
 import { ModBusLogo } from "./util/modbus-logo";
 import { Snap7Logo } from "./util/snap7-logo";
 
+
+import { CarbonDioxideSensor } from "./util/accessories/CarbonDioxideSensor"
 import { AirQualitySensor } from "./util/accessories/AirQualitySensor";
 
 const pjson   = require('../package.json');
@@ -27,7 +29,6 @@ const motionSensorType: string        = "motionSensor";
 const contactSensorType: string       = "contactSensor";
 const temperatureSensorType: string   = "temperatureSensor";
 const humiditySensorType: string      = "humiditySensor";
-const carbonDioxideSensorType: string = "carbonDioxideSensor";
 
 const accessoryAnalogTimeOut = 500;
 
@@ -80,8 +81,7 @@ class LogoAccessory {
   contactDetected: string;
   temperature: string;
   humidity: string;
-  carbonDioxideLevel: string;
-  carbonDioxideLimit: number;
+  
 
   // Runtime state.
   logo: any;
@@ -93,9 +93,7 @@ class LogoAccessory {
   lastLightbulbTargetBrightness: number;
   lastLightbulbTargetBrightnessTime: number;
   lastLightbulbTargetBrightnessTimerSet: boolean;
-  lastCarbonDioxideDetected: boolean;
-  lastCarbonDioxideLevel: number;
-  lastCarbonDioxidePeakLevel: number;
+  
   updateTimer: any;
 
   // Services exposed.
@@ -108,10 +106,12 @@ class LogoAccessory {
   contactSensorService: any;
   temperatureSensorService: any;
   humiditySensorService: any;
+
+
   carbonDioxideSensorService: any;
-
-
   airQualitySensorService: any;
+  
+  carbonDioxideSensor: CarbonDioxideSensor | undefined;
   airQualitySensor: AirQualitySensor | undefined;
 
   constructor(log: any, config: any) {
@@ -163,9 +163,7 @@ class LogoAccessory {
       if (this.type == humiditySensorType) {
         this.humiditySensorAutoUpdate();
       }
-      if (this.type == carbonDioxideSensorType) {
-        this.carbonDioxideSensorAutoUpdate();
-      }
+   
     }
 
     this.lastBlindTargetPos                    = -1;
@@ -176,9 +174,7 @@ class LogoAccessory {
     this.lastLightbulbTargetBrightness         = -1;
     this.lastLightbulbTargetBrightnessTime     = -1;
     this.lastLightbulbTargetBrightnessTimerSet = false;
-    this.lastCarbonDioxideDetected             = false;
-    this.lastCarbonDioxideLevel                = -1;
-    this.lastCarbonDioxidePeakLevel            = -1;
+    
 
     // Characteristic "Manufacturer"      --> pjson.author.name
     // Characteristic "Model"             --> this.type
@@ -439,10 +435,9 @@ class LogoAccessory {
     //
     // 1000ppm CO2 (CO2 in Air 0.04% = ~400ppm)
 
-    this.carbonDioxideLevel = config["carbonDioxideLevel"] || "AM3";
-    this.carbonDioxideLimit = config["carbonDioxideLimit"] || 1000;
+    if (this.type == CarbonDioxideSensor.carbonDioxideSensorType) {
 
-    if (this.type == carbonDioxideSensorType) {
+      this.carbonDioxideSensor = new CarbonDioxideSensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
 
       const carbonDioxideSensorService = new Service.CarbonDioxideSensor(
         this.name,
@@ -455,17 +450,21 @@ class LogoAccessory {
 
       carbonDioxideSensorService
         .getCharacteristic(Characteristic.CarbonDioxideDetected)
-        .on("get", callbackify(this.getCarbonDioxideDetected));
+        .on("get", callbackify(this.carbonDioxideSensor.getCarbonDioxideDetected));
 
       carbonDioxideSensorService
         .getCharacteristic(Characteristic.CarbonDioxideLevel)
-        .on("get", callbackify(this.getCarbonDioxideLevel));
+        .on("get", callbackify(this.carbonDioxideSensor.getCarbonDioxideLevel));
 
       carbonDioxideSensorService
         .getCharacteristic(Characteristic.CarbonDioxidePeakLevel)
-        .on("get", callbackify(this.getCarbonDioxidePeakLevel));
+        .on("get", callbackify(this.carbonDioxideSensor.getCarbonDioxidePeakLevel));
 
       this.carbonDioxideSensorService = carbonDioxideSensorService;
+
+      this.carbonDioxideSensor.carbonDioxideSensorService = this.carbonDioxideSensorService;
+      this.carbonDioxideSensor.carbonDioxideLevel         = config["carbonDioxideLevel"] || "AM3";
+      this.carbonDioxideSensor.carbonDioxideLimit         = config["carbonDioxideLimit"] || 1000;
 
     }
 
@@ -497,7 +496,7 @@ class LogoAccessory {
       this.airQualitySensorService = airQualitySensorService;
 
       this.airQualitySensor.airQualitySensorService = this.airQualitySensorService;
-      this.airQualitySensor.carbonDioxideLevel      = this.carbonDioxideLevel;  // LOGO! Carbon Dioxide Sensor Service
+      this.airQualitySensor.carbonDioxideLevel      = config["carbonDioxideLevel"] || "AM3";
 
     }
   
@@ -528,7 +527,7 @@ class LogoAccessory {
     } else if (this.type == humiditySensorType) {
       return [ this.humiditySensorService ];
 
-    } else if (this.type == carbonDioxideSensorType) {
+    } else if (this.type == CarbonDioxideSensor.carbonDioxideSensorType) {
       return [ this.carbonDioxideSensorService ];
 
     } else if (this.type == AirQualitySensor.airQualitySensorType) {
@@ -1110,92 +1109,6 @@ class LogoAccessory {
   };
 
   //
-  // LOGO! Carbon Dioxide Sensor Service
-  //
-  // 1000ppm CO2 (CO2 in Air 0.04% = ~400ppm)
-
-  getCarbonDioxideDetected = async () => {
-    // CO2_LEVELS_NORMAL = 0; CO2_LEVELS_ABNORMAL = 1;
-
-    let state = this.lastCarbonDioxideDetected == true ? 1 : 0;
-    this.debugLogNum("CarbonDioxideDetected ?", state);
-    return state;
-
-  };
-
-  getCarbonDioxideLevel = async () => {
-
-    // Cancel timer if the call came from the Home-App and not from the update interval.
-    // To avoid duplicate queries at the same time.
-    if (this.updateInterval > 0) {
-      clearTimeout(this.updateTimer);
-      this.updateTimer = 0;
-    }
-
-    this.logo.ReadLogo(this.carbonDioxideLevel, async (value: number) => {
-
-      if (value != -1) {
-
-        this.lastCarbonDioxideLevel = value;
-        this.debugLogNum("CarbonDioxideLevel ?", value);
-
-        if (this.type == carbonDioxideSensorType) {
-
-          await wait(1);
-
-          this.carbonDioxideSensorService.updateCharacteristic(
-            Characteristic.CarbonDioxideLevel,
-            value
-          );
-
-          let newCarbonDioxideDetected = value > this.carbonDioxideLimit ? true : false;
-
-          if (newCarbonDioxideDetected != this.lastCarbonDioxideDetected) {
-
-            this.lastCarbonDioxideDetected = newCarbonDioxideDetected;
-
-            // CO2_LEVELS_NORMAL = 0; CO2_LEVELS_ABNORMAL = 1;
-            let state = newCarbonDioxideDetected == true ? 1 : 0;
-
-            await wait(1);
-
-            this.carbonDioxideSensorService.updateCharacteristic(
-              Characteristic.CarbonDioxideDetected,
-              state
-            );
-          }
-
-          if (value > this.lastCarbonDioxidePeakLevel) {
-            this.lastCarbonDioxidePeakLevel = value;
-            
-            await wait(1);
-
-            this.carbonDioxideSensorService.updateCharacteristic(
-              Characteristic.CarbonDioxidePeakLevel,
-              value
-            );
-          }
-
-        }
-
-      }
-
-      if (this.updateInterval > 0) {
-        this.carbonDioxideSensorAutoUpdate();
-      }
-
-    });
-
-  };
-
-  getCarbonDioxidePeakLevel = async () => {
-    
-    this.debugLogNum("CarbonDioxidePeakLevel ?", this.lastCarbonDioxidePeakLevel);
-    return this.lastCarbonDioxidePeakLevel;
-
-  };
-
-  //
   // Helper Functions
   //
 
@@ -1374,16 +1287,6 @@ class LogoAccessory {
     this.updateTimer = setTimeout(() => {
 
       this.getCurrentRelativeHumidity();
-
-    }, this.updateInterval + Math.floor(Math.random() * 10000));
-
-  }
-
-  carbonDioxideSensorAutoUpdate() {
-
-    this.updateTimer = setTimeout(() => {
-
-      this.getCarbonDioxideLevel();
 
     }, this.updateInterval + Math.floor(Math.random() * 10000));
 
