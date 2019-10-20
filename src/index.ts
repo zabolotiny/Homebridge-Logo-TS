@@ -4,6 +4,9 @@ import callbackify from "./util/callbackify";
 import { ModBusLogo } from "./util/modbus-logo";
 import { Snap7Logo } from "./util/snap7-logo";
 
+import { LightSensor } from "./util/accessories/LightSensor"
+import { MotionSensor } from "./util/accessories/MotionSensor"
+import { ContactSensor } from "./util/accessories/ContactSensor"
 import { TemperatureSensor } from "./util/accessories/TemperatureSensor"
 import { HumiditySensor } from "./util/accessories/HumiditySensor"
 import { CarbonDioxideSensor } from "./util/accessories/CarbonDioxideSensor"
@@ -24,10 +27,6 @@ const switchType: string              = "switch";
 const blindType: string               = "blind";
 const garagedoorType: string          = "garagedoor";
 const lightbulbType: string           = "lightbulb";
-
-const lightSensorType: string         = "lightSensor";
-const motionSensorType: string        = "motionSensor";
-const contactSensorType: string       = "contactSensor";
 
 
 const accessoryAnalogTimeOut = 500;
@@ -75,10 +74,6 @@ class LogoAccessory {
   lightbulbSetOff: string;
   lightbulbSetBrightness: string;
   lightbulbGetBrightness: string;
-
-  lightLevel: string;
-  motionDetected: string;
-  contactDetected: string;
   
 
   // Runtime state.
@@ -99,16 +94,19 @@ class LogoAccessory {
   blindService: any;
   garagedoorService: any;
   lightbulbService: any;
-  lightSensorService: any;
-  motionSensorService: any;
-  contactSensorService: any;
 
 
+  lightSensorService:         any;
+  motionSensorService:        any;
+  contactSensorService:       any;
   temperatureSensorService:   any;
   humiditySensorService:      any;
   carbonDioxideSensorService: any;
   airQualitySensorService:    any;
   
+  lightSensor:         LightSensor         | undefined;
+  motionSensor:        MotionSensor        | undefined;
+  contactSensor:       ContactSensor       | undefined;
   temperatureSensor:   TemperatureSensor   | undefined;
   humiditySensor:      HumiditySensor      | undefined;
   carbonDioxideSensor: CarbonDioxideSensor | undefined;
@@ -147,15 +145,6 @@ class LogoAccessory {
       }
       if (this.type == lightbulbType) {
         this.lightbulbAutoUpdate();
-      }
-      if (this.type == lightSensorType) {
-        this.lightSensorAutoUpdate();
-      }
-      if (this.type == motionSensorType) {
-        this.motionSensorAutoUpdate();
-      }
-      if (this.type == contactSensorType) {
-        this.contactSensorAutoUpdate();
       }
    
     }
@@ -303,13 +292,13 @@ class LogoAccessory {
     // LOGO! Light Sensor Service
     //
 
-    this.lightLevel = config["lightLevel"] || "AM3";
+    if (this.type == LightSensor.lightSensorType) {
 
-    if (this.type == lightSensorType) {
+      this.lightSensor = new LightSensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
 
       const lightSensorService = new Service.LightSensor(
         this.name,
-        "lightSensor",
+        LightSensor.lightSensorType,
       );
 
       lightSensorService
@@ -318,9 +307,12 @@ class LogoAccessory {
 
       lightSensorService
         .getCharacteristic(Characteristic.CurrentAmbientLightLevel)
-        .on("get", callbackify(this.getCurrentAmbientLightLevel));
+        .on("get", callbackify(this.lightSensor.getCurrentAmbientLightLevel));
 
       this.lightSensorService = lightSensorService;
+
+      this.lightSensor.lightSensorService = this.lightSensorService;
+      this.lightSensor.lightLevel         = config["lightLevel"] || "AM3";
 
     }
 
@@ -328,24 +320,27 @@ class LogoAccessory {
     // LOGO! Motion Sensor Service
     //
 
-    this.motionDetected = config["motionDetected"] || "M9";
+    if (this.type == MotionSensor.motionSensorType) {
 
-    if (this.type == motionSensorType) {
+      this.motionSensor = new MotionSensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
 
       const motionSensorService = new Service.MotionSensor(
         this.name,
-        "motionSensor",
+        MotionSensor.motionSensorType,
       );
 
       motionSensorService
         .getCharacteristic(Characteristic.StatusActive)
-        .on("get", callbackify(this.getStatusActive));
+        .on("get", callbackify(this.motionSensor.getStatusActive));
 
       motionSensorService
         .getCharacteristic(Characteristic.MotionDetected)
-        .on("get", callbackify(this.getMotionDetected));
+        .on("get", callbackify(this.motionSensor.getMotionDetected));
 
       this.motionSensorService = motionSensorService;
+
+      this.motionSensor.motionSensorService = this.motionSensorService;
+      this.motionSensor.motionDetected      = config["motionDetected"] || "M9";
 
     }
 
@@ -353,24 +348,27 @@ class LogoAccessory {
     // LOGO! Contact Sensor Service
     //
 
-    this.contactDetected = config["contactDetected"] || "M15";
+    if (this.type == ContactSensor.contactSensorType) {
 
-    if (this.type == contactSensorType) {
+      this.contactSensor = new ContactSensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
 
       const contactSensorService = new Service.ContactSensor(
         this.name,
-        "contactSensor",
+        ContactSensor.contactSensorType,
       );
 
       contactSensorService
         .getCharacteristic(Characteristic.StatusActive)
-        .on("get", callbackify(this.getStatusActive));
+        .on("get", callbackify(this.contactSensor.getStatusActive));
 
       contactSensorService
         .getCharacteristic(Characteristic.ContactSensorState)
-        .on("get", callbackify(this.getContactSensorState));
+        .on("get", callbackify(this.contactSensor.getContactSensorState));
 
       this.contactSensorService = contactSensorService;
+
+      this.contactSensor.contactSensorService = this.contactSensorService;
+      this.contactSensor.contactDetected      = config["contactDetected"] || "M15";
 
     }
 
@@ -512,13 +510,13 @@ class LogoAccessory {
     } else if (this.type == lightbulbType) {
       return [ this.lightbulbService ];
 
-    } else if (this.type == lightSensorType) {
+    } else if (this.type == LightSensor.lightSensorType) {
       return [ this.lightSensorService ];
 
-    } else if (this.type == motionSensorType) {
+    } else if (this.type == MotionSensor.motionSensorType) {
       return [ this.motionSensorService ];
 
-    } else if (this.type == contactSensorType) {
+    } else if (this.type == ContactSensor.contactSensorType) {
       return [ this.contactSensorService ];
 
     } else if (this.type == TemperatureSensor.temperatureSensorType) {
@@ -923,118 +921,6 @@ class LogoAccessory {
   };
 
   //
-  // LOGO! Light Sensor Service
-  //
-
-  getCurrentAmbientLightLevel = async () => {
-
-    // Cancel timer if the call came from the Home-App and not from the update interval.
-    // To avoid duplicate queries at the same time.
-    if (this.updateInterval > 0) {
-      clearTimeout(this.updateTimer);
-      this.updateTimer = 0;
-    }
-
-    this.logo.ReadLogo(this.lightLevel, async (value: number) => {
-
-      if (value != -1) {
-
-        this.debugLogNum("CurrentAmbientLightLevel ?", value);
-
-        await wait(1);
-
-        this.lightSensorService.updateCharacteristic(
-          Characteristic.CurrentAmbientLightLevel,
-          value
-        );
-
-      }
-
-      if (this.updateInterval > 0) {
-        this.lightSensorAutoUpdate();
-      }
-
-    });
-
-  };
-
-  //
-  // LOGO! Motion Sensor Service
-  //
-
-  getMotionDetected = async () => {
-
-    // Cancel timer if the call came from the Home-App and not from the update interval.
-    // To avoid duplicate queries at the same time.
-    if (this.updateInterval > 0) {
-      clearTimeout(this.updateTimer);
-      this.updateTimer = 0;
-    }
-
-    this.logo.ReadLogo(this.motionDetected, async (value: number) => {
-
-      if (value != -1) {
-
-        const state = value == 1 ? true : false;
-        this.debugLogBool("MotionDetected ?", state);
-
-        await wait(1);
-
-        this.motionSensorService.updateCharacteristic(
-          Characteristic.MotionDetected,
-          state
-        );
-
-      }
-
-      if (this.updateInterval > 0) {
-        this.motionSensorAutoUpdate();
-      }
-
-    });
-
-  };
-
-  //
-  // LOGO! Contact Sensor Service
-  //
-
-  getContactSensorState = async () => {
-    // CONTACT_DETECTED = 0; CONTACT_NOT_DETECTED = 1;
-
-    // Cancel timer if the call came from the Home-App and not from the update interval.
-    // To avoid duplicate queries at the same time.
-    if (this.updateInterval > 0) {
-      clearTimeout(this.updateTimer);
-      this.updateTimer = 0;
-    }
-
-    this.logo.ReadLogo(this.contactDetected, async (value: number) => {
-      // LOGO! return 1 for contact / close
-
-      if (value != -1) {
-
-        const state = value == 1 ? 0 : 1;
-        this.debugLogNum("ContactSensorState ?", state);
-
-        await wait(1);
-
-        this.contactSensorService.updateCharacteristic(
-          Characteristic.ContactSensorState,
-          state
-        );
-
-      }
-
-      if (this.updateInterval > 0) {
-        this.contactSensorAutoUpdate();
-      }
-
-    });
-
-  };
-
-  //
   // Helper Functions
   //
 
@@ -1163,36 +1049,6 @@ class LogoAccessory {
     this.updateTimer = setTimeout(() => {
 
       this.getLightbulbBrightness();
-
-    }, this.updateInterval + Math.floor(Math.random() * 10000));
-
-  }
-
-  lightSensorAutoUpdate() {
-
-    this.updateTimer = setTimeout(() => {
-
-      this.getCurrentAmbientLightLevel();
-
-    }, this.updateInterval + Math.floor(Math.random() * 10000));
-
-  }
-
-  motionSensorAutoUpdate() {
-
-    this.updateTimer = setTimeout(() => {
-
-      this.getMotionDetected();
-
-    }, this.updateInterval + Math.floor(Math.random() * 10000));
-
-  }
-
-  contactSensorAutoUpdate() {
-
-    this.updateTimer = setTimeout(() => {
-
-      this.getContactSensorState();
 
     }, this.updateInterval + Math.floor(Math.random() * 10000));
 
