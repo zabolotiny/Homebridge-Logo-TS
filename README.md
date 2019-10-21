@@ -1,10 +1,12 @@
 Homebridge-Logo-TS
 ==================
 
+[![npm version](https://badge.fury.io/js/homebridge-logo-ts.svg)](https://badge.fury.io/js/homebridge-logo-ts)  
+
 <img src="Standardraum.png" align="right" alt="Standardraum" height="448" width="207">
 
 Use a Siemens LOGO! PLC for switch on whatever you want.  
-Communicate with LOGO! 8.SF4 over Modbus and with LOGO! 0BA7 / 0BA8 over Snap7.  
+Communicate with LOGO! 8.SF4 over Modbus and with LOGO! 0BA7 / 0BA8 over [Snap7](http://snap7.sourceforge.net).  
 
 Type of Accessory:
 - Switch
@@ -27,19 +29,13 @@ The plugin that this one is based on: [homebridge-tesla](https://github.com/nfar
 If you use Homebridge-Logo-TS please donate: [PayPal.Me/Sinclair81](https://www.PayPal.Me/Sinclair81) !!  
 
 
-## Beta Test
-1. Download or clone Homebridge-Logo-TS.
-2. Install: $ npm install
-3. Build:   $ npm run build
-4. Run:     $ /usr/local/bin/homebridge -D -P ~/Homebridge-Logo-TS/
-
-<!--## Installation
+## Installation
 
 1. Install homebridge using: `sudo npm install -g --unsafe-perm homebridge`
 2. Install homebridge-config-ui-x using: `sudo npm install -g --unsafe-perm homebridge-config-ui-x`
 3. Update your configuration file with this guide: https://smartapfel.de/homebridge/plugins-installieren/
 4. Install homebridge-logo-ts using: homebridge-config-ui-x's Webserver
-5. Update your configuration file with code like the sample below -->
+5. Update your configuration file with code like the sample below
 
 ## Homebridge-Logo-TS Main Configuration Parameters:
 Name                     | Value               | Required | Option for | Notes
@@ -433,3 +429,9 @@ Name                     | Value               | Required | Option for | Notes
         }
     ]
 ```
+
+## Test Homebridge-Logo-TS
+1. Download or clone Homebridge-Logo-TS.
+2. Install: $ npm install
+3. Build:   $ npm run build
+4. Run:     $ /usr/local/bin/homebridge -D -P ~/Homebridge-Logo-TS/
