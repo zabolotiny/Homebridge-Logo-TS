@@ -198,6 +198,62 @@
 				"required": false,
 				"default": "VW72",
 				"description": "AMn or VWn"
+			},
+			"lightLevel": {
+				"title": "Light Level (required for a Light Sensor Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "AM3",
+				"description": "AMn or VWn"
+			},
+			"motionDetected": {
+				"title": "Motion Detected (required for a Motion Sensor Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "M9",
+				"description": "Mn or Vn.n"
+			},
+			"contactDetected": {
+				"title": "Contact Detected (required for a Contact Sensor Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "M15",
+				"description": "Mn or Vn.n"
+			},
+			"smokeDetected": {
+				"title": "Smoke Detected (required for a Smoke Sensor Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "M12",
+				"description": "Mn or Vn.n"
+			},
+			"temperature": {
+				"title": "Temperature (required for a Temperature Sensor Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "AM2",
+				"description": "AMn or VWn"
+			},
+			"humidity": {
+				"title": "Humidity (required for a Humidity Sensor Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "AM1",
+				"description": "AMn or VWn"
+			},
+			"carbonDioxideLevel": {
+				"title": "Carbon Dioxide Level (required for a Carbon Dioxide or Air Quality Sensor Accessory)",
+				"type": "string",
+				"required": false,
+				"default": "AM3",
+				"description": "AMn or VWn"
+			},
+			"carbonDioxideLimit": {
+				"title": "Carbon Dioxide Limit (required for a Carbon Dioxide Sensor Accessory)",
+				"type": "integer",
+				"required": false,
+				"default": 1000,
+				"description": "AMn or VWn"
 			}
 		}
 	}

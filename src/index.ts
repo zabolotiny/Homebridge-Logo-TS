@@ -109,9 +109,9 @@ class LogoAccessory {
     // Characteristic "Serial Number"     --> "0xDEADBEEF"
     // Characteristic "Version"
 
-    //
-    // LOGO! Switch Service
-    //
+    /************************
+     * LOGO! Switch Service *
+     ************************/
 
     if (this.type == SwitchAccessory.switchType) {
 
@@ -136,9 +136,9 @@ class LogoAccessory {
 
     }
 
-    //
-    // LOGO! Blind Service
-    //
+    /***********************
+     * LOGO! Blind Service *
+     ***********************/
 
     if (this.type == BlindAccessory.blindType) {
 
@@ -175,9 +175,9 @@ class LogoAccessory {
 
     }
 
-    //
-    // LOGO! GarageDoor Service
-    //
+    /****************************
+     * LOGO! GarageDoor Service *
+     ****************************/
 
     if (this.type == GaragedoorAccessory.garagedoorType) {
 
@@ -210,9 +210,9 @@ class LogoAccessory {
 
     }
 
-    //
-    // LOGO! LightBulb Service
-    //
+    /***************************
+     * LOGO! LightBulb Service *
+     ***************************/
 
     if (this.type == LightbulbAccessory.lightbulbType) {
 
@@ -243,9 +243,9 @@ class LogoAccessory {
 
     }
 
-    //
-    // LOGO! Light Sensor Service
-    //
+    /******************************
+     * LOGO! Light Sensor Service *
+     ******************************/
 
     if (this.type == LightSensor.lightSensorType) {
 
@@ -271,9 +271,9 @@ class LogoAccessory {
 
     }
 
-    //
-    // LOGO! Motion Sensor Service
-    //
+    /*******************************
+     * LOGO! Motion Sensor Service *
+     *******************************/
 
     if (this.type == MotionSensor.motionSensorType) {
 
@@ -299,9 +299,9 @@ class LogoAccessory {
 
     }
 
-    //
-    // LOGO! Contact Sensor Service
-    //
+    /********************************
+     * LOGO! Contact Sensor Service *
+     ********************************/
 
     if (this.type == ContactSensor.contactSensorType) {
 
@@ -327,9 +327,9 @@ class LogoAccessory {
 
     }
 
-    //
-    // LOGO! Smoke Sensor Service
-    //
+    /******************************
+     * LOGO! Smoke Sensor Service *
+     ******************************/
 
     if (this.type == SmokeSensor.smokeSensorType) {
 
@@ -355,9 +355,9 @@ class LogoAccessory {
 
     }
 
-    //
-    // LOGO! Temperature Sensor Service
-    //
+    /************************************
+     * LOGO! Temperature Sensor Service *
+     ************************************/
 
     if (this.type == TemperatureSensor.temperatureSensorType) {
 
@@ -383,9 +383,9 @@ class LogoAccessory {
 
     }
 
-    //
-    // LOGO! Humidity Sensor Service
-    //
+    /*********************************
+     * LOGO! Humidity Sensor Service *
+     *********************************/
 
     if (this.type == HumiditySensor.humiditySensorType) {
 
@@ -411,10 +411,10 @@ class LogoAccessory {
 
     }
 
-    //
-    // LOGO! Carbon Dioxide Sensor Service
-    //
-    // 1000ppm CO2 (CO2 in Air 0.04% = ~400ppm)
+    /********************************************
+     * LOGO! Carbon Dioxide Sensor Service      *
+     * 1000ppm CO2 (CO2 in Air 0.04% = ~400ppm) *
+     ********************************************/
 
     if (this.type == CarbonDioxideSensor.carbonDioxideSensorType) {
 
@@ -449,9 +449,9 @@ class LogoAccessory {
 
     }
 
-    //
-    // LOGO! Air Quality Sensor Service
-    //
+    /***++++++++++++*********************
+     * LOGO! Air Quality Sensor Service *
+     ************************************/
 
     if (this.type == AirQualitySensor.airQualitySensorType) {
 
@@ -522,9 +522,9 @@ class LogoAccessory {
     }
   }
 
-  //
-  // Helper Functions
-  //
+  /********************
+   * Helper Functions *
+   ********************/
 
   debugLogNum(msg: string, num: number) {
     if (this.debugMsgLog == 1) {
