@@ -101,7 +101,7 @@ class LogoAccessory {
     } else {
       this.logo = new Snap7Logo(this.logoType, this.ip, this.localTSAP, this.remoteTSAP, this.debugMsgLog, this.log);
     }
-    
+
     // Characteristic "Manufacturer"      --> pjson.author.name
     // Characteristic "Model"             --> this.type
     // Characteristic "Firmware Revision" --> pjson.version
@@ -268,6 +268,19 @@ class LogoAccessory {
 
       this.lightSensor.lightSensorService = this.lightSensorService;
       this.lightSensor.lightLevel         = config["lightLevel"] || "AM3";
+
+      this.lightSensor.lightLDRLevelParts = config["lightLDRLevelParts"] || 3;
+      this.lightSensor.lightLDRLevelMin   = config["lightLDRLevelMin"]   || 0;
+      this.lightSensor.lightLDRLevelMax   = config["lightLDRLevelMax"]   || 1000;
+      this.lightSensor.lightLDRLevelP1Min = config["lightLDRLevelP1Min"] || 423;
+      this.lightSensor.lightLDRLevelP2Min = config["lightLDRLevelP2Min"] || 696;
+     
+      this.lightSensor.lightLDRLevelP0S   = config["lightLDRLevelP0S"]   || 1.92170242765178;
+      this.lightSensor.lightLDRLevelP0Y   = config["lightLDRLevelP0Y"]   || -2.27030759992747;
+      this.lightSensor.lightLDRLevelP1S   = config["lightLDRLevelP1S"]   || 3.85547119519305;
+      this.lightSensor.lightLDRLevelP1Y   = config["lightLDRLevelP1Y"]   || -7.34902696724256;
+      this.lightSensor.lightLDRLevelP2S   = config["lightLDRLevelP2S"]   || 16.3271951868277;
+      this.lightSensor.lightLDRLevelP2Y   = config["lightLDRLevelP2Y"]   || -42.8043502895429;
 
     }
 
@@ -449,7 +462,7 @@ class LogoAccessory {
 
     }
 
-    /***++++++++++++*********************
+    /************************************
      * LOGO! Air Quality Sensor Service *
      ************************************/
 
@@ -480,7 +493,7 @@ class LogoAccessory {
       this.airQualitySensor.carbonDioxideLevel      = config["carbonDioxideLevel"] || "AM3";
 
     }
-  
+
   }
 
   getServices() {
