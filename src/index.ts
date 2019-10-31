@@ -551,6 +551,9 @@ class LogoAccessory {
     } else if (this.type == LightbulbAccessory.lightbulbType) {
       return [ this.lightbulbService ];
 
+    } else if (this.type == ThermostatAccessory.thermostatType) {
+      return [ this.thermostatService ];
+
     } else if (this.type == LightSensor.lightSensorType) {
       return [ this.lightSensorService ];
 
