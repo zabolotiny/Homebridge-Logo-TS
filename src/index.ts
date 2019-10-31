@@ -8,6 +8,7 @@ import { SwitchAccessory } from "./util/accessories/SwitchAccessory"
 import { BlindAccessory } from "./util/accessories/BlindAccessory"
 import { GaragedoorAccessory } from "./util/accessories/GaragedoorAccessory"
 import { LightbulbAccessory } from "./util/accessories/LightbulbAccessory"
+import { ThermostatAccessory } from "./util/accessories/ThermostatAccessory"
 import { LightSensor } from "./util/accessories/LightSensor"
 import { MotionSensor } from "./util/accessories/MotionSensor"
 import { ContactSensor } from "./util/accessories/ContactSensor"
@@ -59,6 +60,7 @@ class LogoAccessory {
   blindService:               any;
   garagedoorService:          any;
   lightbulbService:           any;
+  thermostatService:           any;
   lightSensorService:         any;
   motionSensorService:        any;
   contactSensorService:       any;
@@ -72,6 +74,7 @@ class LogoAccessory {
   blindAccessory:      BlindAccessory      | undefined;
   garagedoorAccessory: GaragedoorAccessory | undefined;
   lightbulbAccessory:  LightbulbAccessory  | undefined;
+  thermostatAccessory: ThermostatAccessory | undefined;
   lightSensor:         LightSensor         | undefined;
   motionSensor:        MotionSensor        | undefined;
   contactSensor:       ContactSensor       | undefined;
@@ -240,6 +243,48 @@ class LogoAccessory {
       this.lightbulbAccessory.lightbulbSetOff        = config["lightbulbSetOff"]        || "V7.1";
       this.lightbulbAccessory.lightbulbSetBrightness = config["lightbulbSetBrightness"] || "VW70";
       this.lightbulbAccessory.lightbulbGetBrightness = config["lightbulbGetBrightness"] || "VW72";
+
+    }
+
+    /****************************
+     * LOGO! Thermostat Service *
+     ****************************/
+
+    if (this.type == ThermostatAccessory.thermostatType) {
+
+      this.thermostatAccessory = new ThermostatAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
+
+      const thermostatService = new Service.Thermostat(
+        this.name,
+        ThermostatAccessory.thermostatType,
+      );
+
+      thermostatService
+        .getCharacteristic(Characteristic.CurrentHeatingCoolingState)
+        .on("get", callbackify(this.thermostatAccessory.getCurrentHeatingCoolingState));
+
+      thermostatService
+        .getCharacteristic(Characteristic.TargetHeatingCoolingState)
+        .on("get", callbackify(this.thermostatAccessory.getTargetHeatingCoolingState))
+        .on("set", callbackify(this.thermostatAccessory.setTargetHeatingCoolingState));
+
+      thermostatService
+        .getCharacteristic(Characteristic.CurrentTemperature)
+        .on("get", callbackify(this.thermostatAccessory.getCurrentTemperature));
+
+      thermostatService
+        .getCharacteristic(Characteristic.TargetTemperature)
+        .on("get", callbackify(this.thermostatAccessory.getTargetTemperature))
+        .on("set", callbackify(this.thermostatAccessory.setTargetTemperature));
+
+      this.thermostatService = thermostatService;
+
+      this.thermostatAccessory.thermostatService          = this.thermostatService;
+      this.thermostatAccessory.thermostatGetHCState       = config["thermostatGetHCState"]       || "VW211";
+      this.thermostatAccessory.thermostatSetHCState       = config["thermostatSetHCState"]       || "VW201";
+      this.thermostatAccessory.thermostatGetTemp          = config["thermostatGetTemp"]          || "VW213";
+      this.thermostatAccessory.thermostatSetTemp          = config["thermostatSetTemp"]          || "VW203";
+      this.thermostatAccessory.thermostatTempDisplayUnits = config["thermostatTempDisplayUnits"] || 0;
 
     }
 

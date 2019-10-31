@@ -13,6 +13,7 @@ Type of Accessory:
 - Blind
 - Garage Door
 - Lightbulb
+- Thermostat
 
 Type of Sensor Accessory:
 - Light Sensor
@@ -48,7 +49,7 @@ Name                     | Value               | Required | Option for | Notes
 `logoType`               | "8.SF4"             | no       | "snap7"    | Must be set to the type of your LOGO! PLC, default is: "8.SF4".
 `localTSAP`              | "0x1200"            | no       | "snap7"    | Must be set to the localTSAP of your LOGO! PLC, default is: 0x1200.
 `remoteTSAP`             | "0x2200"            | no       | "snap7"    | Must be set to the remoteTSAP of your LOGO! PLC, default is: 0x2200.
-`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "garagedoor", "lightbulb" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
+`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "garagedoor", "lightbulb", "thermostat" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
 `updateInterval`         | 0                   | no       | all        | Auto Update Interval in milliseconds, 0 = Off
 `buttonValue`            | 1                   | no       | all        | Value for Digital Button
 `pushButton`             | 1                   | no       | all        | If e.g. the network input in the LOGO! a hardware button on the LOGO! simulated.
@@ -241,11 +242,56 @@ Name                     | Value               | Required | Option for | Notes
 ```
 
 
+## Thermostat Accessory Configuration  
+
+Name                     | Value               | Required | Option for | Notes
+------------------------ | ------------------- | -------- | ---------- | ------------------------
+`thermostatGetHCState`   | "VW211"             | no       | "thermostat" | Thermostat Get Heating Cooling State - AMn or VWn
+`thermostatSetHCState`   | "VW201"             | no       | "thermostat" | Thermostat Set Heating Cooling State - AMn or VWn
+`thermostatGetTemp`      | "VW213"             | no       | "thermostat" | Thermostat Get Temperature - AMn or VWn
+`thermostatSetTemp`      | "VW203"             | no       | "thermostat" | Thermostat Set Temperature - AMn or VWn
+`thermostatTempDisplayUnits` | 0               | no       | "thermostat" | Temperature Display Units - Celsius = 0; Fahrenheit = 1;
+
+```
+"accessories": [
+        {
+            "accessory": "Logo-TS",
+            "name": "Thermostat ModBus",
+            "interface": "modbus",
+            "ip": "10.0.0.100",
+            "port": 505,
+            "type": "thermostat",
+            "thermostatGetHCState": "VW211",
+            "thermostatSetHCState": "VW201",
+            "thermostatGetTemp": "VW213",
+            "thermostatSetTemp": "VW203",
+            "thermostatTempDisplayUnits": 0
+        },
+        {
+            "accessory": "Logo-TS",
+            "name": "Thermostat Snap7",
+            "interface": "snap7",
+            "ip": "10.0.0.200",
+            "logoType": "0BA7",
+            "localTSAP": "0x1200",
+            "remoteTSAP": "0x2200",
+            "type": "thermostat",
+            "thermostatGetHCState": "VW211",
+            "thermostatSetHCState": "VW201",
+            "thermostatGetTemp": "VW213",
+            "thermostatSetTemp": "VW203",
+            "thermostatTempDisplayUnits": 0
+        }
+    ]
+```
+
+
 ## Light Sensor Accessory Configuration  
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`lightLevel`             | "AM3"               | no       | "lightSensor"         | Light Sensor for Current Ambient Light Level in Lux
+`lightLevel`             | "AM3"               | no       | "lightSensor" | Light Sensor for Current Ambient Light Level in Lux
+`lightLDRLevelParts`     | 0                   | no       | "lightSensor" | Indicates how many formula parts the lux value is calculated. [0, 1, 2, 3] 0 - simply shows the value of the LOGO!, [more information about the light sensor](src/util/accessories/LightSensor/LightSensor.md)
 
 ```
 "accessories": [
@@ -260,7 +306,8 @@ Name                     | Value               | Required | Option for | Notes
             "updateInterval": 30000,
             "debugMsgLog": 1,
             "type": "lightSensor",
-            "lightLevel": "AM3"
+            "lightLevel": "AM3",
+            "lightLDRLevelParts": 0
         }
     ]
 ```
