@@ -144,3 +144,36 @@ export class FilterMaintenanceAccessory {
   }
 
 }
+
+     /************************************
+     * LOGO! Filter Maintenance Service *
+     ************************************/
+
+     /*
+
+    if (this.type == FilterMaintenanceAccessory.filterMaintenanceType) {
+
+      this.filterMaintenanceAccessory = new FilterMaintenanceAccessory(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
+
+      const filterMaintenanceService = new Service.FilterMaintenance(
+        this.name,
+        FilterMaintenanceAccessory.filterMaintenanceType,
+      );
+
+      filterMaintenanceService
+        .getCharacteristic(Characteristic.FilterChangeIndication)
+        .on("get", callbackify(this.filterMaintenanceAccessory.getFilterChangeIndication));
+
+      filterMaintenanceService
+        .getCharacteristic(Characteristic.FilterLifeLevel)
+        .on("get", callbackify(this.filterMaintenanceAccessory.getFilterLifeLevel));
+
+      this.filterMaintenanceService = filterMaintenanceService;
+
+      this.filterMaintenanceAccessory.filterMaintenanceService = this.filterMaintenanceService;
+      this.filterMaintenanceAccessory.filterChangeIndication   = config["filterChangeIndication"] || "V120.0";
+      this.filterMaintenanceAccessory.filterLifeLevel          = config["filterLifeLevel"]        || "VW122";
+
+    }
+
+    */

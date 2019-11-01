@@ -49,7 +49,7 @@ Name                     | Value               | Required | Option for | Notes
 `logoType`               | "8.SF4"             | no       | "snap7"    | Must be set to the type of your LOGO! PLC, default is: "8.SF4".
 `localTSAP`              | "0x1200"            | no       | "snap7"    | Must be set to the localTSAP of your LOGO! PLC, default is: 0x1200.
 `remoteTSAP`             | "0x2200"            | no       | "snap7"    | Must be set to the remoteTSAP of your LOGO! PLC, default is: 0x2200.
-`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "garagedoor", "lightbulb", "thermostat", "filterMaintenance" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
+`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "garagedoor", "lightbulb", "thermostat" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
 `updateInterval`         | 0                   | no       | all        | Auto Update Interval in milliseconds, 0 = Off
 `buttonValue`            | 1                   | no       | all        | Value for Digital Button
 `pushButton`             | 1                   | no       | all        | If e.g. the network input in the LOGO! a hardware button on the LOGO! simulated.
@@ -281,41 +281,6 @@ Name                     | Value               | Required | Option for | Notes
             "thermostatGetTemp": "VW213",
             "thermostatSetTemp": "VW203",
             "thermostatTempDisplayUnits": 0
-        }
-    ]
-```
-
-
-## Filter Maintenance Accessory Configuration  
-
-Name                     | Value               | Required | Option for | Notes
------------------------- | ------------------- | -------- | ---------- | ------------------------
-`filterChangeIndication` | "V120.0"            | no       | "filterMaintenance" | FilterMaintenance Get Filter Change Indication - Mn or Vn.n
-`filterLifeLevel`        | "VW122"             | no       | "filterMaintenance" | FilterMaintenance Get Filter Life Level - AMn or VWn
-
-```
-"accessories": [
-        {
-            "accessory": "Logo-TS",
-            "name": "Filter Maintenance ModBus",
-            "interface": "modbus",
-            "ip": "10.0.0.100",
-            "port": 505,
-            "type": "filterMaintenance",
-            "filterChangeIndication": "V120.0",
-            "filterLifeLevel": "VW122"
-        },
-        {
-            "accessory": "Logo-TS",
-            "name": "Filter Maintenance Snap7",
-            "interface": "snap7",
-            "ip": "10.0.0.200",
-            "logoType": "0BA7",
-            "localTSAP": "0x1200",
-            "remoteTSAP": "0x2200",
-            "type": "filterMaintenance",
-            "filterChangeIndication": "V120.0",
-            "filterLifeLevel": "VW122"
         }
     ]
 ```
