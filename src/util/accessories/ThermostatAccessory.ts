@@ -24,9 +24,12 @@ export class ThermostatAccessory {
   debugMsgLog: number;
   lastTargetHeatingCoolingState: number;
   lastTargetTemperature: number;
+  lastTargetHeatingCoolingStateTime: number;
+  lastTargetHeatingCoolingStateTimerSet: boolean;
   lastTargetTemperatureTime: number;
   lastTargetTemperatureTimerSet: boolean;
-  updateTimer: any;
+  updateHCSTimer: any;
+  updateTempTimer: any;
 
   constructor(log: Function, 
               logo: any,
@@ -46,11 +49,16 @@ export class ThermostatAccessory {
     Characteristic      = characteristic;
 
     if (this.updateInterval > 0) {
-      this.thermostatAutoUpdate();
+      this.thermostatHCSAutoUpdate();
+    }
+    if (this.updateInterval > 0) {
+      this.thermostatTempAutoUpdate();
     }
 
     this.lastTargetHeatingCoolingState = -1;
     this.lastTargetTemperature         = -1;
+    this.lastTargetHeatingCoolingStateTime     = -1;
+    this.lastTargetHeatingCoolingStateTimerSet = false;
     this.lastTargetTemperatureTime     = -1;
     this.lastTargetTemperatureTimerSet = false;
 
@@ -65,8 +73,8 @@ export class ThermostatAccessory {
     // Cancel timer if the call came from the Home-App and not from the update interval.
     // To avoid duplicate queries at the same time.
     if (this.updateInterval > 0) {
-      clearTimeout(this.updateTimer);
-      this.updateTimer = 0;
+      clearTimeout(this.updateHCSTimer);
+      this.updateHCSTimer = 0;
     }
 
     this.logo.ReadLogo(this.thermostatGetHCState, async (state: number) => {
@@ -85,7 +93,7 @@ export class ThermostatAccessory {
       }
 
       if (this.updateInterval > 0) {
-        this.thermostatAutoUpdate();
+        this.thermostatHCSAutoUpdate();
       }
 
     });
@@ -105,6 +113,7 @@ export class ThermostatAccessory {
 
   setTargetHeatingCoolingState = async (state: number) => {
 
+    this.debugLogNum("Set TargetHeatingCoolingState to", state);
     this.lastTargetHeatingCoolingState = state;
     this.logo.WriteLogo(this.thermostatSetHCState, state, 0);
 
@@ -115,7 +124,7 @@ export class ThermostatAccessory {
     await wait(1);
 
     this.thermostatService.setCharacteristic(
-      Characteristic.TargetHeatingCoolingState,
+      Characteristic.CurrentHeatingCoolingState,
       state
     );
 
@@ -126,8 +135,8 @@ export class ThermostatAccessory {
     // Cancel timer if the call came from the Home-App and not from the update interval.
     // To avoid duplicate queries at the same time.
     if (this.updateInterval > 0) {
-      clearTimeout(this.updateTimer);
-      this.updateTimer = 0;
+      clearTimeout(this.updateTempTimer);
+      this.updateTempTimer = 0;
     }
 
     this.logo.ReadLogo(this.thermostatGetTemp, async (value: number) => {
@@ -147,7 +156,7 @@ export class ThermostatAccessory {
       }
 
       if (this.updateInterval > 0) {
-        this.thermostatAutoUpdate();
+        this.thermostatTempAutoUpdate();
       }
 
     });
@@ -173,16 +182,12 @@ export class ThermostatAccessory {
       this.targetTemperatureTimeout();
     }
 
-    // We succeeded, so update the "current" state as well.
-    // We need to update the current state "later" because Siri can't
-    // handle receiving the change event inside the same "set target state"
-    // response.
-    await wait(1);
+  };
 
-    this.thermostatService.setCharacteristic(
-      Characteristic.TargetTemperature,
-      temp
-    );
+  getTemperatureDisplayUnits = async () => {
+
+    this.debugLogNum("TemperatureDisplayUnits ?", this.thermostatTempDisplayUnits);
+    return this.thermostatTempDisplayUnits;
 
   };
 
@@ -222,11 +227,20 @@ export class ThermostatAccessory {
     }, 100);
   }
 
-  thermostatAutoUpdate() {
+  thermostatHCSAutoUpdate() {
 
-    this.updateTimer = setTimeout(() => {
+    this.updateHCSTimer = setTimeout(() => {
 
       this.getCurrentHeatingCoolingState();
+
+    }, this.updateInterval + Math.floor(Math.random() * 10000));
+
+  }
+
+  thermostatTempAutoUpdate() {
+
+    this.updateTempTimer = setTimeout(() => {
+
       this.getCurrentTemperature();
 
     }, this.updateInterval + Math.floor(Math.random() * 10000));

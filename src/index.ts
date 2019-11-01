@@ -277,6 +277,10 @@ class LogoAccessory {
         .on("get", callbackify(this.thermostatAccessory.getTargetTemperature))
         .on("set", callbackify(this.thermostatAccessory.setTargetTemperature));
 
+      thermostatService
+        .getCharacteristic(Characteristic.TemperatureDisplayUnits)
+        .on("get", callbackify(this.thermostatAccessory.getTemperatureDisplayUnits));
+
       this.thermostatService = thermostatService;
 
       this.thermostatAccessory.thermostatService          = this.thermostatService;
