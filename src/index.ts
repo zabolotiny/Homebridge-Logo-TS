@@ -9,6 +9,7 @@ import { BlindAccessory } from "./util/accessories/BlindAccessory"
 import { GaragedoorAccessory } from "./util/accessories/GaragedoorAccessory"
 import { LightbulbAccessory } from "./util/accessories/LightbulbAccessory"
 import { ThermostatAccessory } from "./util/accessories/ThermostatAccessory"
+import { FilterMaintenanceAccessory } from "./util/accessories/FilterMaintenanceAccessory"
 import { LightSensor } from "./util/accessories/LightSensor"
 import { MotionSensor } from "./util/accessories/MotionSensor"
 import { ContactSensor } from "./util/accessories/ContactSensor"
@@ -60,7 +61,8 @@ class LogoAccessory {
   blindService:               any;
   garagedoorService:          any;
   lightbulbService:           any;
-  thermostatService:           any;
+  thermostatService:          any;
+  filterMaintenanceService:   any;
   lightSensorService:         any;
   motionSensorService:        any;
   contactSensorService:       any;
@@ -70,19 +72,20 @@ class LogoAccessory {
   carbonDioxideSensorService: any;
   airQualitySensorService:    any;
 
-  switchAccessory:     SwitchAccessory     | undefined;
-  blindAccessory:      BlindAccessory      | undefined;
-  garagedoorAccessory: GaragedoorAccessory | undefined;
-  lightbulbAccessory:  LightbulbAccessory  | undefined;
-  thermostatAccessory: ThermostatAccessory | undefined;
-  lightSensor:         LightSensor         | undefined;
-  motionSensor:        MotionSensor        | undefined;
-  contactSensor:       ContactSensor       | undefined;
-  smokeSensor:         SmokeSensor         | undefined;
-  temperatureSensor:   TemperatureSensor   | undefined;
-  humiditySensor:      HumiditySensor      | undefined;
-  carbonDioxideSensor: CarbonDioxideSensor | undefined;
-  airQualitySensor:    AirQualitySensor    | undefined;
+  switchAccessory:            SwitchAccessory            | undefined;
+  blindAccessory:             BlindAccessory             | undefined;
+  garagedoorAccessory:        GaragedoorAccessory        | undefined;
+  lightbulbAccessory:         LightbulbAccessory         | undefined;
+  thermostatAccessory:        ThermostatAccessory        | undefined;
+  filterMaintenanceAccessory: FilterMaintenanceAccessory | undefined;
+  lightSensor:                LightSensor                | undefined;
+  motionSensor:               MotionSensor               | undefined;
+  contactSensor:              ContactSensor              | undefined;
+  smokeSensor:                SmokeSensor                | undefined;
+  temperatureSensor:          TemperatureSensor          | undefined;
+  humiditySensor:             HumiditySensor             | undefined;
+  carbonDioxideSensor:        CarbonDioxideSensor        | undefined;
+  airQualitySensor:           AirQualitySensor           | undefined;
 
   constructor(log: any, config: any) {
     this.log            = log;
@@ -289,6 +292,35 @@ class LogoAccessory {
       this.thermostatAccessory.thermostatGetTemp          = config["thermostatGetTemp"]          || "VW213";
       this.thermostatAccessory.thermostatSetTemp          = config["thermostatSetTemp"]          || "VW203";
       this.thermostatAccessory.thermostatTempDisplayUnits = config["thermostatTempDisplayUnits"] || 0;
+
+    }
+
+    /************************************
+     * LOGO! Filter Maintenance Service *
+     ************************************/
+
+    if (this.type == FilterMaintenanceAccessory.filterMaintenanceType) {
+
+      this.filterMaintenanceAccessory = new FilterMaintenanceAccessory(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
+
+      const filterMaintenanceService = new Service.FilterMaintenance(
+        this.name,
+        FilterMaintenanceAccessory.filterMaintenanceType,
+      );
+
+      filterMaintenanceService
+        .getCharacteristic(Characteristic.FilterChangeIndication)
+        .on("get", callbackify(this.filterMaintenanceAccessory.getFilterChangeIndication));
+
+      filterMaintenanceService
+        .getCharacteristic(Characteristic.FilterLifeLevel)
+        .on("get", callbackify(this.filterMaintenanceAccessory.getFilterLifeLevel));
+
+      this.filterMaintenanceService = filterMaintenanceService;
+
+      this.filterMaintenanceAccessory.filterMaintenanceService = this.filterMaintenanceService;
+      this.filterMaintenanceAccessory.filterChangeIndication   = config["filterChangeIndication"] || "V120.0";
+      this.filterMaintenanceAccessory.filterLifeLevel          = config["filterLifeLevel"]        || "VW122";
 
     }
 
@@ -557,6 +589,9 @@ class LogoAccessory {
 
     } else if (this.type == ThermostatAccessory.thermostatType) {
       return [ this.thermostatService ];
+
+    } else if (this.type == FilterMaintenanceAccessory.filterMaintenanceType) {
+      return [ this.filterMaintenanceService ];
 
     } else if (this.type == LightSensor.lightSensorType) {
       return [ this.lightSensorService ];
