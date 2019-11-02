@@ -249,7 +249,8 @@ Name                     | Value               | Required | Option for | Notes
 `thermostatGetHCState`   | "VW211"             | no       | "thermostat" | Thermostat Get Heating Cooling State - AMn or VWn
 `thermostatSetHCState`   | "VW201"             | no       | "thermostat" | Thermostat Set Heating Cooling State - AMn or VWn
 `thermostatGetTemp`      | "VW213"             | no       | "thermostat" | Thermostat Get Temperature - AMn or VWn
-`thermostatSetTemp`      | "VW203"             | no       | "thermostat" | Thermostat Set Temperature - AMn or VWn
+`thermostatGetTargetTemp`    | "VW215"         | no       | "thermostat" | Thermostat Get Target Temperature - AMn or VWn
+`thermostatSetTargetTemp`    | "VW203"         | no       | "thermostat" | Thermostat Set Target Temperature - AMn or VWn
 `thermostatTempDisplayUnits` | 0               | no       | "thermostat" | Temperature Display Units - Celsius = 0; Fahrenheit = 1;
 
 ```
@@ -264,7 +265,8 @@ Name                     | Value               | Required | Option for | Notes
             "thermostatGetHCState": "VW211",
             "thermostatSetHCState": "VW201",
             "thermostatGetTemp": "VW213",
-            "thermostatSetTemp": "VW203",
+            "thermostatGetTargetTemp": "VW215",
+            "thermostatSetTargetTemp": "VW203",
             "thermostatTempDisplayUnits": 0
         },
         {
@@ -279,7 +281,8 @@ Name                     | Value               | Required | Option for | Notes
             "thermostatGetHCState": "VW211",
             "thermostatSetHCState": "VW201",
             "thermostatGetTemp": "VW213",
-            "thermostatSetTemp": "VW203",
+            "thermostatGetTargetTemp": "VW215",
+            "thermostatSetTargetTemp": "VW203",
             "thermostatTempDisplayUnits": 0
         }
     ]

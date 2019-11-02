@@ -289,7 +289,8 @@ class LogoAccessory {
       this.thermostatAccessory.thermostatGetHCState       = config["thermostatGetHCState"]       || "VW211";
       this.thermostatAccessory.thermostatSetHCState       = config["thermostatSetHCState"]       || "VW201";
       this.thermostatAccessory.thermostatGetTemp          = config["thermostatGetTemp"]          || "VW213";
-      this.thermostatAccessory.thermostatSetTemp          = config["thermostatSetTemp"]          || "VW203";
+      this.thermostatAccessory.thermostatGetTargetTemp    = config["thermostatGetTargetTemp"]    || "VW215";
+      this.thermostatAccessory.thermostatSetTargetTemp    = config["thermostatSetTargetTemp"]    || "VW203";
       this.thermostatAccessory.thermostatTempDisplayUnits = config["thermostatTempDisplayUnits"] || 0;
 
     }

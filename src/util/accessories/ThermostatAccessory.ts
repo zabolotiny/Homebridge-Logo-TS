@@ -11,7 +11,8 @@ export class ThermostatAccessory {
   public thermostatGetHCState: string       = "VW211";
   public thermostatSetHCState: string       = "VW201";
   public thermostatGetTemp: string          = "VW213";
-  public thermostatSetTemp: string          = "VW203";
+  public thermostatGetTargetTemp: string    = "VW215";
+  public thermostatSetTargetTemp: string    = "VW203";
   public thermostatTempDisplayUnits: number = 0;
 
   accessoryAnalogTimeOut = 500;
@@ -30,6 +31,7 @@ export class ThermostatAccessory {
   lastTargetTemperatureTimerSet: boolean;
   updateHCSTimer: any;
   updateTempTimer: any;
+  updateTargetTempTimer: any;
 
   constructor(log: Function, 
               logo: any,
@@ -50,9 +52,8 @@ export class ThermostatAccessory {
 
     if (this.updateInterval > 0) {
       this.thermostatHCSAutoUpdate();
-    }
-    if (this.updateInterval > 0) {
       this.thermostatTempAutoUpdate();
+      this.thermostatTargetTempAutoUpdate();
     }
 
     this.lastTargetHeatingCoolingState = -1;
@@ -165,12 +166,35 @@ export class ThermostatAccessory {
 
   getTargetTemperature = async () => {
 
-    this.debugLogNum("TargetTemperature ?", this.lastTargetTemperature);
-    if (this.lastTargetTemperature != -1) {
-      return this.lastTargetTemperature;
-    } else {
-      return 0;
+    // Cancel timer if the call came from the Home-App and not from the update interval.
+    // To avoid duplicate queries at the same time.
+    if (this.updateInterval > 0) {
+      clearTimeout(this.updateTargetTempTimer);
+      this.updateTargetTempTimer = 0;
     }
+
+    this.logo.ReadLogo(this.thermostatGetTargetTemp, async (value: number) => {
+
+      if (value != -1) {
+
+        let temp = value / 10;
+        this.lastTargetTemperature = temp;
+        this.debugLogNum("TargetTemperature ?", temp);
+
+        await wait(1);
+
+        this.thermostatService.updateCharacteristic(
+          Characteristic.TargetTemperature,
+          temp
+        );
+
+      }
+
+      if (this.updateInterval > 0) {
+        this.thermostatTargetTempAutoUpdate();
+      }
+
+    });
 
   };
 
@@ -216,7 +240,7 @@ export class ThermostatAccessory {
           this.debugLogNum("Set TargetTemperature to", this.lastTargetTemperature);
           this.lastTargetTemperatureTimerSet = false;
 
-            this.logo.WriteLogo(this.thermostatSetTemp, (this.lastTargetTemperature * 10), 0);
+            this.logo.WriteLogo(this.thermostatSetTargetTemp, (this.lastTargetTemperature * 10), 0);
 
         } else {
 
@@ -242,6 +266,16 @@ export class ThermostatAccessory {
     this.updateTempTimer = setTimeout(() => {
 
       this.getCurrentTemperature();
+
+    }, this.updateInterval + Math.floor(Math.random() * 10000));
+
+  }
+
+  thermostatTargetTempAutoUpdate() {
+
+    this.updateTargetTempTimer = setTimeout(() => {
+
+      this.getTargetTemperature();
 
     }, this.updateInterval + Math.floor(Math.random() * 10000));
 
