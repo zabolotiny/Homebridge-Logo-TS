@@ -357,6 +357,51 @@ Name                     | Value               | Required | Option for | Notes
 ```
 
 
+## Irrigation System Accessory Configuration  
+
+Name                     | Value               | Required | Option for | Notes
+------------------------ | ------------------- | -------- | ---------- | ------------------------
+`irrigationSystemGetActive`      | "V400.0"    | no       | "irrigationSystem" | Irrigation System Get Active - Mn or Vn.n
+`irrigationSystemSetActiveOn`    | "V400.1"    | no       | "irrigationSystem" | Irrigation System Set Active to On - Mn or Vn.n
+`irrigationSystemSetActiveOff`   | "V400.2"    | no       | "irrigationSystem" | Irrigation System Set Active to Off - Mn or Vn.n
+`irrigationSystemGetProgramMode` | "VW402"     | no       | "irrigationSystem" | Irrigation System Get Program Mode - AMn or VWn
+`irrigationSystemGetInUse`       | "V400.3"    | no       | "irrigationSystem" | Irrigation System Get In Use - Mn or Vn.n
+
+```
+"accessories": [
+        {
+            "accessory": "Logo-TS",
+            "name": "Irrigation System ModBus",
+            "interface": "modbus",
+            "ip": "10.0.0.100",
+            "port": 505,
+            "type": "irrigationSystem",
+            "irrigationSystemGetActive": "V400.0",
+            "irrigationSystemSetActiveOn": "V400.1",
+            "irrigationSystemSetActiveOff": "V400.2",
+            "irrigationSystemGetProgramMode": "VW402",
+            "irrigationSystemGetInUse": "V400.3"
+        },
+        {
+            "accessory": "Logo-TS",
+            "name": "Irrigation System Snap7",
+            "interface": "snap7",
+            "ip": "10.0.0.200",
+            "logoType": "0BA7",
+            "localTSAP": "0x1200",
+            "remoteTSAP": "0x2200",
+            "type": "irrigationSystem",
+            "irrigationSystemGetActive": "V400.0",
+            "irrigationSystemSetActiveOn": "V400.1",
+            "irrigationSystemSetActiveOff": "V400.2",
+            "irrigationSystemGetProgramMode": "VW402",
+            "irrigationSystemGetInUse": "V400.3"
+        }
+    ]
+```
+
+
+
 ## Light Sensor Accessory Configuration  
 
 Name                     | Value               | Required | Option for | Notes

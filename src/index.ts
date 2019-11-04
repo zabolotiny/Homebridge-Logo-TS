@@ -10,6 +10,7 @@ import { WindowAccessory } from "./util/accessories/WindowAccessory"
 import { GaragedoorAccessory } from "./util/accessories/GaragedoorAccessory"
 import { LightbulbAccessory } from "./util/accessories/LightbulbAccessory"
 import { ThermostatAccessory } from "./util/accessories/ThermostatAccessory"
+import { IrrigationSystemAccessory } from "./util/accessories/IrrigationSystemAccessory"
 import { LightSensor } from "./util/accessories/LightSensor"
 import { MotionSensor } from "./util/accessories/MotionSensor"
 import { ContactSensor } from "./util/accessories/ContactSensor"
@@ -57,14 +58,15 @@ class LogoAccessory {
   logo: any;
 
   // Services exposed.
+  serviceToExpose:            any;
+  /*
   switchService:              any;
   blindService:               any;
   windowService:              any;
   garagedoorService:          any;
   lightbulbService:           any;
   thermostatService:          any;
-  filterMaintenanceService:   any;
-  fanService:                 any;
+  thermostatService:          any;
   lightSensorService:         any;
   motionSensorService:        any;
   contactSensorService:       any;
@@ -73,6 +75,7 @@ class LogoAccessory {
   humiditySensorService:      any;
   carbonDioxideSensorService: any;
   airQualitySensorService:    any;
+  */
 
   switchAccessory:            SwitchAccessory            | undefined;
   blindAccessory:             BlindAccessory             | undefined;
@@ -80,6 +83,7 @@ class LogoAccessory {
   garagedoorAccessory:        GaragedoorAccessory        | undefined;
   lightbulbAccessory:         LightbulbAccessory         | undefined;
   thermostatAccessory:        ThermostatAccessory        | undefined;
+  irrigationSystemAccessory:  IrrigationSystemAccessory  | undefined;
   lightSensor:                LightSensor                | undefined;
   motionSensor:               MotionSensor               | undefined;
   contactSensor:              ContactSensor              | undefined;
@@ -135,9 +139,9 @@ class LogoAccessory {
         .on("get", callbackify(this.switchAccessory.getSwitchOn))
         .on("set", callbackify(this.switchAccessory.setSwitchOn));
 
-      this.switchService = switchService;
+        this.serviceToExpose = switchService;
 
-      this.switchAccessory.switchService = this.switchService;
+      this.switchAccessory.switchService = this.serviceToExpose;
       this.switchAccessory.switchGet     = config["switchGet"]    || "Q1";
       this.switchAccessory.switchSetOn   = config["switchSetOn"]  || "V2.0";
       this.switchAccessory.switchSetOff  = config["switchSetOff"] || "V3.0";
@@ -170,9 +174,9 @@ class LogoAccessory {
         .getCharacteristic(Characteristic.PositionState)
         .on("get", callbackify(this.blindAccessory.getBlindPositionState));
 
-      this.blindService = blindService;
+      this.serviceToExpose = blindService;
 
-      this.blindAccessory.blindService    = this.blindService;
+      this.blindAccessory.blindService    = this.serviceToExpose;
       this.blindAccessory.blindSetPos     = config["blindSetPos"]    || "VW50";
       this.blindAccessory.blindGetPos     = config["blindGetPos"]    || "VW52";
       this.blindAccessory.blindGetState   = config["blindGetState"]  || "VW54";
@@ -209,9 +213,9 @@ class LogoAccessory {
         .getCharacteristic(Characteristic.PositionState)
         .on("get", callbackify(this.windowAccessory.getWindowPositionState));
 
-      this.windowService = windowService;
+      this.serviceToExpose = windowService;
 
-      this.windowAccessory.windowService    = this.windowService;
+      this.windowAccessory.windowService    = this.serviceToExpose;
       this.windowAccessory.windowSetPos     = config["windowSetPos"]    || "VW50";
       this.windowAccessory.windowGetPos     = config["windowGetPos"]    || "VW52";
       this.windowAccessory.windowGetState   = config["windowGetState"]  || "VW54";
@@ -248,9 +252,9 @@ class LogoAccessory {
         .getCharacteristic(Characteristic.ObstructionDetected)
         .on("get", callbackify(this.garagedoorAccessory.getGarageDoorObstructionDetected));
 
-      this.garagedoorService = garagedoorService;
+      this.serviceToExpose = garagedoorService;
 
-      this.garagedoorAccessory.garagedoorService = this.garagedoorService;
+      this.garagedoorAccessory.garagedoorService = this.serviceToExpose;
       this.garagedoorAccessory.garagedoorOpen    = config["garagedoorOpen"]  || "V6.0";
       this.garagedoorAccessory.garagedoorClose   = config["garagedoorClose"] || "V6.1";
       this.garagedoorAccessory.garagedoorState   = config["garagedoorState"] || "V6.2";
@@ -280,9 +284,9 @@ class LogoAccessory {
         .on("get", callbackify(this.lightbulbAccessory.getLightbulbBrightness))
         .on("set", callbackify(this.lightbulbAccessory.setLightbulbBrightness));
 
-      this.lightbulbService = lightbulbService;
+      this.serviceToExpose = lightbulbService;
 
-      this.lightbulbAccessory.lightbulbService       = this.lightbulbService;
+      this.lightbulbAccessory.lightbulbService       = this.serviceToExpose;
       this.lightbulbAccessory.lightbulbSetOn         = config["lightbulbSetOn"]         || "V7.0";
       this.lightbulbAccessory.lightbulbSetOff        = config["lightbulbSetOff"]        || "V7.1";
       this.lightbulbAccessory.lightbulbSetBrightness = config["lightbulbSetBrightness"] || "VW70";
@@ -325,15 +329,52 @@ class LogoAccessory {
         .getCharacteristic(Characteristic.TemperatureDisplayUnits)
         .on("get", callbackify(this.thermostatAccessory.getTemperatureDisplayUnits));
 
-      this.thermostatService = thermostatService;
+      this.serviceToExpose = thermostatService;
 
-      this.thermostatAccessory.thermostatService          = this.thermostatService;
+      this.thermostatAccessory.thermostatService          = this.serviceToExpose;
       this.thermostatAccessory.thermostatGetHCState       = config["thermostatGetHCState"]       || "VW211";
       this.thermostatAccessory.thermostatSetHCState       = config["thermostatSetHCState"]       || "VW201";
       this.thermostatAccessory.thermostatGetTemp          = config["thermostatGetTemp"]          || "VW213";
       this.thermostatAccessory.thermostatGetTargetTemp    = config["thermostatGetTargetTemp"]    || "VW215";
       this.thermostatAccessory.thermostatSetTargetTemp    = config["thermostatSetTargetTemp"]    || "VW203";
       this.thermostatAccessory.thermostatTempDisplayUnits = config["thermostatTempDisplayUnits"] || 0;
+
+    }
+
+    /**********************************
+     * LOGO! IrrigationSystem Service *
+     **********************************/
+
+    if (this.type == IrrigationSystemAccessory.irrigationSystemType) {
+
+      this.irrigationSystemAccessory = new IrrigationSystemAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
+
+      const irrigationSystemService = new Service.IrrigationSystem(
+        this.name,
+        IrrigationSystemAccessory.irrigationSystemType,
+      );
+
+      irrigationSystemService
+        .getCharacteristic(Characteristic.Active)
+        .on("get", callbackify(this.irrigationSystemAccessory.getActive))
+        .on("set", callbackify(this.irrigationSystemAccessory.setActive));
+
+      irrigationSystemService
+        .getCharacteristic(Characteristic.ProgramMode)
+        .on("get", callbackify(this.irrigationSystemAccessory.getProgramMode));
+
+      irrigationSystemService
+        .getCharacteristic(Characteristic.InUse)
+        .on("get", callbackify(this.irrigationSystemAccessory.getInUse));
+
+      this.serviceToExpose = irrigationSystemService;
+
+      this.irrigationSystemAccessory.irrigationSystemService        = this.serviceToExpose;
+      this.irrigationSystemAccessory.irrigationSystemGetActive      = config["irrigationSystemGetActive"]      || "V400.0";
+      this.irrigationSystemAccessory.irrigationSystemSetActiveOn    = config["irrigationSystemSetActiveOn"]    || "V400.1";
+      this.irrigationSystemAccessory.irrigationSystemSetActiveOff   = config["irrigationSystemSetActiveOff"]   || "V400.2";
+      this.irrigationSystemAccessory.irrigationSystemGetProgramMode = config["irrigationSystemGetProgramMode"] || "VW402";
+      this.irrigationSystemAccessory.irrigationSystemGetInUse       = config["irrigationSystemGetInUse"]       || "V400.3";
 
     }
 
@@ -358,9 +399,9 @@ class LogoAccessory {
         .getCharacteristic(Characteristic.CurrentAmbientLightLevel)
         .on("get", callbackify(this.lightSensor.getCurrentAmbientLightLevel));
 
-      this.lightSensorService = lightSensorService;
+      this.serviceToExpose = lightSensorService;
 
-      this.lightSensor.lightSensorService = this.lightSensorService;
+      this.lightSensor.lightSensorService = this.serviceToExpose;
       this.lightSensor.lightLevel         = config["lightLevel"] || "AM3";
 
       this.lightSensor.lightLDRLevelParts = config["lightLDRLevelParts"] || 3;
@@ -399,9 +440,9 @@ class LogoAccessory {
         .getCharacteristic(Characteristic.MotionDetected)
         .on("get", callbackify(this.motionSensor.getMotionDetected));
 
-      this.motionSensorService = motionSensorService;
+      this.serviceToExpose = motionSensorService;
 
-      this.motionSensor.motionSensorService = this.motionSensorService;
+      this.motionSensor.motionSensorService = this.serviceToExpose;
       this.motionSensor.motionDetected      = config["motionDetected"] || "M9";
 
     }
@@ -427,9 +468,9 @@ class LogoAccessory {
         .getCharacteristic(Characteristic.ContactSensorState)
         .on("get", callbackify(this.contactSensor.getContactSensorState));
 
-      this.contactSensorService = contactSensorService;
+      this.serviceToExpose = contactSensorService;
 
-      this.contactSensor.contactSensorService = this.contactSensorService;
+      this.contactSensor.contactSensorService = this.serviceToExpose;
       this.contactSensor.contactDetected      = config["contactDetected"] || "M15";
 
     }
@@ -455,9 +496,9 @@ class LogoAccessory {
         .getCharacteristic(Characteristic.SmokeDetected)
         .on("get", callbackify(this.smokeSensor.getSmokeDetected));
 
-      this.smokeSensorService = smokeSensorService;
+      this.serviceToExpose = smokeSensorService;
 
-      this.smokeSensor.smokeSensorService = this.smokeSensorService;
+      this.smokeSensor.smokeSensorService = this.serviceToExpose;
       this.smokeSensor.smokeDetected      = config["smokeDetected"] || "M12";
 
     }
@@ -483,9 +524,9 @@ class LogoAccessory {
         .getCharacteristic(Characteristic.CurrentTemperature)
         .on("get", callbackify(this.temperatureSensor.getCurrentTemperature));
 
-      this.temperatureSensorService = temperatureSensorService;
+      this.serviceToExpose = temperatureSensorService;
 
-      this.temperatureSensor.temperatureSensorService = this.temperatureSensorService;
+      this.temperatureSensor.temperatureSensorService = this.serviceToExpose;
       this.temperatureSensor.temperature              = config["temperature"] || "AM2";
 
     }
@@ -511,9 +552,9 @@ class LogoAccessory {
         .getCharacteristic(Characteristic.CurrentRelativeHumidity)
         .on("get", callbackify(this.humiditySensor.getCurrentRelativeHumidity));
 
-      this.humiditySensorService = humiditySensorService;
+      this.serviceToExpose = humiditySensorService;
 
-      this.humiditySensor.humiditySensorService = this.humiditySensorService;
+      this.humiditySensor.humiditySensorService = this.serviceToExpose;
       this.humiditySensor.humidity              = config["humidity"] || "AM1";
 
     }
@@ -548,9 +589,9 @@ class LogoAccessory {
         .getCharacteristic(Characteristic.CarbonDioxidePeakLevel)
         .on("get", callbackify(this.carbonDioxideSensor.getCarbonDioxidePeakLevel));
 
-      this.carbonDioxideSensorService = carbonDioxideSensorService;
+      this.serviceToExpose = carbonDioxideSensorService;
 
-      this.carbonDioxideSensor.carbonDioxideSensorService = this.carbonDioxideSensorService;
+      this.carbonDioxideSensor.carbonDioxideSensorService = this.serviceToExpose;
       this.carbonDioxideSensor.carbonDioxideLevel         = config["carbonDioxideLevel"] || "AM3";
       this.carbonDioxideSensor.carbonDioxideLimit         = config["carbonDioxideLimit"] || 1000;
 
@@ -581,9 +622,9 @@ class LogoAccessory {
         .getCharacteristic(Characteristic.CarbonDioxideLevel)
         .on("get", callbackify(this.airQualitySensor.getCarbonDioxideLevel));
 
-      this.airQualitySensorService = airQualitySensorService;
+      this.serviceToExpose = airQualitySensorService;
 
-      this.airQualitySensor.airQualitySensorService = this.airQualitySensorService;
+      this.airQualitySensor.airQualitySensorService = this.serviceToExpose;
       this.airQualitySensor.carbonDioxideLevel      = config["carbonDioxideLevel"] || "AM3";
 
     }
@@ -591,6 +632,7 @@ class LogoAccessory {
   }
 
   getServices() {
+    /*
     if (this.type == BlindAccessory.blindType) {
       return [ this.blindService ];
 
@@ -602,6 +644,9 @@ class LogoAccessory {
 
     } else if (this.type == LightbulbAccessory.lightbulbType) {
       return [ this.lightbulbService ];
+
+    } else if (this.type == ThermostatAccessory.thermostatType) {
+      return [ this.thermostatService ];
 
     } else if (this.type == ThermostatAccessory.thermostatType) {
       return [ this.thermostatService ];
@@ -633,6 +678,8 @@ class LogoAccessory {
     } else {
       return [ this.switchService ];
     }
+    */
+    return [ this.serviceToExpose ];
   }
 
   /********************

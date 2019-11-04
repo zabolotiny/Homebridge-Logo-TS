@@ -1,6 +1,6 @@
 {
   "name": "homebridge-logo-ts",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Use a Siemens LOGO! PLC for switch on whatever you want. >>> $ npm run <scripts>",
   "homepage": "https://github.com/sinclair81/homebridge-logo-ts",
   "author": {
