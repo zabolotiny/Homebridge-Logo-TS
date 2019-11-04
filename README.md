@@ -11,6 +11,7 @@ Communicate with LOGO! 8.SF4 over Modbus and with LOGO! 0BA7 / 0BA8 over [Snap7]
 Type of Accessory:
 - Switch
 - Blind
+- Window
 - Garage Door
 - Lightbulb
 - Thermostat
@@ -49,7 +50,7 @@ Name                     | Value               | Required | Option for | Notes
 `logoType`               | "8.SF4"             | no       | "snap7"    | Must be set to the type of your LOGO! PLC, default is: "8.SF4".
 `localTSAP`              | "0x1200"            | no       | "snap7"    | Must be set to the localTSAP of your LOGO! PLC, default is: 0x1200.
 `remoteTSAP`             | "0x2200"            | no       | "snap7"    | Must be set to the remoteTSAP of your LOGO! PLC, default is: 0x2200.
-`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "garagedoor", "lightbulb", "thermostat" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
+`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "window", "garagedoor", "lightbulb", "thermostat" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
 `updateInterval`         | 0                   | no       | all        | Auto Update Interval in milliseconds, 0 = Off
 `buttonValue`            | 1                   | no       | all        | Value for Digital Button
 `pushButton`             | 1                   | no       | all        | If e.g. the network input in the LOGO! a hardware button on the LOGO! simulated.
@@ -156,6 +157,73 @@ Name                     | Value               | Required | Option for | Notes
             "blindSetUp": "V5.0",
             "blindSetDown": "V5.1",
             "blindGetUpDown": "V5.2"
+        }
+    ]
+```
+
+## Window Accessory Configuration  
+
+Name                     | Value               | Required | Option for | Notes
+------------------------ | ------------------- | -------- | ---------- | ------------------------
+`windowSetPos`            | "VW50"              | no       | "window"    | Window Set Pos - AMn or VWn - (Analog Control)
+`windowGetPos`            | "VW52"              | no       | "window"    | Window Get Pos - AMn or VWn - (Analog Control)
+`windowSetState`          | "VW54"              | no       | "window"    | Window Get State - AMn or VWn - (Analog Control)
+`windowDigital`           | 0                   | no       | "window"    | 0 for Analog Control, 1 for Button Control
+`windowSetUp`             | "V5.0"              | no       | "window"    | Window Set Up - Mn or Vn.n - (Button Control)
+`windowSetDown`           | "V5.1"              | no       | "window"    | Window Set Down - Mn or Vn.n - (Button Control)
+`windowGetUpDown`         | "V5.2"              | no       | "window"    | Window Up or Down - Return 1 for Up or 0 for Down - (Button Control)
+
+```
+"accessories": [
+        {
+            "accessory": "Logo-TS",
+            "name": "Window ModBus Analog",
+            "interface": "modbus",
+            "ip": "10.0.0.100",
+            "port": 505,
+            "type": "window",
+            "windowSetPos": "VW50",
+            "windowGetPos": "VW52",
+            "windowGetState": "VW54"
+        },
+        {
+            "accessory": "Logo-TS",
+            "name": "Window Snap7 Analog",
+            "interface": "snap7",
+            "ip": "10.0.0.200",
+            "logoType": "0BA7",
+            "localTSAP": "0x1200",
+            "remoteTSAP": "0x2200",
+            "type": "window",
+            "windowSetPos": "VW50",
+            "windowGetPos": "VW52",
+            "windowGetState": "VW54"
+        },
+        {
+            "accessory": "Logo-TS",
+            "name": "Window ModBus Digital",
+            "interface": "modbus",
+            "ip": "10.0.0.100",
+            "port": 505,
+            "type": "window",
+            "windowDigital": 1,
+            "windowSetUp": "V5.0",
+            "windowSetDown": "V5.1",
+            "windowGetUpDown": "V5.2"
+        },
+        {
+            "accessory": "Logo-TS",
+            "name": "Window Snap7 Digital",
+            "interface": "snap7",
+            "ip": "10.0.0.200",
+            "logoType": "0BA7",
+            "localTSAP": "0x1200",
+            "remoteTSAP": "0x2200",
+            "type": "window",
+            "windowDigital": 1,
+            "windowSetUp": "V5.0",
+            "windowSetDown": "V5.1",
+            "windowGetUpDown": "V5.2"
         }
     ]
 ```

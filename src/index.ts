@@ -6,6 +6,7 @@ import { Snap7Logo } from "./util/snap7-logo";
 
 import { SwitchAccessory } from "./util/accessories/SwitchAccessory"
 import { BlindAccessory } from "./util/accessories/BlindAccessory"
+import { WindowAccessory } from "./util/accessories/WindowAccessory"
 import { GaragedoorAccessory } from "./util/accessories/GaragedoorAccessory"
 import { LightbulbAccessory } from "./util/accessories/LightbulbAccessory"
 import { ThermostatAccessory } from "./util/accessories/ThermostatAccessory"
@@ -58,6 +59,7 @@ class LogoAccessory {
   // Services exposed.
   switchService:              any;
   blindService:               any;
+  windowService:              any;
   garagedoorService:          any;
   lightbulbService:           any;
   thermostatService:          any;
@@ -74,6 +76,7 @@ class LogoAccessory {
 
   switchAccessory:            SwitchAccessory            | undefined;
   blindAccessory:             BlindAccessory             | undefined;
+  windowAccessory:            WindowAccessory            | undefined;
   garagedoorAccessory:        GaragedoorAccessory        | undefined;
   lightbulbAccessory:         LightbulbAccessory         | undefined;
   thermostatAccessory:        ThermostatAccessory        | undefined;
@@ -177,6 +180,45 @@ class LogoAccessory {
       this.blindAccessory.blindSetUp      = config["blindSetUp"]     || "V5.0";
       this.blindAccessory.blindSetDown    = config["blindSetDown"]   || "V5.1";
       this.blindAccessory.blindGetUpDown  = config["blindGetUpDown"] || "V5.2";
+
+    }
+
+    /************************
+     * LOGO! Window Service *
+     ************************/
+
+    if (this.type == WindowAccessory.windowType) {
+
+      this.windowAccessory = new WindowAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
+
+      const windowService = new Service.Window(
+        this.name,
+        WindowAccessory.windowType,
+      );
+
+      windowService
+        .getCharacteristic(Characteristic.CurrentPosition)
+        .on("get", callbackify(this.windowAccessory.getWindowCurrentPosition));
+
+      windowService
+        .getCharacteristic(Characteristic.TargetPosition)
+        .on("get", callbackify(this.windowAccessory.getWindowTargetPosition))
+        .on("set", callbackify(this.windowAccessory.setWindowTargetPosition));
+
+      windowService
+        .getCharacteristic(Characteristic.PositionState)
+        .on("get", callbackify(this.windowAccessory.getWindowPositionState));
+
+      this.windowService = windowService;
+
+      this.windowAccessory.windowService    = this.windowService;
+      this.windowAccessory.windowSetPos     = config["windowSetPos"]    || "VW50";
+      this.windowAccessory.windowGetPos     = config["windowGetPos"]    || "VW52";
+      this.windowAccessory.windowGetState   = config["windowGetState"]  || "VW54";
+      this.windowAccessory.windowDigital    = config["windowDigital"]   || 0;
+      this.windowAccessory.windowSetUp      = config["windowSetUp"]     || "V5.0";
+      this.windowAccessory.windowSetDown    = config["windowSetDown"]   || "V5.1";
+      this.windowAccessory.windowGetUpDown  = config["windowGetUpDown"] || "V5.2";
 
     }
 
@@ -326,7 +368,7 @@ class LogoAccessory {
       this.lightSensor.lightLDRLevelMax   = config["lightLDRLevelMax"]   || 1000;
       this.lightSensor.lightLDRLevelP1Min = config["lightLDRLevelP1Min"] || 423;
       this.lightSensor.lightLDRLevelP2Min = config["lightLDRLevelP2Min"] || 696;
-     
+
       this.lightSensor.lightLDRLevelP0S   = config["lightLDRLevelP0S"]   || 1.92170242765178;
       this.lightSensor.lightLDRLevelP0Y   = config["lightLDRLevelP0Y"]   || -2.27030759992747;
       this.lightSensor.lightLDRLevelP1S   = config["lightLDRLevelP1S"]   || 3.85547119519305;
@@ -551,6 +593,9 @@ class LogoAccessory {
   getServices() {
     if (this.type == BlindAccessory.blindType) {
       return [ this.blindService ];
+
+    } else if (this.type == WindowAccessory.windowType) {
+      return [ this.windowService ];
 
     } else if (this.type == GaragedoorAccessory.garagedoorType) {
       return [ this.garagedoorService ];
