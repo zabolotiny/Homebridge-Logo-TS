@@ -59,23 +59,6 @@ class LogoAccessory {
 
   // Services exposed.
   serviceToExpose:            any;
-  /*
-  switchService:              any;
-  blindService:               any;
-  windowService:              any;
-  garagedoorService:          any;
-  lightbulbService:           any;
-  thermostatService:          any;
-  thermostatService:          any;
-  lightSensorService:         any;
-  motionSensorService:        any;
-  contactSensorService:       any;
-  smokeSensorService:         any;
-  temperatureSensorService:   any;
-  humiditySensorService:      any;
-  carbonDioxideSensorService: any;
-  airQualitySensorService:    any;
-  */
 
   switchAccessory:            SwitchAccessory            | undefined;
   blindAccessory:             BlindAccessory             | undefined;
@@ -632,53 +615,6 @@ class LogoAccessory {
   }
 
   getServices() {
-    /*
-    if (this.type == BlindAccessory.blindType) {
-      return [ this.blindService ];
-
-    } else if (this.type == WindowAccessory.windowType) {
-      return [ this.windowService ];
-
-    } else if (this.type == GaragedoorAccessory.garagedoorType) {
-      return [ this.garagedoorService ];
-
-    } else if (this.type == LightbulbAccessory.lightbulbType) {
-      return [ this.lightbulbService ];
-
-    } else if (this.type == ThermostatAccessory.thermostatType) {
-      return [ this.thermostatService ];
-
-    } else if (this.type == ThermostatAccessory.thermostatType) {
-      return [ this.thermostatService ];
-
-    } else if (this.type == LightSensor.lightSensorType) {
-      return [ this.lightSensorService ];
-
-    } else if (this.type == MotionSensor.motionSensorType) {
-      return [ this.motionSensorService ];
-
-    } else if (this.type == ContactSensor.contactSensorType) {
-      return [ this.contactSensorService ];
-
-    } else if (this.type == SmokeSensor.smokeSensorType) {
-      return [ this.smokeSensorService ];
-
-    } else if (this.type == TemperatureSensor.temperatureSensorType) {
-      return [ this.temperatureSensorService ];
-
-    } else if (this.type == HumiditySensor.humiditySensorType) {
-      return [ this.humiditySensorService ];
-
-    } else if (this.type == CarbonDioxideSensor.carbonDioxideSensorType) {
-      return [ this.carbonDioxideSensorService ];
-
-    } else if (this.type == AirQualitySensor.airQualitySensorType) {
-      return [ this.airQualitySensorService ];
-
-    } else {
-      return [ this.switchService ];
-    }
-    */
     return [ this.serviceToExpose ];
   }
 

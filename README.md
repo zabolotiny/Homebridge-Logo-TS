@@ -15,6 +15,7 @@ Type of Accessory:
 - Garage Door
 - Lightbulb
 - Thermostat
+- Irrigation System
 
 Type of Sensor Accessory:
 - Light Sensor
@@ -50,7 +51,7 @@ Name                     | Value               | Required | Option for | Notes
 `logoType`               | "8.SF4"             | no       | "snap7"    | Must be set to the type of your LOGO! PLC, default is: "8.SF4".
 `localTSAP`              | "0x1200"            | no       | "snap7"    | Must be set to the localTSAP of your LOGO! PLC, default is: 0x1200.
 `remoteTSAP`             | "0x2200"            | no       | "snap7"    | Must be set to the remoteTSAP of your LOGO! PLC, default is: 0x2200.
-`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "window", "garagedoor", "lightbulb", "thermostat" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
+`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "window", "garagedoor", "lightbulb", "thermostat", "irrigationSystem" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
 `updateInterval`         | 0                   | no       | all        | Auto Update Interval in milliseconds, 0 = Off
 `buttonValue`            | 1                   | no       | all        | Value for Digital Button
 `pushButton`             | 1                   | no       | all        | If e.g. the network input in the LOGO! a hardware button on the LOGO! simulated.
