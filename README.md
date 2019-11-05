@@ -16,6 +16,7 @@ Type of Accessory:
 - Lightbulb
 - Thermostat
 - Irrigation System
+- Valve
 
 Type of Sensor Accessory:
 - Light Sensor
@@ -51,7 +52,7 @@ Name                     | Value               | Required | Option for | Notes
 `logoType`               | "8.SF4"             | no       | "snap7"    | Must be set to the type of your LOGO! PLC, default is: "8.SF4".
 `localTSAP`              | "0x1200"            | no       | "snap7"    | Must be set to the localTSAP of your LOGO! PLC, default is: 0x1200.
 `remoteTSAP`             | "0x2200"            | no       | "snap7"    | Must be set to the remoteTSAP of your LOGO! PLC, default is: 0x2200.
-`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "window", "garagedoor", "lightbulb", "thermostat", "irrigationSystem" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
+`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "window", "garagedoor", "lightbulb", "thermostat", "irrigationSystem", "valve" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
 `updateInterval`         | 0                   | no       | all        | Auto Update Interval in milliseconds, 0 = Off
 `buttonValue`            | 1                   | no       | all        | Value for Digital Button
 `pushButton`             | 1                   | no       | all        | If e.g. the network input in the LOGO! a hardware button on the LOGO! simulated.
@@ -315,11 +316,11 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`thermostatGetHCState`   | "VW211"             | no       | "thermostat" | Thermostat Get Heating Cooling State - AMn or VWn
-`thermostatSetHCState`   | "VW201"             | no       | "thermostat" | Thermostat Set Heating Cooling State - AMn or VWn
-`thermostatGetTemp`      | "VW213"             | no       | "thermostat" | Thermostat Get Temperature - AMn or VWn
-`thermostatGetTargetTemp`    | "VW215"         | no       | "thermostat" | Thermostat Get Target Temperature - AMn or VWn
-`thermostatSetTargetTemp`    | "VW203"         | no       | "thermostat" | Thermostat Set Target Temperature - AMn or VWn
+`thermostatGetHCState`   | "VW210"             | no       | "thermostat" | Thermostat Get Heating Cooling State - AMn or VWn
+`thermostatSetHCState`   | "VW200"             | no       | "thermostat" | Thermostat Set Heating Cooling State - AMn or VWn
+`thermostatGetTemp`      | "VW212"             | no       | "thermostat" | Thermostat Get Temperature - AMn or VWn
+`thermostatGetTargetTemp`    | "VW214"         | no       | "thermostat" | Thermostat Get Target Temperature - AMn or VWn
+`thermostatSetTargetTemp`    | "VW202"         | no       | "thermostat" | Thermostat Set Target Temperature - AMn or VWn
 `thermostatTempDisplayUnits` | 0               | no       | "thermostat" | Temperature Display Units - Celsius = 0; Fahrenheit = 1;
 
 ```
@@ -331,11 +332,11 @@ Name                     | Value               | Required | Option for | Notes
             "ip": "10.0.0.100",
             "port": 505,
             "type": "thermostat",
-            "thermostatGetHCState": "VW211",
-            "thermostatSetHCState": "VW201",
-            "thermostatGetTemp": "VW213",
-            "thermostatGetTargetTemp": "VW215",
-            "thermostatSetTargetTemp": "VW203",
+            "thermostatGetHCState": "VW210",
+            "thermostatSetHCState": "VW200",
+            "thermostatGetTemp": "VW212",
+            "thermostatGetTargetTemp": "VW214",
+            "thermostatSetTargetTemp": "VW202",
             "thermostatTempDisplayUnits": 0
         },
         {
@@ -347,11 +348,11 @@ Name                     | Value               | Required | Option for | Notes
             "localTSAP": "0x1200",
             "remoteTSAP": "0x2200",
             "type": "thermostat",
-            "thermostatGetHCState": "VW211",
-            "thermostatSetHCState": "VW201",
-            "thermostatGetTemp": "VW213",
-            "thermostatGetTargetTemp": "VW215",
-            "thermostatSetTargetTemp": "VW203",
+            "thermostatGetHCState": "VW210",
+            "thermostatSetHCState": "VW200",
+            "thermostatGetTemp": "VW212",
+            "thermostatGetTargetTemp": "VW214",
+            "thermostatSetTargetTemp": "VW202",
             "thermostatTempDisplayUnits": 0
         }
     ]
@@ -397,6 +398,50 @@ Name                     | Value               | Required | Option for | Notes
             "irrigationSystemSetActiveOff": "V400.2",
             "irrigationSystemGetProgramMode": "VW402",
             "irrigationSystemGetInUse": "V400.3"
+        }
+    ]
+```
+
+
+## Valve Accessory Configuration  
+
+Name                     | Value               | Required | Option for | Notes
+------------------------ | ------------------- | -------- | ---------- | ------------------------
+`valveGetActive`    | "V400.0"    | no       | "valve" | Valve Get Active - Mn or Vn.n
+`valveSetActiveOn`  | "V400.1"    | no       | "valve" | Valve Set Active to On - Mn or Vn.n
+`valveSetActiveOff` | "V400.2"    | no       | "valve" | Valve Set Active to Off - Mn or Vn.n
+`valveGetInUse`     | "V400.3"    | no       | "valve" | Valve Get In Use - Mn or Vn.n
+`valveType`         | 0           | no       | "valve" | Valve Type - Generic Valve = 0, Irrigation = 1, Shower Head = 2, Water Faucet = 3,
+
+```
+"accessories": [
+        {
+            "accessory": "Logo-TS",
+            "name": "Valve ModBus",
+            "interface": "modbus",
+            "ip": "10.0.0.100",
+            "port": 505,
+            "type": "valve",
+            "valveGetActive": "V400.0",
+            "valveSetActiveOn": "V400.1",
+            "valveSetActiveOff": "V400.2",
+            "valveGetInUse": "V400.3",
+            "valveType": 1
+        },
+        {
+            "accessory": "Logo-TS",
+            "name": "Valve Snap7",
+            "interface": "snap7",
+            "ip": "10.0.0.200",
+            "logoType": "0BA7",
+            "localTSAP": "0x1200",
+            "remoteTSAP": "0x2200",
+            "type": "valve",
+            "valveGetActive": "V400.0",
+            "valveSetActiveOn": "V400.1",
+            "valveSetActiveOff": "V400.2",
+            "valveGetInUse": "V400.3",
+            "valveType": 1
         }
     ]
 ```

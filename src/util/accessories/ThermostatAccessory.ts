@@ -8,11 +8,11 @@ export class ThermostatAccessory {
 
   public thermostatService: any;
 
-  public thermostatGetHCState: string       = "VW211";
-  public thermostatSetHCState: string       = "VW201";
-  public thermostatGetTemp: string          = "VW213";
-  public thermostatGetTargetTemp: string    = "VW215";
-  public thermostatSetTargetTemp: string    = "VW203";
+  public thermostatGetHCState: string       = "VW210";
+  public thermostatSetHCState: string       = "VW200";
+  public thermostatGetTemp: string          = "VW212";
+  public thermostatGetTargetTemp: string    = "VW214";
+  public thermostatSetTargetTemp: string    = "VW202";
   public thermostatTempDisplayUnits: number = 0;
 
   accessoryAnalogTimeOut = 500;

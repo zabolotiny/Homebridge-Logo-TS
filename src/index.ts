@@ -11,6 +11,7 @@ import { GaragedoorAccessory } from "./util/accessories/GaragedoorAccessory"
 import { LightbulbAccessory } from "./util/accessories/LightbulbAccessory"
 import { ThermostatAccessory } from "./util/accessories/ThermostatAccessory"
 import { IrrigationSystemAccessory } from "./util/accessories/IrrigationSystemAccessory"
+import { ValveAccessory } from "./util/accessories/ValveAccessory"
 import { LightSensor } from "./util/accessories/LightSensor"
 import { MotionSensor } from "./util/accessories/MotionSensor"
 import { ContactSensor } from "./util/accessories/ContactSensor"
@@ -67,6 +68,7 @@ class LogoAccessory {
   lightbulbAccessory:         LightbulbAccessory         | undefined;
   thermostatAccessory:        ThermostatAccessory        | undefined;
   irrigationSystemAccessory:  IrrigationSystemAccessory  | undefined;
+  valveAccessory:             ValveAccessory             | undefined;
   lightSensor:                LightSensor                | undefined;
   motionSensor:               MotionSensor               | undefined;
   contactSensor:              ContactSensor              | undefined;
@@ -315,11 +317,11 @@ class LogoAccessory {
       this.serviceToExpose = thermostatService;
 
       this.thermostatAccessory.thermostatService          = this.serviceToExpose;
-      this.thermostatAccessory.thermostatGetHCState       = config["thermostatGetHCState"]       || "VW211";
-      this.thermostatAccessory.thermostatSetHCState       = config["thermostatSetHCState"]       || "VW201";
-      this.thermostatAccessory.thermostatGetTemp          = config["thermostatGetTemp"]          || "VW213";
-      this.thermostatAccessory.thermostatGetTargetTemp    = config["thermostatGetTargetTemp"]    || "VW215";
-      this.thermostatAccessory.thermostatSetTargetTemp    = config["thermostatSetTargetTemp"]    || "VW203";
+      this.thermostatAccessory.thermostatGetHCState       = config["thermostatGetHCState"]       || "VW210";
+      this.thermostatAccessory.thermostatSetHCState       = config["thermostatSetHCState"]       || "VW200";
+      this.thermostatAccessory.thermostatGetTemp          = config["thermostatGetTemp"]          || "VW212";
+      this.thermostatAccessory.thermostatGetTargetTemp    = config["thermostatGetTargetTemp"]    || "VW214";
+      this.thermostatAccessory.thermostatSetTargetTemp    = config["thermostatSetTargetTemp"]    || "VW202";
       this.thermostatAccessory.thermostatTempDisplayUnits = config["thermostatTempDisplayUnits"] || 0;
 
     }
@@ -358,6 +360,43 @@ class LogoAccessory {
       this.irrigationSystemAccessory.irrigationSystemSetActiveOff   = config["irrigationSystemSetActiveOff"]   || "V400.2";
       this.irrigationSystemAccessory.irrigationSystemGetProgramMode = config["irrigationSystemGetProgramMode"] || "VW402";
       this.irrigationSystemAccessory.irrigationSystemGetInUse       = config["irrigationSystemGetInUse"]       || "V400.3";
+
+    }
+
+    /***********************
+     * LOGO! Valve Service *
+     ***********************/
+
+    if (this.type == ValveAccessory.valveType) {
+
+      this.valveAccessory = new ValveAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
+
+      const valveService = new Service.Valve(
+        this.name,
+        ValveAccessory.valveType,
+      );
+
+      valveService
+        .getCharacteristic(Characteristic.Active)
+        .on("get", callbackify(this.valveAccessory.getActive))
+        .on("set", callbackify(this.valveAccessory.setActive));
+
+      valveService
+        .getCharacteristic(Characteristic.InUse)
+        .on("get", callbackify(this.valveAccessory.getInUse));
+
+      valveService
+        .getCharacteristic(Characteristic.ValveType)
+        .on("get", callbackify(this.valveAccessory.getValveType));
+
+      this.serviceToExpose = valveService;
+
+      this.valveAccessory.valveService        = this.serviceToExpose;
+      this.valveAccessory.valveGetActive      = config["valveGetActive"]    || "V400.0";
+      this.valveAccessory.valveSetActiveOn    = config["valveSetActiveOn"]  || "V400.1";
+      this.valveAccessory.valveSetActiveOff   = config["valveSetActiveOff"] || "V400.2";
+      this.valveAccessory.valveGetInUse       = config["valveGetInUse"]     || "V400.3";
+      this.valveAccessory.valveType           = config["valveType"]         || 0;
 
     }
 
