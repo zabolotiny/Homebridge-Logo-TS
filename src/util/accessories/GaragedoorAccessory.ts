@@ -11,7 +11,7 @@ export class GaragedoorAccessory {
   public garagedoorOpen: string        = "V401.0";
   public garagedoorClose: string       = "V401.1";
   public garagedoorState: string       = "V401.2";
-  public garagedoorObstruction: string = "false"; // "V401.3"
+  public garagedoorObstruction: string = "false";
 
   log: Function;
   logo: any;
@@ -148,8 +148,6 @@ export class GaragedoorAccessory {
       }
 
       this.logo.ReadLogo(this.garagedoorObstruction, async (value: number) => {
-        this.log("this.garagedoorObstruction: ", this.garagedoorObstruction);
-        this.log("value: ", value);
 
         if (value != -1) {
 

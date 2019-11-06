@@ -243,7 +243,7 @@ class LogoAccessory {
       this.garagedoorAccessory.garagedoorOpen        = config["garagedoorOpen"]        || "V401.0";
       this.garagedoorAccessory.garagedoorClose       = config["garagedoorClose"]       || "V401.1";
       this.garagedoorAccessory.garagedoorState       = config["garagedoorState"]       || "V401.2";
-      this.garagedoorAccessory.garagedoorObstruction = config["garagedoorObstruction"] || "false"; // "V401.3"
+      this.garagedoorAccessory.garagedoorObstruction = config["garagedoorObstruction"] || "false";
 
     }
 
