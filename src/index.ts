@@ -239,10 +239,11 @@ class LogoAccessory {
 
       this.serviceToExpose = garagedoorService;
 
-      this.garagedoorAccessory.garagedoorService = this.serviceToExpose;
-      this.garagedoorAccessory.garagedoorOpen    = config["garagedoorOpen"]  || "V6.0";
-      this.garagedoorAccessory.garagedoorClose   = config["garagedoorClose"] || "V6.1";
-      this.garagedoorAccessory.garagedoorState   = config["garagedoorState"] || "V6.2";
+      this.garagedoorAccessory.garagedoorService     = this.serviceToExpose;
+      this.garagedoorAccessory.garagedoorOpen        = config["garagedoorOpen"]        || "V401.0";
+      this.garagedoorAccessory.garagedoorClose       = config["garagedoorClose"]       || "V401.1";
+      this.garagedoorAccessory.garagedoorState       = config["garagedoorState"]       || "V401.2";
+      this.garagedoorAccessory.garagedoorObstruction = config["garagedoorObstruction"] || "false"; // "V401.3"
 
     }
 

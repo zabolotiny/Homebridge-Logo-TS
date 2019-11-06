@@ -8,9 +8,10 @@ export class GaragedoorAccessory {
 
   public garagedoorService: any;
 
-  public garagedoorOpen: string  = "V6.0";
-  public garagedoorClose: string = "V6.1";
-  public garagedoorState: string = "V6.2";
+  public garagedoorOpen: string        = "V401.0";
+  public garagedoorClose: string       = "V401.1";
+  public garagedoorState: string       = "V401.2";
+  public garagedoorObstruction: string = "false"; // "V401.3"
 
   log: Function;
   logo: any;
@@ -19,7 +20,8 @@ export class GaragedoorAccessory {
   pushButton: number;
   debugMsgLog: number;
   lastGaragedoorTargetState: number;
-  updateTimer: any;
+  updateCDSTimer: any;
+  updateODTimer: any;
 
   constructor(log: Function, 
               logo: any,
@@ -39,7 +41,8 @@ export class GaragedoorAccessory {
     Characteristic      = characteristic;
 
     if (this.updateInterval > 0) {
-      this.garagedoorAutoUpdate();
+      this.garagedoorCDSAutoUpdate();
+      this.garagedoorODAutoUpdate();
     }
 
     this.lastGaragedoorTargetState = -1;
@@ -56,8 +59,8 @@ export class GaragedoorAccessory {
     // Cancel timer if the call came from the Home-App and not from the update interval.
     // To avoid duplicate queries at the same time.
     if (this.updateInterval > 0) {
-      clearTimeout(this.updateTimer);
-      this.updateTimer = 0;
+      clearTimeout(this.updateCDSTimer);
+      this.updateCDSTimer = 0;
     }
 
     this.logo.ReadLogo(this.garagedoorState, async (value: number) => {
@@ -88,7 +91,7 @@ export class GaragedoorAccessory {
       }
 
       if (this.updateInterval > 0) {
-        this.garagedoorAutoUpdate();
+        this.garagedoorCDSAutoUpdate();
       }
 
     });
@@ -135,14 +138,58 @@ export class GaragedoorAccessory {
   getGarageDoorObstructionDetected = async () => {
     // true or false
 
-    this.debugLogBool("GarageDoorObstructionDetected ?", false);
-    return false;
+    if (this.logo.isValidLogoAddress(this.garagedoorObstruction)) {
+
+      // Cancel timer if the call came from the Home-App and not from the update interval.
+      // To avoid duplicate queries at the same time.
+      if (this.updateInterval > 0) {
+        clearTimeout(this.updateODTimer);
+        this.updateODTimer = 0;
+      }
+
+      this.logo.ReadLogo(this.garagedoorObstruction, async (value: number) => {
+        this.log("this.garagedoorObstruction: ", this.garagedoorObstruction);
+        this.log("value: ", value);
+
+        if (value != -1) {
+
+          const state = value == 1 ? true : false;
+          this.debugLogBool("GarageDoorObstructionDetected ?", state);
+
+          await wait(1);
+
+          this.garagedoorService.updateCharacteristic(
+            Characteristic.ObstructionDetected,
+            state
+          );
+
+        }
+
+        if (this.updateInterval > 0) {
+          this.garagedoorODAutoUpdate();
+        }
+
+      });
+
+      
+    } else {
+
+      this.debugLogStr("GarageDoorObstructionDetected ?", this.garagedoorObstruction);
+      return this.defaultFromString(this.garagedoorObstruction);
+      
+    }
+
   };
 
   //
   // Helper Functions
   //
 
+  debugLogStr(msg: string, str: string) {
+    if (this.debugMsgLog == 1) {
+      this.log(msg, str);
+    }
+  }
   debugLogNum(msg: string, num: number) {
     if (this.debugMsgLog == 1) {
       this.log(msg, num);
@@ -153,14 +200,43 @@ export class GaragedoorAccessory {
       this.log(msg, bool);
     }
   }
+  defaultFromString(str: string): any {
+    if (str == "false") {
+      return false;
+    }
+    if (str == "true") {
+      return true;
+    }
+    if (str == "1") {
+      return 1;
+    }
+    if (str == "0") {
+      return 0;
+    }
+    return -1;
+  }
 
-  garagedoorAutoUpdate() {
+  garagedoorCDSAutoUpdate() {
 
-    this.updateTimer = setTimeout(() => {
+    this.updateCDSTimer = setTimeout(() => {
 
       this.getGarageDoorCurrentDoorState();
 
     }, this.updateInterval + Math.floor(Math.random() * 10000));
+
+  }
+
+  garagedoorODAutoUpdate() {
+
+    if (this.logo.isValidLogoAddress(this.garagedoorObstruction)) {
+
+      this.updateODTimer = setTimeout(() => {
+
+        this.getGarageDoorObstructionDetected();
+  
+      }, this.updateInterval + Math.floor(Math.random() * 10000));
+      
+    }
 
   }
 

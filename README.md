@@ -235,9 +235,10 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`garagedoorOpen`         | "V6.0"              | no       | "garagedoor" | Garagedoor Open - Mn or Vn.n
-`garagedoorClose`        | "V6.1"              | no       | "garagedoor" | Garagedoor Close - Mn or Vn.n
-`garagedoorState`        | "V6.2"              | no       | "garagedoor" | Garagedoor State - Mn or Vn.n
+`garagedoorOpen`         | "V401.0"            | no       | "garagedoor" | Garagedoor Open - Mn or Vn.n
+`garagedoorClose`        | "V401.1"            | no       | "garagedoor" | Garagedoor Close - Mn or Vn.n
+`garagedoorState`        | "V401.2"            | no       | "garagedoor" | Garagedoor State - Mn or Vn.n
+`garagedoorObstruction`  | "false"             | no       | "garagedoor" | Garagedoor Obstruction Detected - `false` or a valid LOGO! Address (Mn or Vn.n)
 
 ```
 "accessories": [
@@ -249,9 +250,10 @@ Name                     | Value               | Required | Option for | Notes
             "port": 505,
             "updateInterval": 120000,
             "type": "garagedoor",
-            "garagedoorOpen": "V6.0",
-            "garagedoorClose": "V6.1",
-            "garagedoorState": "V6.2"
+            "garagedoorOpen": "V401.0",
+            "garagedoorClose": "V401.1",
+            "garagedoorState": "V401.2",
+            "garagedoorObstruction": "false"
         },
         {
             "accessory": "Logo-TS",
@@ -263,9 +265,10 @@ Name                     | Value               | Required | Option for | Notes
             "remoteTSAP": "0x2200",
             "updateInterval": 120000,
             "type": "garagedoor",
-            "garagedoorOpen": "V6.0",
-            "garagedoorClose": "V6.1",
-            "garagedoorState": "V6.2"
+            "garagedoorOpen": "V401.0",
+            "garagedoorClose": "V401.1",
+            "garagedoorState": "V401.2",
+            "garagedoorObstruction": "false"
         }
     ]
 ```
