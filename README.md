@@ -238,7 +238,7 @@ Name                     | Value               | Required | Option for | Notes
 `garagedoorOpen`         | "V401.0"            | no       | "garagedoor" | Garagedoor Open - Mn or Vn.n
 `garagedoorClose`        | "V401.1"            | no       | "garagedoor" | Garagedoor Close - Mn or Vn.n
 `garagedoorState`        | "V401.2"            | no       | "garagedoor" | Garagedoor State - Mn or Vn.n
-`garagedoorObstruction`  | "false"             | no       | "garagedoor" | Garagedoor Obstruction Detected - `false` or a valid LOGO! Address (Mn or Vn.n)
+`garagedoorObstruction`  | "false"             | no       | "garagedoor" | Garagedoor Obstruction Detected - `"false"` or a valid LOGO! Address (Mn or Vn.n)
 
 ```
 "accessories": [
@@ -410,11 +410,13 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`valveGetActive`    | "V400.0"    | no       | "valve" | Valve Get Active - Mn or Vn.n
-`valveSetActiveOn`  | "V400.1"    | no       | "valve" | Valve Set Active to On - Mn or Vn.n
-`valveSetActiveOff` | "V400.2"    | no       | "valve" | Valve Set Active to Off - Mn or Vn.n
-`valveGetInUse`     | "V400.3"    | no       | "valve" | Valve Get In Use - Mn or Vn.n
-`valveType`         | 0           | no       | "valve" | Valve Type - Generic Valve = 0, Irrigation = 1, Shower Head = 2, Water Faucet = 3,
+`valveGetActive`         | "V400.0"    | no       | "valve" | Valve Get Active - Mn or Vn.n
+`valveSetActiveOn`       | "V400.1"    | no       | "valve" | Valve Set Active to On - Mn or Vn.n
+`valveSetActiveOff`      | "V400.2"    | no       | "valve" | Valve Set Active to Off - Mn or Vn.n
+`valveGetInUse`          | "V400.3"    | no       | "valve" | Valve Get In Use - Mn or Vn.n
+`valveType`              | 0           | no       | "valve" | Valve Type - Generic Valve = 0, Irrigation = 1, Shower Head = 2, Water Faucet = 3,
+`valveSetDuration`       | "0"         | no       | "valve" | Valve Set Duration - `"0"` or a valid LOGO! Address (AMn or VWn)
+`valveGetDuration`       | "0"         | no       | "valve" | Valve Get Duration - `"0"` or a valid LOGO! Address (AMn or VWn)
 
 ```
 "accessories": [
@@ -429,7 +431,9 @@ Name                     | Value               | Required | Option for | Notes
             "valveSetActiveOn": "V400.1",
             "valveSetActiveOff": "V400.2",
             "valveGetInUse": "V400.3",
-            "valveType": 1
+            "valveType": 1,
+            "valveSetDuration": "0",
+            "valveGetDuration": "0"
         },
         {
             "accessory": "Logo-TS",
@@ -444,7 +448,9 @@ Name                     | Value               | Required | Option for | Notes
             "valveSetActiveOn": "V400.1",
             "valveSetActiveOff": "V400.2",
             "valveGetInUse": "V400.3",
-            "valveType": 1
+            "valveType": 1,
+            "valveSetDuration": "0",
+            "valveGetDuration": "0"
         }
     ]
 ```

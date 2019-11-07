@@ -13,6 +13,8 @@ export class ValveAccessory {
   public valveSetActiveOff: string = "V400.2";
   public valveGetInUse: string     = "V400.3";
   public valveType: number         = 0;
+  public valveSetDuration: string  = "0";
+  public valveGetDuration: string  = "0";
 
   log: Function;
   logo: any;
@@ -20,8 +22,10 @@ export class ValveAccessory {
   buttonValue: number;
   pushButton: number;
   debugMsgLog: number;
+  lastSetDuration: number;
   updateATimer: any;
   updateIUTimer: any;
+  updateRDTimer: any;
 
   constructor(log: Function, 
               logo: any,
@@ -43,7 +47,10 @@ export class ValveAccessory {
     if (this.updateInterval > 0) {
       this.valveAAutoUpdate();
       this.valveIUAutoUpdate();
+      this.valveRDAutoUpdate();
     }
+
+    this.lastSetDuration = -1;
 
   }
 
@@ -138,10 +145,83 @@ export class ValveAccessory {
 
   };
 
+  getSetDuration = async () => {
+
+    this.debugLogNum("SetDuration ?", this.lastSetDuration);
+
+    if (this.lastSetDuration != -1) {
+      return this.lastSetDuration;
+    } else {
+      return 0;
+    }
+
+  };
+
+  setSetDuration = async (value: number) => {
+
+    this.debugLogNum("Set SetDuration to", value);
+
+    if (this.logo.isValidLogoAddress(this.valveSetDuration)) {
+
+      this.lastSetDuration = value;
+      this.logo.WriteLogo(this.valveSetDuration, value, 0);
+
+    }
+
+  };
+
+  getRemainingDuration = async () => {
+    // true or false
+
+    if (this.logo.isValidLogoAddress(this.valveGetDuration)) {
+
+      // Cancel timer if the call came from the Home-App and not from the update interval.
+      // To avoid duplicate queries at the same time.
+      if (this.updateInterval > 0) {
+        clearTimeout(this.updateRDTimer);
+        this.updateRDTimer = 0;
+      }
+
+      this.logo.ReadLogo(this.valveGetDuration, async (value: number) => {
+
+        if (value != -1) {
+
+          this.debugLogNum("RemainingDuration ?", value);
+
+          await wait(1);
+
+          this.valveService.updateCharacteristic(
+            Characteristic.RemainingDuration,
+            value
+          );
+
+        }
+
+        if (this.updateInterval > 0) {
+          this.valveRDAutoUpdate();
+        }
+
+      });
+
+      
+    } else {
+
+      this.debugLogStr("RemainingDuration ?", this.valveGetDuration);
+      return this.defaultFromString(this.valveGetDuration);
+      
+    }
+
+  };
+
   //
   // Helper Functions
   //
 
+  debugLogStr(msg: string, str: string) {
+    if (this.debugMsgLog == 1) {
+      this.log(msg, str);
+    }
+  }
   debugLogNum(msg: string, num: number) {
     if (this.debugMsgLog == 1) {
       this.log(msg, num);
@@ -151,6 +231,21 @@ export class ValveAccessory {
     if (this.debugMsgLog == 1) {
       this.log(msg, bool);
     }
+  }
+  defaultFromString(str: string): any {
+    if (str == "false") {
+      return false;
+    }
+    if (str == "true") {
+      return true;
+    }
+    if (str == "1") {
+      return 1;
+    }
+    if (str == "0") {
+      return 0;
+    }
+    return -1;
   }
 
   valveAAutoUpdate() {
@@ -170,6 +265,20 @@ export class ValveAccessory {
       this.getInUse();
 
     }, this.updateInterval + Math.floor(Math.random() * 10000));
+
+  }
+
+  valveRDAutoUpdate() {
+
+    if (this.logo.isValidLogoAddress(this.valveGetDuration)) {
+      
+      this.updateRDTimer = setTimeout(() => {
+
+        this.getRemainingDuration();
+  
+      }, this.updateInterval + Math.floor(Math.random() * 10000));
+
+    }
 
   }
 
