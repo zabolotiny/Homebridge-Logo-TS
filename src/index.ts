@@ -12,6 +12,7 @@ import { LightbulbAccessory } from "./util/accessories/LightbulbAccessory"
 import { ThermostatAccessory } from "./util/accessories/ThermostatAccessory"
 import { IrrigationSystemAccessory } from "./util/accessories/IrrigationSystemAccessory"
 import { ValveAccessory } from "./util/accessories/ValveAccessory"
+import { FanAccessory } from "./util/accessories/FanAccessory"
 import { LightSensor } from "./util/accessories/LightSensor"
 import { MotionSensor } from "./util/accessories/MotionSensor"
 import { ContactSensor } from "./util/accessories/ContactSensor"
@@ -69,6 +70,7 @@ class LogoAccessory {
   thermostatAccessory:        ThermostatAccessory        | undefined;
   irrigationSystemAccessory:  IrrigationSystemAccessory  | undefined;
   valveAccessory:             ValveAccessory             | undefined;
+  fanAccessory:               FanAccessory               | undefined;
   lightSensor:                LightSensor                | undefined;
   motionSensor:               MotionSensor               | undefined;
   contactSensor:              ContactSensor              | undefined;
@@ -426,6 +428,59 @@ class LogoAccessory {
       this.serviceToExpose = valveService;
 
       this.valveAccessory.valveService = this.serviceToExpose;
+
+    }
+
+    /*********************
+     * LOGO! Fan Service *
+     *********************/
+
+    if (this.type == FanAccessory.fanType) {
+
+      this.fanAccessory = new FanAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
+
+      const fanService = new Service.Fan(
+        this.name,
+        FanAccessory.fanType,
+      );
+
+      this.fanAccessory.fanGetOn                   = config["fanGetOn"]                   || "V130.0";
+      this.fanAccessory.fanSetOn                   = config["fanSetOn"]                   || "V130.1";
+      this.fanAccessory.fanSetOff                  = config["fanSetOff"]                  || "V130.2";
+      this.fanAccessory.fanGetRotationDirection    = config["fanGetRotationDirection"]    || "0";
+      this.fanAccessory.fanSetRotationDirectionCW  = config["fanSetRotationDirectionCW"]  || "0";
+      this.fanAccessory.fanSetRotationDirectionCCW = config["fanSetRotationDirectionCCW"] || "0";
+      this.fanAccessory.fanGetRotationSpeed        = config["fanGetRotationSpeed"]        || "0";
+      this.fanAccessory.fanSetRotationSpeed        = config["fanSetRotationSpeed"]        || "0";
+
+      fanService
+        .getCharacteristic(Characteristic.On)
+        .on("get", callbackify(this.fanAccessory.getOn))
+        .on("set", callbackify(this.fanAccessory.setOn));
+
+      if (this.logo.isValidLogoAddress(this.fanAccessory.fanGetRotationDirection) 
+            && this.logo.isValidLogoAddress(this.fanAccessory.fanSetRotationDirectionCW)
+                && this.logo.isValidLogoAddress(this.fanAccessory.fanSetRotationDirectionCCW)) {
+      
+        fanService
+          .getCharacteristic(Characteristic.RotationDirection)
+          .on("get", callbackify(this.fanAccessory.getRotationDirection))
+          .on("set", callbackify(this.fanAccessory.setRotationDirection));
+
+      }
+
+      if (this.logo.isValidLogoAddress(this.fanAccessory.fanGetRotationSpeed) && this.logo.isValidLogoAddress(this.fanAccessory.fanSetRotationSpeed)) {
+        
+        fanService
+          .getCharacteristic(Characteristic.RotationSpeed)
+          .on("get", callbackify(this.fanAccessory.getRotationSpeed))
+          .on("set", callbackify(this.fanAccessory.setRotationSpeed));
+
+      }
+
+      this.serviceToExpose = fanService;
+
+      this.fanAccessory.fanService = this.serviceToExpose;
 
     }
 

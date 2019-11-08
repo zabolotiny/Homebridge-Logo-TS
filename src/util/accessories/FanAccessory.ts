@@ -7,11 +7,14 @@ export class FanAccessory {
   static fanType: string = "fan";
 
   public fanService: any;
-  public fanGetOn: string             = "V130.0";
-  public fanSetOn: string             = "V130.1";
-  public fanSetOff: string            = "V130.2";
-  public fanGetRotationSpeed: string  = "VW133";
-  public fanSetRotationSpeed: string  = "VW135";
+  public fanGetOn: string                   = "V130.0";
+  public fanSetOn: string                   = "V130.1";
+  public fanSetOff: string                  = "V130.2";
+  public fanGetRotationDirection: string    = "0";
+  public fanSetRotationDirectionCW: string  = "0";
+  public fanSetRotationDirectionCCW: string = "0";
+  public fanGetRotationSpeed: string        = "0";
+  public fanSetRotationSpeed: string        = "0";
 
   accessoryAnalogTimeOut = 500;
 
@@ -21,10 +24,12 @@ export class FanAccessory {
   buttonValue: number;
   pushButton: number;
   debugMsgLog: number;
+  lastOn: boolean;
   lastRotationSpeed: number;
   lastRotationSpeedTime: number;
   lastRotationSpeedTimerSet: boolean;
   updateOnTimer: any;
+  updateRDTimer: any;
   updateRSTimer: any;
 
   constructor(log: Function, 
@@ -46,9 +51,11 @@ export class FanAccessory {
 
     if (this.updateInterval > 0) {
       this.fanOnAutoUpdate();
+      this.fanRDAutoUpdate();
       this.fanRSAutoUpdate();
     }
 
+    this.lastOn                    = false;
     this.lastRotationSpeed         = -1;
     this.lastRotationSpeedTime     = -1;
     this.lastRotationSpeedTimerSet = false;
@@ -74,6 +81,7 @@ export class FanAccessory {
       if (value != -1) {
 
         let on: boolean = value == 1 ? true : false;
+        this.lastOn = on;
         this.debugLogBool("On ?", on);
         
         await wait(1);
@@ -97,63 +105,134 @@ export class FanAccessory {
 
     this.debugLogBool("Set On to", value);
 
-    if (value == true) {
-      this.logo.WriteLogo(this.fanSetOn, this.buttonValue, this.pushButton);
-    } else {
-      this.logo.WriteLogo(this.fanSetOff, this.buttonValue, this.pushButton);
+    if (value != this.lastOn) {
+
+      this.lastOn = value;
+
+      if (value == true) {
+        this.logo.WriteLogo(this.fanSetOn, this.buttonValue, this.pushButton);
+      } else {
+        this.logo.WriteLogo(this.fanSetOff, this.buttonValue, this.pushButton);
+      }
+      
     }
+    
+  };
+
+  getRotationDirection = async () => {
+    // CLOCKWISE = 0; COUNTER_CLOCKWISE = 1;
+
+    if (this.logo.isValidLogoAddress(this.fanGetRotationDirection)) {
+      
+      // Cancel timer if the call came from the Home-App and not from the update interval.
+      // To avoid duplicate queries at the same time.
+      if (this.updateInterval > 0) {
+        clearTimeout(this.updateRDTimer);
+        this.updateRDTimer = 0;
+      }
+
+      this.logo.ReadLogo(this.fanGetRotationDirection, async (value: number) => {
+
+        if (value != -1) {
+
+          this.debugLogNum("RotationDirection ?", value);
+
+          await wait(1);
+
+          this.fanService.updateCharacteristic(
+            Characteristic.RotationDirection,
+            value
+          );
+
+        }
+
+        if (this.updateInterval > 0) {
+          this.fanRDAutoUpdate();
+        }
+
+      });
+
+    } else {
+      
+      this.debugLogStr("RotationDirection ?", this.fanGetRotationDirection);
+      return this.defaultFromString(this.fanGetRotationDirection);
+
+    }
+
+  };
+
+  setRotationDirection = async (value: number) => {
+
+    if (this.logo.isValidLogoAddress(this.fanSetRotationDirectionCW) && this.logo.isValidLogoAddress(this.fanSetRotationDirectionCCW)) {
+      
+      this.debugLogNum("Set RotationDirection to", value);
+
+      if (value == 1) {
+
+        this.logo.WriteLogo(this.fanSetRotationDirectionCCW, this.buttonValue, this.pushButton);
+        
+      } else {
+
+        this.logo.WriteLogo(this.fanSetRotationDirectionCW, this.buttonValue, this.pushButton);
+        
+      }
+
+    }
+
   };
 
   getRotationSpeed = async () => {
 
-    // Cancel timer if the call came from the Home-App and not from the update interval.
-    // To avoid duplicate queries at the same time.
-    if (this.updateInterval > 0) {
-      clearTimeout(this.updateRSTimer);
-      this.updateRSTimer = 0;
-    }
-
-    this.logo.ReadLogo(this.fanGetRotationSpeed, async (value: number) => {
-
-      if (value != -1) {
-
-        this.debugLogNum("RotationSpeed ?", value);
-
-        await wait(1);
-
-        this.fanService.updateCharacteristic(
-          Characteristic.RotationSpeed,
-          value
-        );
-
-      }
-
+    if (this.logo.isValidLogoAddress(this.fanGetRotationSpeed)) {
+      
+      // Cancel timer if the call came from the Home-App and not from the update interval.
+      // To avoid duplicate queries at the same time.
       if (this.updateInterval > 0) {
-        this.fanRSAutoUpdate();
+        clearTimeout(this.updateRSTimer);
+        this.updateRSTimer = 0;
       }
 
-    });
+      this.logo.ReadLogo(this.fanGetRotationSpeed, async (value: number) => {
+
+        if (value != -1) {
+
+          this.debugLogNum("RotationSpeed ?", value);
+
+          await wait(1);
+
+          this.fanService.updateCharacteristic(
+            Characteristic.RotationSpeed,
+            value
+          );
+
+        }
+
+        if (this.updateInterval > 0) {
+          this.fanRSAutoUpdate();
+        }
+
+      });
+
+    } else {
+      
+      this.debugLogStr("RotationSpeed ?", this.fanGetRotationSpeed);
+      return this.defaultFromString(this.fanGetRotationSpeed);
+
+    }
 
   };
 
   setRotationSpeed = async (value: number) => {
 
-    this.lastRotationSpeed = value;
-    this.lastRotationSpeedTime = + new Date();
-    if (!this.lastRotationSpeedTimerSet) {
-      this.fanRotationSpeedTimeout();
+    if (this.logo.isValidLogoAddress(this.fanGetRotationSpeed)) {
+      
+      this.lastRotationSpeed = value;
+      this.lastRotationSpeedTime = + new Date();
+      if (!this.lastRotationSpeedTimerSet) {
+        this.fanRotationSpeedTimeout();
+      }
+
     }
-
-    // We succeeded, so update the "current" state as well.
-    // We need to update the current state "later" because Siri can't
-    // handle receiving the change event inside the same "set target state"
-    // response.
-    await wait(1);
-
-    this.fanService.setCharacteristic(
-      Characteristic.RotationSpeed,
-      value
-    );
 
   };
 
@@ -161,6 +240,11 @@ export class FanAccessory {
   // Helper Functions
   //
 
+  debugLogStr(msg: string, str: string) {
+    if (this.debugMsgLog == 1) {
+      this.log(msg, str);
+    }
+  }
   debugLogNum(msg: string, num: number) {
     if (this.debugMsgLog == 1) {
       this.log(msg, num);
@@ -170,6 +254,21 @@ export class FanAccessory {
     if (this.debugMsgLog == 1) {
       this.log(msg, bool);
     }
+  }
+  defaultFromString(str: string): any {
+    if (str == "false") {
+      return false;
+    }
+    if (str == "true") {
+      return true;
+    }
+    if (str == "1") {
+      return 1;
+    }
+    if (str == "0") {
+      return 0;
+    }
+    return -1;
   }
 
   fanRotationSpeedTimeout() {
@@ -182,7 +281,7 @@ export class FanAccessory {
           this.debugLogNum("Set RotationSpeed to", this.lastRotationSpeed);
           this.lastRotationSpeedTimerSet = false;
 
-          this.logo.WriteLogo(this.setRotationSpeed, this.lastRotationSpeed, 0);
+          this.logo.WriteLogo(this.fanSetRotationSpeed, this.lastRotationSpeed, 0);
 
         } else {
 
@@ -203,50 +302,32 @@ export class FanAccessory {
 
   }
 
+  fanRDAutoUpdate() {
+
+    if (this.logo.isValidLogoAddress(this.fanGetRotationDirection)) {
+
+      this.updateRDTimer = setTimeout(() => {
+
+        this.getRotationDirection();
+  
+      }, this.updateInterval + Math.floor(Math.random() * 10000));
+      
+    }
+
+  }
+
   fanRSAutoUpdate() {
 
-    this.updateRSTimer = setTimeout(() => {
+    if (this.logo.isValidLogoAddress(this.fanGetRotationSpeed)) {
 
-      this.getRotationSpeed;
+      this.updateRSTimer = setTimeout(() => {
 
-    }, this.updateInterval + Math.floor(Math.random() * 10000));
+        this.getRotationSpeed();
+  
+      }, this.updateInterval + Math.floor(Math.random() * 10000));
+      
+    }
 
   }
 
 }
-
-    /*********************
-     * LOGO! Fan Service *
-     *********************/
-
-     /*
-    if (this.type == FanAccessory.fanType) {
-
-      this.fanAccessory = new FanAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
-
-      const fanService = new Service.Fan(
-        this.name,
-        FanAccessory.fanType,
-      );
-
-      fanService
-        .getCharacteristic(Characteristic.Active)
-        .on("get", callbackify(this.fanAccessory.getOn))
-        .on("set", callbackify(this.fanAccessory.setOn));
-
-      fanService
-        .getCharacteristic(Characteristic.RotationSpeed)
-        .on("get", callbackify(this.fanAccessory.getRotationSpeed))
-        .on("set", callbackify(this.fanAccessory.setRotationSpeed));
-
-      this.fanService = fanService;
-
-      this.fanAccessory.fanService          = this.fanService;
-      this.fanAccessory.fanGetOn            = config["fanGetOn"]            || "V130.0";
-      this.fanAccessory.fanSetOn            = config["fanSetOn"]            || "V130.1";
-      this.fanAccessory.fanSetOff           = config["fanSetOff"]           || "V130.2";
-      this.fanAccessory.fanGetRotationSpeed = config["fanGetRotationSpeed"] || "VW133";
-      this.fanAccessory.fanSetRotationSpeed = config["fanSetRotationSpeed"] || "VW135";
-
-    }
-    */

@@ -71,7 +71,7 @@ export class ModBusLogo {
 
         var addr = this.getLogoAddress(item);
 
-        if (addr.readOnly == false) {
+        if ((addr.readOnly == false) && (value >= 0)) {
 
             if (addr.type == AddressType.MBATCoil) {
 

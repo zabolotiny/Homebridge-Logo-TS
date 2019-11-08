@@ -17,6 +17,7 @@ Type of Accessory:
 - Thermostat
 - Irrigation System
 - Valve
+- Fan
 
 Type of Sensor Accessory:
 - Light Sensor
@@ -52,7 +53,7 @@ Name                     | Value               | Required | Option for | Notes
 `logoType`               | "8.SF4"             | no       | "snap7"    | Must be set to the type of your LOGO! PLC, default is: "8.SF4".
 `localTSAP`              | "0x1200"            | no       | "snap7"    | Must be set to the localTSAP of your LOGO! PLC, default is: 0x1200.
 `remoteTSAP`             | "0x2200"            | no       | "snap7"    | Must be set to the remoteTSAP of your LOGO! PLC, default is: 0x2200.
-`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "window", "garagedoor", "lightbulb", "thermostat", "irrigationSystem", "valve" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
+`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "window", "garagedoor", "lightbulb", "thermostat", "irrigationSystem", "valve", "fan" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
 `updateInterval`         | 0                   | no       | all        | Auto Update Interval in milliseconds, 0 = Off
 `buttonValue`            | 1                   | no       | all        | Value for Digital Button
 `pushButton`             | 1                   | no       | all        | If e.g. the network input in the LOGO! a hardware button on the LOGO! simulated.
@@ -63,9 +64,9 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`switchGet`              | "Q1"                | no       | "switch"   | Switch Get - Qn, Mn or Vn.n
-`switchSetOn`            | "V2.0"              | no       | "switch"   | Switch Set On - Mn or Vn.n
-`switchSetOff`           | "V3.0"              | no       | "switch"   | Switch Set Off - Mn or Vn.n  
+`switchGet`              | "Q1"                | yes*     | "switch"   | Switch Get - Qn, Mn or Vn.n
+`switchSetOn`            | "V2.0"              | yes*     | "switch"   | Switch Set On - Mn or Vn.n
+`switchSetOff`           | "V3.0"              | yes*     | "switch"   | Switch Set Off - Mn or Vn.n  
 
 ```
 "accessories": [
@@ -100,13 +101,13 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`blindSetPos`            | "VW50"              | no       | "blind"    | Blind Set Pos - AMn or VWn - (Analog Control)
-`blindGetPos`            | "VW52"              | no       | "blind"    | Blind Get Pos - AMn or VWn - (Analog Control)
-`blindSetState`          | "VW54"              | no       | "blind"    | Blind Get State - AMn or VWn - (Analog Control)
-`blindDigital`           | 0                   | no       | "blind"    | 0 for Analog Control, 1 for Button Control
-`blindSetUp`             | "V5.0"              | no       | "blind"    | Blind Set Up - Mn or Vn.n - (Button Control)
-`blindSetDown`           | "V5.1"              | no       | "blind"    | Blind Set Down - Mn or Vn.n - (Button Control)
-`blindGetUpDown`         | "V5.2"              | no       | "blind"    | Blind Up or Down - Return 1 for Up or 0 for Down - (Button Control)
+`blindSetPos`            | "VW50"              | yes*     | "blind"    | Blind Set Pos - AMn or VWn - (Analog Control)
+`blindGetPos`            | "VW52"              | yes*     | "blind"    | Blind Get Pos - AMn or VWn - (Analog Control)
+`blindSetState`          | "VW54"              | yes*     | "blind"    | Blind Get State - AMn or VWn - (Analog Control)
+`blindDigital`           | 0                   | yes*     | "blind"    | 0 for Analog Control, 1 for Button Control
+`blindSetUp`             | "V5.0"              | yes*     | "blind"    | Blind Set Up - Mn or Vn.n - (Button Control)
+`blindSetDown`           | "V5.1"              | yes*     | "blind"    | Blind Set Down - Mn or Vn.n - (Button Control)
+`blindGetUpDown`         | "V5.2"              | yes*     | "blind"    | Blind Up or Down - Return 1 for Up or 0 for Down - (Button Control)
 
 ```
 "accessories": [
@@ -167,13 +168,13 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`windowSetPos`            | "VW50"              | no       | "window"    | Window Set Pos - AMn or VWn - (Analog Control)
-`windowGetPos`            | "VW52"              | no       | "window"    | Window Get Pos - AMn or VWn - (Analog Control)
-`windowSetState`          | "VW54"              | no       | "window"    | Window Get State - AMn or VWn - (Analog Control)
-`windowDigital`           | 0                   | no       | "window"    | 0 for Analog Control, 1 for Button Control
-`windowSetUp`             | "V5.0"              | no       | "window"    | Window Set Up - Mn or Vn.n - (Button Control)
-`windowSetDown`           | "V5.1"              | no       | "window"    | Window Set Down - Mn or Vn.n - (Button Control)
-`windowGetUpDown`         | "V5.2"              | no       | "window"    | Window Up or Down - Return 1 for Up or 0 for Down - (Button Control)
+`windowSetPos`           | "VW50"              | yes*     | "window"   | Window Set Pos - AMn or VWn - (Analog Control)
+`windowGetPos`           | "VW52"              | yes*     | "window"   | Window Get Pos - AMn or VWn - (Analog Control)
+`windowSetState`         | "VW54"              | yes*     | "window"   | Window Get State - AMn or VWn - (Analog Control)
+`windowDigital`          | 0                   | yes*     | "window"   | 0 for Analog Control, 1 for Button Control
+`windowSetUp`            | "V5.0"              | yes*     | "window"   | Window Set Up - Mn or Vn.n - (Button Control)
+`windowSetDown`          | "V5.1"              | yes*     | "window"   | Window Set Down - Mn or Vn.n - (Button Control)
+`windowGetUpDown`        | "V5.2"              | yes*     | "window"   | Window Up or Down - Return 1 for Up or 0 for Down - (Button Control)
 
 ```
 "accessories": [
@@ -235,10 +236,10 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`garagedoorOpen`         | "V401.0"            | no       | "garagedoor" | Garagedoor Open - Mn or Vn.n
-`garagedoorClose`        | "V401.1"            | no       | "garagedoor" | Garagedoor Close - Mn or Vn.n
-`garagedoorState`        | "V401.2"            | no       | "garagedoor" | Garagedoor State - Mn or Vn.n
-`garagedoorObstruction`  | "false"             | no       | "garagedoor" | Garagedoor Obstruction Detected - `"false"` or a valid LOGO! Address (Mn or Vn.n)
+`garagedoorOpen`         | "V401.0"            | yes*     | "garagedoor" | Garagedoor Open - Mn or Vn.n
+`garagedoorClose`        | "V401.1"            | yes*     | "garagedoor" | Garagedoor Close - Mn or Vn.n
+`garagedoorState`        | "V401.2"            | yes*     | "garagedoor" | Garagedoor State - Mn or Vn.n
+`garagedoorObstruction`  | "false"             | no*      | "garagedoor" | Garagedoor Obstruction Detected - `"false"` or a valid LOGO! Address (Mn or Vn.n)
 
 ```
 "accessories": [
@@ -278,10 +279,10 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`lightbulbSetOn`         | "V7.0"              | no       | "lightbulb" | Lightbulb Set On - Mn or Vn.n
-`lightbulbSetOff`        | "V7.1"              | no       | "lightbulb" | Lightbulb Set Off - Mn or Vn.n
-`lightbulbSetBrightness` | "VW70"              | no       | "lightbulb" | Lightbulb Set Brightness - AMn or VWn
-`lightbulbGetBrightness` | "VW72"              | no       | "lightbulb" | Lightbulb Get Brightness - AMn or VWn
+`lightbulbSetOn`         | "V7.0"              | yes*     | "lightbulb" | Lightbulb Set On - Mn or Vn.n
+`lightbulbSetOff`        | "V7.1"              | yes*     | "lightbulb" | Lightbulb Set Off - Mn or Vn.n
+`lightbulbSetBrightness` | "VW70"              | yes*     | "lightbulb" | Lightbulb Set Brightness - AMn or VWn
+`lightbulbGetBrightness` | "VW72"              | yes*     | "lightbulb" | Lightbulb Get Brightness - AMn or VWn
 
 ```
 "accessories": [
@@ -319,12 +320,12 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`thermostatGetHCState`   | "VW210"             | no       | "thermostat" | Thermostat Get Heating Cooling State - AMn or VWn
-`thermostatSetHCState`   | "VW200"             | no       | "thermostat" | Thermostat Set Heating Cooling State - AMn or VWn
-`thermostatGetTemp`      | "VW212"             | no       | "thermostat" | Thermostat Get Temperature - AMn or VWn
-`thermostatGetTargetTemp`    | "VW214"         | no       | "thermostat" | Thermostat Get Target Temperature - AMn or VWn
-`thermostatSetTargetTemp`    | "VW202"         | no       | "thermostat" | Thermostat Set Target Temperature - AMn or VWn
-`thermostatTempDisplayUnits` | 0               | no       | "thermostat" | Temperature Display Units - Celsius = 0; Fahrenheit = 1;
+`thermostatGetHCState`   | "VW210"             | yes*     | "thermostat" | Thermostat Get Heating Cooling State - AMn or VWn
+`thermostatSetHCState`   | "VW200"             | yes*     | "thermostat" | Thermostat Set Heating Cooling State - AMn or VWn
+`thermostatGetTemp`      | "VW212"             | yes*     | "thermostat" | Thermostat Get Temperature - AMn or VWn
+`thermostatGetTargetTemp`    | "VW214"         | yes*     | "thermostat" | Thermostat Get Target Temperature - AMn or VWn
+`thermostatSetTargetTemp`    | "VW202"         | yes*     | "thermostat" | Thermostat Set Target Temperature - AMn or VWn
+`thermostatTempDisplayUnits` | 0               | yes*     | "thermostat" | Temperature Display Units - Celsius = 0; Fahrenheit = 1;
 
 ```
 "accessories": [
@@ -366,11 +367,11 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`irrigationSystemGetActive`      | "V400.0"    | no       | "irrigationSystem" | Irrigation System Get Active - Mn or Vn.n
-`irrigationSystemSetActiveOn`    | "V400.1"    | no       | "irrigationSystem" | Irrigation System Set Active to On - Mn or Vn.n
-`irrigationSystemSetActiveOff`   | "V400.2"    | no       | "irrigationSystem" | Irrigation System Set Active to Off - Mn or Vn.n
-`irrigationSystemGetProgramMode` | "VW402"     | no       | "irrigationSystem" | Irrigation System Get Program Mode - AMn or VWn
-`irrigationSystemGetInUse`       | "V400.3"    | no       | "irrigationSystem" | Irrigation System Get In Use - Mn or Vn.n
+`irrigationSystemGetActive`      | "V400.0"    | yes*     | "irrigationSystem" | Irrigation System Get Active - Mn or Vn.n
+`irrigationSystemSetActiveOn`    | "V400.1"    | yes*     | "irrigationSystem" | Irrigation System Set Active to On - Mn or Vn.n
+`irrigationSystemSetActiveOff`   | "V400.2"    | yes*     | "irrigationSystem" | Irrigation System Set Active to Off - Mn or Vn.n
+`irrigationSystemGetProgramMode` | "VW402"     | yes*     | "irrigationSystem" | Irrigation System Get Program Mode - AMn or VWn
+`irrigationSystemGetInUse`       | "V400.3"    | yes*     | "irrigationSystem" | Irrigation System Get In Use - Mn or Vn.n
 
 ```
 "accessories": [
@@ -410,13 +411,13 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`valveGetActive`         | "V400.0"    | no       | "valve" | Valve Get Active - Mn or Vn.n
-`valveSetActiveOn`       | "V400.1"    | no       | "valve" | Valve Set Active to On - Mn or Vn.n
-`valveSetActiveOff`      | "V400.2"    | no       | "valve" | Valve Set Active to Off - Mn or Vn.n
-`valveGetInUse`          | "V400.3"    | no       | "valve" | Valve Get In Use - Mn or Vn.n
-`valveType`              | 0           | no       | "valve" | Valve Type - Generic Valve = 0, Irrigation = 1, Shower Head = 2, Water Faucet = 3,
-`valveSetDuration`       | "0"         | no       | "valve" | Valve Set Duration - `"0"` or a valid LOGO! Address (AMn or VWn)
-`valveGetDuration`       | "0"         | no       | "valve" | Valve Get Duration - `"0"` or a valid LOGO! Address (AMn or VWn)
+`valveGetActive`         | "V400.0"    | yes*     | "valve" | Valve Get Active - Mn or Vn.n
+`valveSetActiveOn`       | "V400.1"    | yes*     | "valve" | Valve Set Active to On - Mn or Vn.n
+`valveSetActiveOff`      | "V400.2"    | yes*     | "valve" | Valve Set Active to Off - Mn or Vn.n
+`valveGetInUse`          | "V400.3"    | yes*     | "valve" | Valve Get In Use - Mn or Vn.n
+`valveType`              | 0           | yes*     | "valve" | Valve Type - Generic Valve = 0, Irrigation = 1, Shower Head = 2, Water Faucet = 3,
+`valveSetDuration`       | "0"         | no*      | "valve" | Valve Set Duration - `"0"` or a valid LOGO! Address (AMn or VWn)
+`valveGetDuration`       | "0"         | no*      | "valve" | Valve Get Duration - `"0"` or a valid LOGO! Address (AMn or VWn)
 
 ```
 "accessories": [
@@ -455,14 +456,67 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
+## Fan Accessory Configuration  
+
+Name                     | Value               | Required | Option for | Notes
+------------------------ | ------------------- | -------- | ---------- | ------------------------
+`fanGetOn`                   | "V130.0"        | yes*     | "fan"      | Fan Get On - Mn or Vn.n
+`fanSetOn`                   | "V130.1"        | yes*     | "fan"      | Fan Set On to On - Mn or Vn.n
+`fanSetOff`                  | "V130.2"        | yes*     | "fan"      | Fan Set On to Off - Mn or Vn.n
+`fanGetRotationDirection`    | "0"             | no*      | "fan"      | Fan Get Rotation Direction - `"0"` or a valid LOGO! Address (Mn or Vn.n)
+`fanSetRotationDirectionCW`  | "0"             | no*      | "fan"      | Fan Set Rotation Direction to Clockwise - `"0"` or a valid LOGO! Address (Mn or Vn.n)
+`fanSetRotationDirectionCCW` | "0"             | no*      | "fan"      | Fan Set Rotation Direction to Counter Clockwise - `"0"` or a valid LOGO! Address (Mn or Vn.n)
+`fanGetRotationSpeed`        | "0"             | no*      | "fan"      | Fan Get Rotation Speed - `"0"` or a valid LOGO! Address (AMn or VWn)
+`fanSetRotationSpeed`        | "0"             | no*      | "fan"      | Fan Set Rotation Speed - `"0"` or a valid LOGO! Address (AMn or VWn)
+
+
+```
+"accessories": [
+        {
+            "accessory": "Logo-TS",
+            "name": "Fan ModBus",
+            "interface": "modbus",
+            "ip": "10.0.0.100",
+            "port": 505,
+            "type": "fan",
+            "fanGetOn": "V130.0",
+            "fanSetOn": "V130.1",
+            "fanSetOff": "V130.2",
+            "fanGetRotationDirection": "0",
+            "fanSetRotationDirectionCW": "0",
+            "fanSetRotationDirectionCCW": "0",
+            "fanGetRotationSpeed": "0",
+            "fanSetRotationSpeed": "0"
+        },
+        {
+            "accessory": "Logo-TS",
+            "name": "Fan Snap7",
+            "interface": "snap7",
+            "ip": "10.0.0.200",
+            "logoType": "0BA7",
+            "localTSAP": "0x1200",
+            "remoteTSAP": "0x2200",
+            "type": "fan",
+            "fanGetOn": "V130.0",
+            "fanSetOn": "V130.1",
+            "fanSetOff": "V130.2",
+            "fanGetRotationDirection": "0",
+            "fanSetRotationDirectionCW": "0",
+            "fanSetRotationDirectionCCW": "0",
+            "fanGetRotationSpeed": "0",
+            "fanSetRotationSpeed": "0"
+        }
+    ]
+```
+
 
 
 ## Light Sensor Accessory Configuration  
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`lightLevel`             | "AM3"               | no       | "lightSensor" | Light Sensor for Current Ambient Light Level in Lux
-`lightLDRLevelParts`     | 0                   | no       | "lightSensor" | Indicates how many formula parts the lux value is calculated. [0, 1, 2, 3] 0 - simply shows the value of the LOGO!, [more information about the light sensor](src/util/accessories/LightSensor/LightSensor.md)
+`lightLevel`             | "AM3"               | yes*     | "lightSensor" | Light Sensor for Current Ambient Light Level in Lux
+`lightLDRLevelParts`     | 0                   | yes*     | "lightSensor" | Indicates how many formula parts the lux value is calculated. [0, 1, 2, 3] 0 - simply shows the value of the LOGO!, [more information about the light sensor](src/util/accessories/LightSensor/LightSensor.md)
 
 ```
 "accessories": [
@@ -488,7 +542,7 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`motionDetected`         | "M9"                | no       | "motionSensor"        | Motion Sensor
+`motionDetected`         | "M9"                | yes*     | "motionSensor"        | Motion Sensor
 
 ```
 "accessories": [
@@ -513,7 +567,7 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`contactDetected`        | "M15"               | no       | "contactSensor"       | Contact Sensor
+`contactDetected`        | "M15"               | yes*     | "contactSensor"       | Contact Sensor
 
 ```
 "accessories": [
@@ -536,7 +590,7 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`smokeDetected`          | "M12"               | no       | "smokeSensor"         | Smoke Sensor
+`smokeDetected`          | "M12"               | yes*     | "smokeSensor"         | Smoke Sensor
 
 ```
 "accessories": [
@@ -559,7 +613,7 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`temperature`            | "AM2"               | no       | "temperatureSensor"   | Temperature Sensor for Current Temperature in °C
+`temperature`            | "AM2"               | yes*     | "temperatureSensor"   | Temperature Sensor for Current Temperature in °C
 
 ```
 "accessories": [
@@ -582,7 +636,7 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`humidity`               | "AM1"               | no       | "humiditySensor"      | Humidity Sensor for Current Relative Humidity in %
+`humidity`               | "AM1"               | yes*     | "humiditySensor"      | Humidity Sensor for Current Relative Humidity in %
 
 ```
 "accessories": [
@@ -605,8 +659,8 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`carbonDioxideLevel`     | "AM3"               | no       | "carbonDioxideSensor" | Carbon Dioxide Sensor for Carbon Dioxide Level in ppm
-`carbonDioxideLimit`     | 1000                | no       | "carbonDioxideSensor" | Carbon Dioxide Sensor for Carbon Dioxide Peak Level in ppm
+`carbonDioxideLevel`     | "AM3"               | yes*     | "carbonDioxideSensor" | Carbon Dioxide Sensor for Carbon Dioxide Level in ppm
+`carbonDioxideLimit`     | 1000                | yes*     | "carbonDioxideSensor" | Carbon Dioxide Sensor for Carbon Dioxide Peak Level in ppm
 
 ```
 "accessories": [
@@ -630,7 +684,7 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`carbonDioxideLevel`     | "AM3"               | no       | "airQualitySensor"    | Air Quality Sensor for Air Quality (Carbon Dioxide Level in ppm)
+`carbonDioxideLevel`     | "AM3"               | yes*     | "airQualitySensor"    | Air Quality Sensor for Air Quality (Carbon Dioxide Level in ppm)
 
 ```
 "accessories": [
@@ -647,7 +701,12 @@ Name                     | Value               | Required | Option for | Notes
         }
     ]
 ```
+  
 
+Required: yes* - means that this parameter is only required for this particular accessory!
+Required: no* - means that if no valid LOGO! Address is specified for this parameter, this characteristic is deactivated in the accessory!
+  
+  
 ## Test Homebridge-Logo-TS
 1. Download or clone Homebridge-Logo-TS.
 2. Install: $ npm install
