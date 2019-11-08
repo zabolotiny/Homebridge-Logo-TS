@@ -703,10 +703,10 @@ Name                     | Value               | Required | Option for | Notes
 ```
   
 
-Required: yes* - means that this parameter is only required for this particular accessory!
+Required: yes* - means that this parameter is only required for this particular accessory!  
 Required: no* - means that if no valid LOGO! Address is specified for this parameter, this characteristic is deactivated in the accessory!
   
-  
+
 ## Test Homebridge-Logo-TS
 1. Download or clone Homebridge-Logo-TS.
 2. Install: $ npm install
