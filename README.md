@@ -704,7 +704,7 @@ Name                     | Value               | Required | Option for | Notes
   
 
 Required: yes* - means that this parameter is only required for this particular accessory!  
-Required: no * - means if no valid LOGO address is specified for this parameter, this characteristic returns the specified value or is deactivated in the accessory!
+Required: no* - means if no valid LOGO address is specified for this parameter, this characteristic returns the specified value or is deactivated in the accessory!
   
 
 ## Test Homebridge-Logo-TS
