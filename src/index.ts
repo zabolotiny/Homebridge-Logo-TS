@@ -14,6 +14,8 @@ import { IrrigationSystemAccessory } from "./util/accessories/IrrigationSystemAc
 import { ValveAccessory } from "./util/accessories/ValveAccessory"
 import { FanAccessory } from "./util/accessories/FanAccessory"
 import { Fanv2Accessory } from "./util/accessories/Fanv2Accessory"
+import { FilterMaintenanceAccessory } from "./util/accessories/FilterMaintenanceAccessory"
+import { VentilationAccessory } from "./util/accessories/VentilationAccessory"
 import { LightSensor } from "./util/accessories/LightSensor"
 import { MotionSensor } from "./util/accessories/MotionSensor"
 import { ContactSensor } from "./util/accessories/ContactSensor"
@@ -73,6 +75,8 @@ class LogoAccessory {
   valveAccessory:             ValveAccessory             | undefined;
   fanAccessory:               FanAccessory               | undefined;
   fanv2Accessory:             Fanv2Accessory             | undefined;
+  filterMaintenanceAccessory: FilterMaintenanceAccessory | undefined;
+  ventilationAccessory:       VentilationAccessory       | undefined;
   lightSensor:                LightSensor                | undefined;
   motionSensor:               MotionSensor               | undefined;
   contactSensor:              ContactSensor              | undefined;
@@ -556,6 +560,130 @@ class LogoAccessory {
       this.serviceToExpose = fanv2Service;
 
       this.fanv2Accessory.fanv2Service = this.serviceToExpose;
+
+    }
+
+    /************************************
+     * LOGO! Filter Maintenance Service *
+     ************************************/
+
+    if (this.type == FilterMaintenanceAccessory.filterMaintenanceType) {
+
+      this.filterMaintenanceAccessory = new FilterMaintenanceAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
+
+      const filterMaintenanceService = new Service.FilterMaintenance(
+        this.name,
+        FilterMaintenanceAccessory.filterMaintenanceType,
+      );
+
+      this.filterMaintenanceAccessory.filterChangeIndication      = config["filterChangeIndication"]      || "V120.0";
+      this.filterMaintenanceAccessory.filterLifeLevel             = config["filterLifeLevel"]             || "0";
+      this.filterMaintenanceAccessory.filterResetFilterIndication = config["filterResetFilterIndication"] || "0";
+
+      filterMaintenanceService
+        .getCharacteristic(Characteristic.FilterChangeIndication)
+        .on("get", callbackify(this.filterMaintenanceAccessory.getFilterChangeIndication));
+
+      if (this.logo.isValidLogoAddress(this.filterMaintenanceAccessory.filterLifeLevel)) {
+
+        filterMaintenanceService
+          .getCharacteristic(Characteristic.FilterLifeLevel)
+          .on("get", callbackify(this.filterMaintenanceAccessory.getFilterLifeLevel));
+        
+      }
+
+      if (this.logo.isValidLogoAddress(this.filterMaintenanceAccessory.filterResetFilterIndication)) {
+
+        filterMaintenanceService
+          .getCharacteristic(Characteristic.ResetFilterIndication)
+          .on("set", callbackify(this.filterMaintenanceAccessory.setResetFilterIndication));
+        
+      }
+
+      this.serviceToExpose = filterMaintenanceService;
+
+      this.filterMaintenanceAccessory.filterMaintenanceService = this.serviceToExpose;
+
+    }
+
+    /****************************************************************
+     * LOGO! Ventilation Service (Fan + Filter Maintenance Service) *
+     ****************************************************************/
+
+    if (this.type == VentilationAccessory.ventilationType) {
+
+      this.ventilationAccessory = new VentilationAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
+
+      const ventilationService = new Service.Fan(
+        this.name,
+        VentilationAccessory.ventilationType,
+      );
+
+      /* Fan Accessory */
+
+      this.ventilationAccessory.ventilationGetOn                   = config["ventilationGetOn"]                   || "V130.0";
+      this.ventilationAccessory.ventilationSetOn                   = config["ventilationSetOn"]                   || "V130.1";
+      this.ventilationAccessory.ventilationSetOff                  = config["ventilationSetOff"]                  || "V130.2";
+      this.ventilationAccessory.ventilationGetRotationDirection    = config["ventilationGetRotationDirection"]    || "0";
+      this.ventilationAccessory.ventilationSetRotationDirectionCW  = config["ventilationSetRotationDirectionCW"]  || "0";
+      this.ventilationAccessory.ventilationSetRotationDirectionCCW = config["ventilationSetRotationDirectionCCW"] || "0";
+      this.ventilationAccessory.ventilationGetRotationSpeed        = config["ventilationGetRotationSpeed"]        || "0";
+      this.ventilationAccessory.ventilationSetRotationSpeed        = config["ventilationSetRotationSpeed"]        || "0";
+
+      ventilationService
+        .getCharacteristic(Characteristic.On)
+        .on("get", callbackify(this.ventilationAccessory.getOn))
+        .on("set", callbackify(this.ventilationAccessory.setOn));
+
+      if (this.logo.isValidLogoAddress(this.ventilationAccessory.ventilationGetRotationDirection) 
+            && this.logo.isValidLogoAddress(this.ventilationAccessory.ventilationSetRotationDirectionCW)
+                && this.logo.isValidLogoAddress(this.ventilationAccessory.ventilationSetRotationDirectionCCW)) {
+      
+        ventilationService
+          .getCharacteristic(Characteristic.RotationDirection)
+          .on("get", callbackify(this.ventilationAccessory.getRotationDirection))
+          .on("set", callbackify(this.ventilationAccessory.setRotationDirection));
+
+      }
+
+      if (this.logo.isValidLogoAddress(this.ventilationAccessory.ventilationGetRotationSpeed) && this.logo.isValidLogoAddress(this.ventilationAccessory.ventilationSetRotationSpeed)) {
+        
+        ventilationService
+          .getCharacteristic(Characteristic.RotationSpeed)
+          .on("get", callbackify(this.ventilationAccessory.getRotationSpeed))
+          .on("set", callbackify(this.ventilationAccessory.setRotationSpeed));
+
+      }
+
+      /* Filter Maintenance Accessory */
+
+      this.ventilationAccessory.ventilationGetFilterChangeIndication = config["ventilationGetFilterChangeIndication"] || "V120.0";
+      this.ventilationAccessory.ventilationGetFilterLifeLevel        = config["ventilationGetFilterLifeLevel"]        || "0";
+      this.ventilationAccessory.ventilationSetResetFilterIndication  = config["ventilationSetResetFilterIndication"]  || "0";
+
+      ventilationService
+        .getCharacteristic(Characteristic.FilterChangeIndication)
+        .on("get", callbackify(this.ventilationAccessory.getFilterChangeIndication));
+
+      if (this.logo.isValidLogoAddress(this.ventilationAccessory.ventilationGetFilterLifeLevel)) {
+
+        ventilationService
+          .getCharacteristic(Characteristic.FilterLifeLevel)
+          .on("get", callbackify(this.ventilationAccessory.getFilterLifeLevel));
+        
+      }
+
+      if (this.logo.isValidLogoAddress(this.ventilationAccessory.ventilationSetResetFilterIndication)) {
+
+        ventilationService
+          .getCharacteristic(Characteristic.ResetFilterIndication)
+          .on("set", callbackify(this.ventilationAccessory.setResetFilterIndication));
+        
+      }
+
+      this.serviceToExpose = ventilationService;
+
+      this.ventilationAccessory.ventilationService = this.serviceToExpose;
 
     }
 

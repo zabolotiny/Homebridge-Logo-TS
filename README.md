@@ -3,7 +3,7 @@ Homebridge-Logo-TS
 
 [![npm version](https://badge.fury.io/js/homebridge-logo-ts.svg)](https://badge.fury.io/js/homebridge-logo-ts)  
 
-<img src="Standardraum.png" align="right" alt="Standardraum" height="448" width="207">
+<img src="https://raw.githubusercontent.com/Sinclair81/Homebridge-Logo-TS/master/Standardraum.png" align="right" alt="Standardraum" height="448" width="207">
 
 Use a Siemens LOGO! PLC for switch on whatever you want.  
 Communicate with LOGO! 8.SF4 over Modbus and with LOGO! 0BA7 / 0BA8 over [Snap7](http://snap7.sourceforge.net).  
@@ -19,6 +19,8 @@ Type of Accessory:
 - Valve
 - Fan
 - Fan v2
+- Filter Maintenance
+- Ventilation (Fan + Filter Maintenance)
 
 Type of Sensor Accessory:
 - Light Sensor
@@ -54,7 +56,7 @@ Name                     | Value               | Required | Option for | Notes
 `logoType`               | "8.SF4"             | no       | "snap7"    | Must be set to the type of your LOGO! PLC, default is: "8.SF4".
 `localTSAP`              | "0x1200"            | no       | "snap7"    | Must be set to the localTSAP of your LOGO! PLC, default is: 0x1200.
 `remoteTSAP`             | "0x2200"            | no       | "snap7"    | Must be set to the remoteTSAP of your LOGO! PLC, default is: 0x2200.
-`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "window", "garagedoor", "lightbulb", "thermostat", "irrigationSystem", "valve", "fan" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
+`type`                   | "switch" or ...     | yes      | all        | Type of Accessory: "switch", "blind", "window", "garagedoor", "lightbulb", "thermostat", "irrigationSystem", "valve", "fan", "fanv2", "filterMaintenance", "ventilation" or Type of Sensor Accessory: "lightSensor", "motionSensor", "contactSensor", "smokeSensor", "temperatureSensor", "humiditySensor", "carbonDioxideSensor", "airQualitySensor"
 `updateInterval`         | 0                   | no       | all        | Auto Update Interval in milliseconds, 0 = Off
 `buttonValue`            | 1                   | no       | all        | Value for Digital Button
 `pushButton`             | 1                   | no       | all        | If e.g. the network input in the LOGO! a hardware button on the LOGO! simulated.
@@ -568,6 +570,109 @@ Name                     | Value               | Required | Option for | Notes
             "fanv2SetRotationDirectionCCW": "0",
             "fanv2GetRotationSpeed": "0",
             "fanv2SetRotationSpeed": "0"
+        }
+    ]
+```
+
+## Filter Maintenance Accessory Configuration
+#### In the HomeKit Accessory Protocol Specification available but currently not supported by the Home-App!?!  
+
+Name                     | Value               | Required | Option for | Notes
+------------------------ | ------------------- | -------- | ---------- | ------------------------
+`filterChangeIndication`      | "V120.0"       | yes*     | "filterMaintenance" | Filter Maintenance Get Filter Change Indication - Mn or Vn.n
+`filterLifeLevel`             | "0"            | no*      | "filterMaintenance" | Filter Maintenance Get Filter Life Level - `"0"` or a valid LOGO! Address (AMn or VWn)
+`filterResetFilterIndication` | "0"            | no*      | "filterMaintenance" | Filter Maintenance Set Reset Filter Indication - `"0"` or a valid LOGO! Address (Mn or Vn.n)
+
+
+```
+"accessories": [
+        {
+            "accessory": "Logo-TS",
+            "name": "Filter Maintenance ModBus",
+            "interface": "modbus",
+            "ip": "10.0.0.100",
+            "port": 505,
+            "type": "filterMaintenance",
+            "filterChangeIndication": "V120.0",
+            "filterLifeLevel": "0",
+            "filterResetFilterIndication": "0"
+        },
+        {
+            "accessory": "Logo-TS",
+            "name": "Filter Maintenance Snap7",
+            "interface": "snap7",
+            "ip": "10.0.0.200",
+            "logoType": "0BA7",
+            "localTSAP": "0x1200",
+            "remoteTSAP": "0x2200",
+            "type": "filterMaintenance",
+            "filterChangeIndication": "V120.0",
+            "filterLifeLevel": "0",
+            "filterResetFilterIndication": "0"
+        }
+    ]
+```
+
+
+## Ventilation (Fan + Filter Maintenance) Accessory Configuration
+#### Not in HomeKit Accessory Protocol Specification available but supported by the Home-App!
+
+Name                     | Value               | Required | Option for | Notes
+------------------------ | ------------------- | -------- | ---------- | ------------------------
+`ventilationGetOn`                   | "V130.0"        | yes*     | "ventilation"      | Ventilation Get On - Mn or Vn.n
+`ventilationSetOn`                   | "V130.1"        | yes*     | "ventilation"      | Ventilation Set On to On - Mn or Vn.n
+`ventilationSetOff`                  | "V130.2"        | yes*     | "ventilation"      | Ventilation Set On to Off - Mn or Vn.n
+`ventilationGetRotationDirection`    | "0"             | no*      | "ventilation"      | Ventilation Get Rotation Direction - `"0"` or a valid LOGO! Address (Mn or Vn.n)
+`ventilationSetRotationDirectionCW`  | "0"             | no*      | "ventilation"      | Ventilation Set Rotation Direction to Clockwise - `"0"` or a valid LOGO! Address (Mn or Vn.n)
+`ventilationSetRotationDirectionCCW` | "0"             | no*      | "ventilation"      | Ventilation Set Rotation Direction to Counter Clockwise - `"0"` or a valid LOGO! Address (Mn or Vn.n)
+`ventilationGetRotationSpeed`        | "0"             | no*      | "ventilation"      | Ventilation Get Rotation Speed - `"0"` or a valid LOGO! Address (AMn or VWn)
+`ventilationSetRotationSpeed`        | "0"             | no*      | "ventilation"      | Ventilation Set Rotation Speed - `"0"` or a valid LOGO! Address (AMn or VWn)
+`ventilationGetFilterChangeIndication` | "V120.0"      | yes*     | "ventilation"      | Ventilation Get Filter Change Indication - Mn or Vn.n
+`ventilationGetFilterLifeLevel`        | "0"           | no*      | "ventilation"      | Ventilation Get Filter Life Level - `"0"` or a valid LOGO! Address (AMn or VWn)
+`ventilationSetResetFilterIndication`  | "0"           | no*      | "ventilation"      | Ventilation Set Reset Filter Indication - `"0"` or a valid LOGO! Address (Mn or Vn.n)
+
+
+```
+"accessories": [
+        {
+            "accessory": "Logo-TS",
+            "name": "Ventilation ModBus",
+            "interface": "modbus",
+            "ip": "10.0.0.100",
+            "port": 505,
+            "type": "ventilation",
+            "ventilationGetOn": "V130.0",
+            "ventilationSetOn": "V130.1",
+            "ventilationSetOff": "V130.2",
+            "ventilationGetRotationDirection": "0",
+            "ventilationSetRotationDirectionCW": "0",
+            "ventilationSetRotationDirectionCCW": "0",
+            "ventilationGetRotationSpeed": "0",
+            "ventilationSetRotationSpeed": "0",
+            "ventilationGetFilterChangeIndication": "V120.0",
+            "ventilationGetFilterLifeLevel": "0",
+            "ventilationSetResetFilterIndication": "0"
+        },
+        {
+            "accessory": "Logo-TS",
+            "name": "Ventilation Snap7",
+            "interface": "snap7",
+            "ip": "10.0.0.200",
+            "logoType": "0BA7",
+            "localTSAP": "0x1200",
+            "remoteTSAP": "0x2200",
+            "type": "ventilation",
+            "ventilationGetOn": "V130.0",
+            "ventilationSetOn": "V130.1",
+            "ventilationSetOff": "V130.2",
+            "ventilationGetRotationDirection": "0",
+            "ventilationSetRotationDirectionCW": "0",
+            "ventilationSetRotationDirectionCCW": "0",
+            "ventilationGetRotationSpeed": "0",
+            "ventilationSetRotationSpeed": "0",
+            "ventilationGetFilterChangeIndication": "V120.0",
+            "ventilationGetFilterLifeLevel": "0",
+            "ventilationSetResetFilterIndication": "0"
         }
     ]
 ```
