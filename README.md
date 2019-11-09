@@ -105,10 +105,10 @@ Name                     | Value               | Required | Option for | Notes
 `blindSetPos`            | "VW50"              | yes*     | "blind"    | Blind Set Pos - AMn or VWn - (Analog Control)
 `blindGetPos`            | "VW52"              | yes*     | "blind"    | Blind Get Pos - AMn or VWn - (Analog Control)
 `blindSetState`          | "VW54"              | yes*     | "blind"    | Blind Get State - AMn or VWn - (Analog Control)
-`blindDigital`           | 0                   | yes*     | "blind"    | 0 for Analog Control, 1 for Button Control
-`blindSetUp`             | "V5.0"              | yes*     | "blind"    | Blind Set Up - Mn or Vn.n - (Button Control)
-`blindSetDown`           | "V5.1"              | yes*     | "blind"    | Blind Set Down - Mn or Vn.n - (Button Control)
-`blindGetUpDown`         | "V5.2"              | yes*     | "blind"    | Blind Up or Down - Return 1 for Up or 0 for Down - (Button Control)
+`blindDigital`           | 0                   | no       | "blind"    | 0 for Analog Control, 1 for Button Control
+`blindSetUp`             | "V5.0"              | no       | "blind"    | Blind Set Up - Mn or Vn.n - (Button Control)
+`blindSetDown`           | "V5.1"              | no       | "blind"    | Blind Set Down - Mn or Vn.n - (Button Control)
+`blindGetUpDown`         | "V5.2"              | no       | "blind"    | Blind Up or Down - Return 1 for Up or 0 for Down - (Button Control)
 
 ```
 "accessories": [
@@ -172,10 +172,10 @@ Name                     | Value               | Required | Option for | Notes
 `windowSetPos`           | "VW50"              | yes*     | "window"   | Window Set Pos - AMn or VWn - (Analog Control)
 `windowGetPos`           | "VW52"              | yes*     | "window"   | Window Get Pos - AMn or VWn - (Analog Control)
 `windowSetState`         | "VW54"              | yes*     | "window"   | Window Get State - AMn or VWn - (Analog Control)
-`windowDigital`          | 0                   | yes*     | "window"   | 0 for Analog Control, 1 for Button Control
-`windowSetUp`            | "V5.0"              | yes*     | "window"   | Window Set Up - Mn or Vn.n - (Button Control)
-`windowSetDown`          | "V5.1"              | yes*     | "window"   | Window Set Down - Mn or Vn.n - (Button Control)
-`windowGetUpDown`        | "V5.2"              | yes*     | "window"   | Window Up or Down - Return 1 for Up or 0 for Down - (Button Control)
+`windowDigital`          | 0                   | no       | "window"   | 0 for Analog Control, 1 for Button Control
+`windowSetUp`            | "V5.0"              | no       | "window"   | Window Set Up - Mn or Vn.n - (Button Control)
+`windowSetDown`          | "V5.1"              | no       | "window"   | Window Set Down - Mn or Vn.n - (Button Control)
+`windowGetUpDown`        | "V5.2"              | no       | "window"   | Window Up or Down - Return 1 for Up or 0 for Down - (Button Control)
 
 ```
 "accessories": [
