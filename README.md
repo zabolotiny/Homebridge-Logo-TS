@@ -18,6 +18,7 @@ Type of Accessory:
 - Irrigation System
 - Valve
 - Fan
+- Fan v2
 
 Type of Sensor Accessory:
 - Light Sensor
@@ -509,6 +510,67 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
+## Fan v2 Accessory Configuration  
+
+Name                     | Value               | Required | Option for | Notes
+------------------------ | ------------------- | -------- | ---------- | ------------------------
+`fanv2GetActive`               | "V130.0"        | yes*     | "fanv2"      | Fan v2 Get Active - Mn or Vn.n
+`fanv2SetActiveOn`             | "V130.1"        | yes*     | "fanv2"      | Fan v2 Set Active to On - Mn or Vn.n
+`fanv2SetActiveOff`            | "V130.2"        | yes*     | "fanv2"      | Fan v2 Set Active to Off - Mn or Vn.n
+`fanv2GetCurrentFanState`      | "0"             | no*      | "fanv2"      | Fan v2 Get Current Fan State (0 = Inactive, 1 = Idle, 2 = Blowing Air) - `"0"` or a valid LOGO! Address (AMn or VWn)
+`fanv2SetTargetFanStateAuto`   | "0"             | no*      | "fanv2"      | Fan v2 Set Target Fan State to Auto - `"0"` or a valid LOGO! Address (Mn or Vn.n)
+`fanv2SetTargetFanStateManual` | "0"             | no*      | "fanv2"      | Fan v2 Set Target Fan State to Manual - `"0"` or a valid LOGO! Address (Mn or Vn.n)
+`fanv2GetRotationDirection`    | "0"             | no*      | "fanv2"      | Fan v2 Get Rotation Direction - `"0"` or a valid LOGO! Address (Mn or Vn.n)
+`fanv2SetRotationDirectionCW`  | "0"             | no*      | "fanv2"      | Fan v2 Set Rotation Direction to Clockwise - `"0"` or a valid LOGO! Address (Mn or Vn.n)
+`fanv2SetRotationDirectionCCW` | "0"             | no*      | "fanv2"      | Fan v2 Set Rotation Direction to Counter Clockwise - `"0"` or a valid LOGO! Address (Mn or Vn.n)
+`fanv2GetRotationSpeed`        | "0"             | no*      | "fanv2"      | Fan v2 Get Rotation Speed - `"0"` or a valid LOGO! Address (AMn or VWn)
+`fanv2SetRotationSpeed`        | "0"             | no*      | "fanv2"      | Fan v2 Set Rotation Speed - `"0"` or a valid LOGO! Address (AMn or VWn)
+
+
+```
+"accessories": [
+        {
+            "accessory": "Logo-TS",
+            "name": "Fan v2 ModBus",
+            "interface": "modbus",
+            "ip": "10.0.0.100",
+            "port": 505,
+            "type": "fanv2",
+            "fanv2GetActive": "V130.0",
+            "fanv2SetActiveOn": "V130.1",
+            "fanv2SetActiveOff": "V130.2",
+            "fanv2GetCurrentFanState": "0",
+            "fanv2SetTargetFanStateAuto": "0",
+            "fanv2SetTargetFanStateManual": "0",
+            "fanv2GetRotationDirection": "0",
+            "fanv2SetRotationDirectionCW": "0",
+            "fanv2SetRotationDirectionCCW": "0",
+            "fanv2GetRotationSpeed": "0",
+            "fanv2SetRotationSpeed": "0"
+        },
+        {
+            "accessory": "Logo-TS",
+            "name": "Fan v2 Snap7",
+            "interface": "snap7",
+            "ip": "10.0.0.200",
+            "logoType": "0BA7",
+            "localTSAP": "0x1200",
+            "remoteTSAP": "0x2200",
+            "type": "fanv2",
+            "fanv2GetActive": "V130.0",
+            "fanv2SetActiveOn": "V130.1",
+            "fanv2SetActiveOff": "V130.2",
+            "fanv2GetCurrentFanState": "0",
+            "fanv2SetTargetFanStateAuto": "0",
+            "fanv2SetTargetFanStateManual": "0",
+            "fanv2GetRotationDirection": "0",
+            "fanv2SetRotationDirectionCW": "0",
+            "fanv2SetRotationDirectionCCW": "0",
+            "fanv2GetRotationSpeed": "0",
+            "fanv2SetRotationSpeed": "0"
+        }
+    ]
+```
 
 
 ## Light Sensor Accessory Configuration  
@@ -523,11 +585,9 @@ Name                     | Value               | Required | Option for | Notes
         {
             "accessory": "Logo-TS",
             "name": "Light Sensor",
-            "interface": "snap7",
-            "ip": "10.0.0.200",
-            "logoType": "0BA7",
-            "localTSAP": "0x1200",
-            "remoteTSAP": "0x2200",
+            "interface": "modbus",
+            "ip": "10.0.0.100",
+            "port": 505,
             "updateInterval": 30000,
             "debugMsgLog": 1,
             "type": "lightSensor",
@@ -549,11 +609,9 @@ Name                     | Value               | Required | Option for | Notes
         {
             "accessory": "Logo-TS",
             "name": "Motion Sensor",
-            "interface": "snap7",
-            "ip": "10.0.0.200",
-            "logoType": "0BA7",
-            "localTSAP": "0x1200",
-            "remoteTSAP": "0x2200",
+            "interface": "modbus",
+            "ip": "10.0.0.100",
+            "port": 505,
             "updateInterval": 30000,
             "debugMsgLog": 1,
             "type": "motionSensor",

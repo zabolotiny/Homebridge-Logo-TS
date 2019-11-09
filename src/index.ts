@@ -13,6 +13,7 @@ import { ThermostatAccessory } from "./util/accessories/ThermostatAccessory"
 import { IrrigationSystemAccessory } from "./util/accessories/IrrigationSystemAccessory"
 import { ValveAccessory } from "./util/accessories/ValveAccessory"
 import { FanAccessory } from "./util/accessories/FanAccessory"
+import { Fanv2Accessory } from "./util/accessories/Fanv2Accessory"
 import { LightSensor } from "./util/accessories/LightSensor"
 import { MotionSensor } from "./util/accessories/MotionSensor"
 import { ContactSensor } from "./util/accessories/ContactSensor"
@@ -71,6 +72,7 @@ class LogoAccessory {
   irrigationSystemAccessory:  IrrigationSystemAccessory  | undefined;
   valveAccessory:             ValveAccessory             | undefined;
   fanAccessory:               FanAccessory               | undefined;
+  fanv2Accessory:             Fanv2Accessory             | undefined;
   lightSensor:                LightSensor                | undefined;
   motionSensor:               MotionSensor               | undefined;
   contactSensor:              ContactSensor              | undefined;
@@ -481,6 +483,79 @@ class LogoAccessory {
       this.serviceToExpose = fanService;
 
       this.fanAccessory.fanService = this.serviceToExpose;
+
+    }
+
+    /************************
+     * LOGO! Fan v2 Service *
+     ************************/
+
+    if (this.type == Fanv2Accessory.fanv2Type) {
+
+      this.fanv2Accessory = new Fanv2Accessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
+
+      const fanv2Service = new Service.Fanv2(
+        this.name,
+        Fanv2Accessory.fanv2Type,
+      );
+
+      this.fanv2Accessory.fanv2GetActive               = config["fanv2GetActive"]               || "V130.0";
+      this.fanv2Accessory.fanv2SetActiveOn             = config["fanv2SetActiveOn"]             || "V130.1";
+      this.fanv2Accessory.fanv2SetActiveOff            = config["fanv2SetActiveOff"]            || "V130.2";
+      this.fanv2Accessory.fanv2GetCurrentFanState      = config["fanv2GetCurrentFanState"]      || "0";
+      this.fanv2Accessory.fanv2SetTargetFanStateAuto   = config["fanv2SetTargetFanStateAuto"]   || "0";
+      this.fanv2Accessory.fanv2SetTargetFanStateManual = config["fanv2SetTargetFanStateManual"] || "0";
+      this.fanv2Accessory.fanv2GetRotationDirection    = config["fanv2GetRotationDirection"]    || "0";
+      this.fanv2Accessory.fanv2SetRotationDirectionCW  = config["fanv2SetRotationDirectionCW"]  || "0";
+      this.fanv2Accessory.fanv2SetRotationDirectionCCW = config["fanv2SetRotationDirectionCCW"] || "0";
+      this.fanv2Accessory.fanv2GetRotationSpeed        = config["fanv2GetRotationSpeed"]        || "0";
+      this.fanv2Accessory.fanv2SetRotationSpeed        = config["fanv2SetRotationSpeed"]        || "0";
+
+      fanv2Service
+        .getCharacteristic(Characteristic.Active)
+        .on("get", callbackify(this.fanv2Accessory.getActive))
+        .on("set", callbackify(this.fanv2Accessory.setActive));
+
+      if (this.logo.isValidLogoAddress(this.fanv2Accessory.fanv2GetCurrentFanState)) {
+      
+        fanv2Service
+          .getCharacteristic(Characteristic.CurrentFanState)
+          .on("get", callbackify(this.fanv2Accessory.getCurrentFanState));
+
+      }
+
+      if (this.logo.isValidLogoAddress(this.fanv2Accessory.fanv2SetTargetFanStateAuto) && this.logo.isValidLogoAddress(this.fanv2Accessory.fanv2SetTargetFanStateManual)) {
+      
+        fanv2Service
+          .getCharacteristic(Characteristic.TargetFanState)
+          .on("get", callbackify(this.fanv2Accessory.getTargetFanState))
+          .on("set", callbackify(this.fanv2Accessory.setTargetFanState));
+
+      }
+
+      if (this.logo.isValidLogoAddress(this.fanv2Accessory.fanv2GetRotationDirection) 
+            && this.logo.isValidLogoAddress(this.fanv2Accessory.fanv2SetRotationDirectionCW)
+                && this.logo.isValidLogoAddress(this.fanv2Accessory.fanv2SetRotationDirectionCCW)) {
+      
+        fanv2Service
+          .getCharacteristic(Characteristic.RotationDirection)
+          .on("get", callbackify(this.fanv2Accessory.getRotationDirection))
+          .on("set", callbackify(this.fanv2Accessory.setRotationDirection));
+
+      }
+
+      if (this.logo.isValidLogoAddress(this.fanv2Accessory.fanv2GetRotationSpeed) && this.logo.isValidLogoAddress(this.fanv2Accessory.fanv2SetRotationSpeed)) {
+        
+        fanv2Service
+          .getCharacteristic(Characteristic.RotationSpeed)
+          .on("get", callbackify(this.fanv2Accessory.getRotationSpeed))
+          .on("set", callbackify(this.fanv2Accessory.setRotationSpeed));
+
+      }
+
+      this.serviceToExpose = fanv2Service;
+
+      this.fanv2Accessory.fanv2Service = this.serviceToExpose;
 
     }
 
