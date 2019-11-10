@@ -1,14 +1,13 @@
-Light Sensor - Lux approximation
-================================
+# Light Sensor - Lux approximation #
 
-## Characterizing the Light Dependent Resistor
+## Characterizing the Light Dependent Resistor ##
 
 Place the sensor of the commercial light meter beside the LDR.
 While ensuring that the same levels of light fall on the two sensors, record a reading of the LDR voltages and the light meter lux. Repeat this process for many different lighting levels from very dark (near 0 lux) to very bright (thousands of lux).  It is important that at all of these different light levels, you do your best to ensure that both sensors get the same amount of light.  
 Transfer your readings to a spreadsheet (or enter them directly while you are making measurements) and then make a plot of the illuminance (lux) as a function of voltages (resistance).  
 You can download the spreadsheet which will create the plot and perform all of the necessary analysis from your entries.  
 
-## Light Sensor Accessory Configuration  
+## Light Sensor Accessory Configuration ##
 
 Name                     | Value               | Required | Option for    | Notes
 ------------------------ | ------------------- | -------- | ------------- | ---------------------------------------------------
@@ -25,7 +24,7 @@ Name                     | Value               | Required | Option for    | Note
 `lightLDRLevelP2S`       | 16,3271951868277    | no       | "lightSensor" | Slope of Formula 3
 `lightLDRLevelP2Y`       | -42,8043502895429   | no       | "lightSensor" | y-intercept of Formula 3
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -52,14 +51,14 @@ Name                     | Value               | Required | Option for    | Note
     ]
 ```
 
-## Lux Formula
+## Lux Formula ##
 
-#### Slope = INDEX( RGP( LOG(lux)[Area in table]; LOG(volt)[Area in table] ); 1 )
-#### y-intercept = INDEX( RGP( LOG(lux)[Area in table]; LOG(volt)[Area in table] ); 2 )
-#### A = 10 ^ y-intercept
-#### B = Slope
-#### Lux = A * Voltage ^ B  
-  
-  
-  
+```
+Slope = INDEX( RGP( LOG(lux)[Area in table]; LOG(volt)[Area in table] ); 1 )  
+y-intercept = INDEX( RGP( LOG(lux)[Area in table]; LOG(volt)[Area in table] ); 2 )  
+A = 10 ^ y-intercept  
+B = Slope  
+Lux = A * Voltage ^ B  
+```
+
 Original: [Design a Luxmeter Using a Light Dependent Resistor](https://www.allaboutcircuits.com/projects/design-a-luxmeter-using-a-light-dependent-resistor/)

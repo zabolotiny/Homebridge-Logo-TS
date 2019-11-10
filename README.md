@@ -9,31 +9,31 @@
 Use a Siemens LOGO! PLC for switch on whatever you want.  
 Communicate with LOGO! 8.SF4 over Modbus and with LOGO! 0BA7 / 0BA8 over [Snap7](http://snap7.sourceforge.net).  
 
-Type of Accessory:
+__Type of Accessory:__
 
-- Switch
-- Blind
-- Window
-- Garage Door
-- Lightbulb
-- Thermostat
-- Irrigation System
-- Valve
-- Fan
-- Fan v2
-- Filter Maintenance
-- Ventilation (Fan + Filter Maintenance)
+- [Switch](#switch-accessory-configuration)
+- [Blind](#blind-accessory-configuration)
+- [Window](#window-accessory-configuration)
+- [Garage Door](#garage-door-accessory-configuration)
+- [Lightbulb](#lightbulb-accessory-configuration)
+- [Thermostat](#thermostat-accessory-configuration)
+- [Irrigation System](#irrigation-system-accessory-configuration)
+- [Valve](#valve-accessory-configuration)
+- [Fan](#fan-accessory-configuration)
+- [Fan v2](#fan-v2-accessory-configuration)
+- [Filter Maintenance](#filter-maintenance-accessory-configuration)
+- [Ventilation](#ventilation-accessory-configuration)
 
-Type of Sensor Accessory:
+__Type of Sensor Accessory:__
 
-- Light Sensor
-- Motion Sensor
-- Contact Sensor
-- Smoke Sensor
-- Temperature Sensor
-- Humidity Sensor
-- Carbon Dioxide Sensor
-- Air Quality Sensor  
+- [Light Sensor](#light-sensor-accessory-configuration)
+- [Motion Sensor](#motion-sensor-accessory-configuration)
+- [Contact Sensor](#contact-sensor-accessory-configuration)
+- [Smoke Sensor](#smoke-sensor-accessory-configuration)
+- [Temperature Sensor](#temperature-sensor-accessory-configuration)
+- [Humidity Sensor](#humidity-sensor-accessory-configuration)
+- [Carbon Dioxide Sensor](#carbon-dioxide-sensor-accessory-configuration)
+- [Air Quality Sensor](#air-quality-sensor-accessory-configuration)
 
 The plugin that this one is based on: [homebridge-tesla](https://github.com/nfarina/homebridge-tesla).  
 If you use Homebridge-Logo-TS please donate: [PayPal.Me/Sinclair81](https://www.PayPal.Me/Sinclair81) !!  
@@ -570,7 +570,7 @@ Name                     | Value               | Required | Option for | Notes
 
 ## Filter Maintenance Accessory Configuration ##
 
-:construction: In HomeKit Accessory Protocol Specification available but currently not supported by the Home-App! :construction:
+__:construction: In HomeKit Accessory Protocol Specification available but currently not supported by the Home-App!__
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
@@ -607,9 +607,10 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-## Ventilation (Fan + Filter Maintenance) Accessory Configuration ##
+## Ventilation Accessory Configuration ##
 
-:sunglasses: Not in HomeKit Accessory Protocol Specification available but supported by the Home-App! :sunglasses:
+__:zap: Fan Accessory + Filter Maintenance Accessory__  
+__:sunglasses: Not in HomeKit Accessory Protocol Specification available but supported by the Home-App!__  
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
@@ -850,8 +851,8 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-Required: yes* - means that this parameter is only required for this particular accessory!  
-Required: no* - means if no valid LOGO address is specified for this parameter, this characteristic returns the specified value or is deactivated in the accessory!
+__Required: yes* - means that this parameter is only required for this particular accessory!__  
+__Required: no* - means if no valid LOGO address is specified for this parameter, this characteristic returns the specified value or is deactivated in the accessory!__  
   
 ## Test Homebridge-Logo-TS ##
 
