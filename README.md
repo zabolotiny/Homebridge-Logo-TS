@@ -1,14 +1,16 @@
-Homebridge-Logo-TS
-==================
+# Homebridge-Logo-TS #
 
 [![npm version](https://badge.fury.io/js/homebridge-logo-ts.svg)](https://badge.fury.io/js/homebridge-logo-ts)  
 
+<!-- markdownlint-disable MD033 -->
 <img src="https://raw.githubusercontent.com/Sinclair81/Homebridge-Logo-TS/master/Standardraum.png" align="right" alt="Standardraum" height="448" width="207">
+<!-- markdownlint-enable MD033 -->
 
 Use a Siemens LOGO! PLC for switch on whatever you want.  
 Communicate with LOGO! 8.SF4 over Modbus and with LOGO! 0BA7 / 0BA8 over [Snap7](http://snap7.sourceforge.net).  
 
 Type of Accessory:
+
 - Switch
 - Blind
 - Window
@@ -23,6 +25,7 @@ Type of Accessory:
 - Ventilation (Fan + Filter Maintenance)
 
 Type of Sensor Accessory:
+
 - Light Sensor
 - Motion Sensor
 - Contact Sensor
@@ -32,20 +35,19 @@ Type of Sensor Accessory:
 - Carbon Dioxide Sensor
 - Air Quality Sensor  
 
-
 The plugin that this one is based on: [homebridge-tesla](https://github.com/nfarina/homebridge-tesla).  
 If you use Homebridge-Logo-TS please donate: [PayPal.Me/Sinclair81](https://www.PayPal.Me/Sinclair81) !!  
 
-
-## Installation
+## Installation ##
 
 1. Install homebridge using: `sudo npm install -g --unsafe-perm homebridge`
 2. Install homebridge-config-ui-x using: `sudo npm install -g --unsafe-perm homebridge-config-ui-x`
-3. Update your configuration file with this guide: https://smartapfel.de/homebridge/plugins-installieren/
+3. Update your configuration file with this guide: [smartapfel.de](https://smartapfel.de/homebridge/plugins-installieren/)
 4. Install homebridge-logo-ts using: homebridge-config-ui-x's Webserver
 5. Update your configuration file with code like the sample below
 
-## Homebridge-Logo-TS Main Configuration Parameters:
+## Homebridge-Logo-TS Main Configuration Parameters ##
+
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
 `accessory`              | "Logo-TS"           | yes      | all        | Must be set to "Logo-TS".
@@ -62,8 +64,7 @@ Name                     | Value               | Required | Option for | Notes
 `pushButton`             | 1                   | no       | all        | If e.g. the network input in the LOGO! a hardware button on the LOGO! simulated.
 `debugMsgLog`            | 0                   | no       | all        | 1 - Displays messages of accessories in the log.
 
-
-## Switch Accessory Configuration  
+## Switch Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
@@ -71,7 +72,7 @@ Name                     | Value               | Required | Option for | Notes
 `switchSetOn`            | "V2.0"              | yes*     | "switch"   | Switch Set On - Mn or Vn.n
 `switchSetOff`           | "V3.0"              | yes*     | "switch"   | Switch Set Off - Mn or Vn.n  
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -100,7 +101,7 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```  
 
-## Blind Accessory Configuration  
+## Blind Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
@@ -112,7 +113,7 @@ Name                     | Value               | Required | Option for | Notes
 `blindSetDown`           | "V5.1"              | no       | "blind"    | Blind Set Down - Mn or Vn.n - (Button Control)
 `blindGetUpDown`         | "V5.2"              | no       | "blind"    | Blind Up or Down - Return 1 for Up or 0 for Down - (Button Control)
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -167,7 +168,7 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-## Window Accessory Configuration  
+## Window Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
@@ -179,7 +180,7 @@ Name                     | Value               | Required | Option for | Notes
 `windowSetDown`          | "V5.1"              | no       | "window"   | Window Set Down - Mn or Vn.n - (Button Control)
 `windowGetUpDown`        | "V5.2"              | no       | "window"   | Window Up or Down - Return 1 for Up or 0 for Down - (Button Control)
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -234,8 +235,7 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-
-## Garage Door Accessory Configuration  
+## Garage Door Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
@@ -244,7 +244,7 @@ Name                     | Value               | Required | Option for | Notes
 `garagedoorState`        | "V401.2"            | yes*     | "garagedoor" | Garagedoor State - Mn or Vn.n
 `garagedoorObstruction`  | "false"             | no*      | "garagedoor" | Garagedoor Obstruction Detected - `"false"` or a valid LOGO! Address (Mn or Vn.n)
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -277,8 +277,7 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-
-## Lightbulb Accessory Configuration  
+## Lightbulb Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
@@ -287,7 +286,7 @@ Name                     | Value               | Required | Option for | Notes
 `lightbulbSetBrightness` | "VW70"              | yes*     | "lightbulb" | Lightbulb Set Brightness - AMn or VWn
 `lightbulbGetBrightness` | "VW72"              | yes*     | "lightbulb" | Lightbulb Get Brightness - AMn or VWn
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -318,8 +317,7 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-
-## Thermostat Accessory Configuration  
+## Thermostat Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
@@ -330,7 +328,7 @@ Name                     | Value               | Required | Option for | Notes
 `thermostatSetTargetTemp`    | "VW202"         | yes*     | "thermostat" | Thermostat Set Target Temperature - AMn or VWn
 `thermostatTempDisplayUnits` | 0               | yes*     | "thermostat" | Temperature Display Units - Celsius = 0; Fahrenheit = 1;
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -365,8 +363,7 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-
-## Irrigation System Accessory Configuration  
+## Irrigation System Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
@@ -376,7 +373,7 @@ Name                     | Value               | Required | Option for | Notes
 `irrigationSystemGetProgramMode` | "VW402"     | yes*     | "irrigationSystem" | Irrigation System Get Program Mode - AMn or VWn
 `irrigationSystemGetInUse`       | "V400.3"    | yes*     | "irrigationSystem" | Irrigation System Get In Use - Mn or Vn.n
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -409,8 +406,7 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-
-## Valve Accessory Configuration  
+## Valve Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
@@ -422,7 +418,7 @@ Name                     | Value               | Required | Option for | Notes
 `valveSetDuration`       | "0"         | no*      | "valve" | Valve Set Duration - `"0"` or a valid LOGO! Address (AMn or VWn)
 `valveGetDuration`       | "0"         | no*      | "valve" | Valve Get Duration - `"0"` or a valid LOGO! Address (AMn or VWn)
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -459,7 +455,7 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-## Fan Accessory Configuration  
+## Fan Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
@@ -472,8 +468,7 @@ Name                     | Value               | Required | Option for | Notes
 `fanGetRotationSpeed`        | "0"             | no*      | "fan"      | Fan Get Rotation Speed - `"0"` or a valid LOGO! Address (AMn or VWn)
 `fanSetRotationSpeed`        | "0"             | no*      | "fan"      | Fan Set Rotation Speed - `"0"` or a valid LOGO! Address (AMn or VWn)
 
-
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -512,7 +507,7 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-## Fan v2 Accessory Configuration  
+## Fan v2 Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
@@ -528,8 +523,7 @@ Name                     | Value               | Required | Option for | Notes
 `fanv2GetRotationSpeed`        | "0"             | no*      | "fanv2"      | Fan v2 Get Rotation Speed - `"0"` or a valid LOGO! Address (AMn or VWn)
 `fanv2SetRotationSpeed`        | "0"             | no*      | "fanv2"      | Fan v2 Set Rotation Speed - `"0"` or a valid LOGO! Address (AMn or VWn)
 
-
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -574,8 +568,9 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-## Filter Maintenance Accessory Configuration
-#### In the HomeKit Accessory Protocol Specification available but currently not supported by the Home-App!?!  
+## Filter Maintenance Accessory Configuration ##
+
+:construction: In HomeKit Accessory Protocol Specification available but currently not supported by the Home-App! :construction:
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
@@ -583,8 +578,7 @@ Name                     | Value               | Required | Option for | Notes
 `filterLifeLevel`             | "0"            | no*      | "filterMaintenance" | Filter Maintenance Get Filter Life Level - `"0"` or a valid LOGO! Address (AMn or VWn)
 `filterResetFilterIndication` | "0"            | no*      | "filterMaintenance" | Filter Maintenance Set Reset Filter Indication - `"0"` or a valid LOGO! Address (Mn or Vn.n)
 
-
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -613,9 +607,9 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
+## Ventilation (Fan + Filter Maintenance) Accessory Configuration ##
 
-## Ventilation (Fan + Filter Maintenance) Accessory Configuration
-#### Not in HomeKit Accessory Protocol Specification available but supported by the Home-App!
+:sunglasses: Not in HomeKit Accessory Protocol Specification available but supported by the Home-App! :sunglasses:
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
@@ -631,8 +625,7 @@ Name                     | Value               | Required | Option for | Notes
 `ventilationGetFilterLifeLevel`        | "0"           | no*      | "ventilation"      | Ventilation Get Filter Life Level - `"0"` or a valid LOGO! Address (AMn or VWn)
 `ventilationSetResetFilterIndication`  | "0"           | no*      | "ventilation"      | Ventilation Set Reset Filter Indication - `"0"` or a valid LOGO! Address (Mn or Vn.n)
 
-
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -677,15 +670,14 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-
-## Light Sensor Accessory Configuration  
+## Light Sensor Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
 `lightLevel`             | "AM3"               | yes*     | "lightSensor" | Light Sensor for Current Ambient Light Level in Lux
 `lightLDRLevelParts`     | 0                   | yes*     | "lightSensor" | Indicates how many formula parts the lux value is calculated. [0, 1, 2, 3] 0 - simply shows the value of the LOGO!, [more information about the light sensor](src/util/accessories/LightSensor/LightSensor.md)
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -702,14 +694,13 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-
-## Motion Sensor Accessory Configuration  
+## Motion Sensor Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
 `motionDetected`         | "M9"                | yes*     | "motionSensor"        | Motion Sensor
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -725,14 +716,13 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-
-## Contact Sensor Accessory Configuration  
+## Contact Sensor Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
 `contactDetected`        | "M15"               | yes*     | "contactSensor"       | Contact Sensor
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -748,14 +738,13 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-
-## Smoke Sensor Accessory Configuration  
+## Smoke Sensor Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
 `smokeDetected`          | "M12"               | yes*     | "smokeSensor"         | Smoke Sensor
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -771,14 +760,13 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-
-## Temperature Sensor Accessory Configuration  
+## Temperature Sensor Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
 `temperature`            | "AM2"               | yes*     | "temperatureSensor"   | Temperature Sensor for Current Temperature in °C
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -794,14 +782,13 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-
-## Humidity Sensor Accessory Configuration  
+## Humidity Sensor Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
 `humidity`               | "AM1"               | yes*     | "humiditySensor"      | Humidity Sensor for Current Relative Humidity in %
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -817,15 +804,14 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-
-## Carbon Dioxide Sensor Accessory Configuration  
+## Carbon Dioxide Sensor Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
 `carbonDioxideLevel`     | "AM3"               | yes*     | "carbonDioxideSensor" | Carbon Dioxide Sensor for Carbon Dioxide Level in ppm
 `carbonDioxideLimit`     | 1000                | yes*     | "carbonDioxideSensor" | Carbon Dioxide Sensor for Carbon Dioxide Peak Level in ppm
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -842,14 +828,13 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
-
-## Air Quality Sensor Accessory Configuration  
+## Air Quality Sensor Accessory Configuration ##
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
 `carbonDioxideLevel`     | "AM3"               | yes*     | "airQualitySensor"    | Air Quality Sensor for Air Quality (Carbon Dioxide Level in ppm)
 
-```
+```json
 "accessories": [
         {
             "accessory": "Logo-TS",
@@ -864,14 +849,13 @@ Name                     | Value               | Required | Option for | Notes
         }
     ]
 ```
-  
 
 Required: yes* - means that this parameter is only required for this particular accessory!  
 Required: no* - means if no valid LOGO address is specified for this parameter, this characteristic returns the specified value or is deactivated in the accessory!
   
+## Test Homebridge-Logo-TS ##
 
-## Test Homebridge-Logo-TS
 1. Download or clone Homebridge-Logo-TS.
-2. Install: $ npm install
-3. Build:   $ npm run build
-4. Run:     $ /usr/local/bin/homebridge -D -P ~/Homebridge-Logo-TS/
+2. Install: `$ npm install`
+3. Build:   `$ npm run build`
+4. Run:     `$ /usr/local/bin/homebridge -D -P ~/Homebridge-Logo-TS/`
