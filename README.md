@@ -765,7 +765,7 @@ Name                     | Value               | Required | Option for | Notes
 
 Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
-`temperature`            | "AM2"               | yes*     | "temperatureSensor"   | Temperature Sensor for Current Temperature in °C
+`temperature`            | "AM2"               | yes*     | "temperatureSensor"   | Temperature Sensor for Current Temperature in °C (0°C - 100°C!!, a value of 105 is 10.5°C)
 
 ```json
 "accessories": [

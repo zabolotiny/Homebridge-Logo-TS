@@ -55,15 +55,24 @@ export class TemperatureSensor {
 
       if (value != -1) {
 
-        let temp = value / 10;
-        this.debugLogNum("CurrentTemperature ?", temp);
+        let temp = (value / 10);
+        if ((temp >= 0) && (temp <= 100)) {
 
-        await wait(1);
+          this.debugLogNum("CurrentTemperature ?", temp);
 
-        this.temperatureSensorService.updateCharacteristic(
-          Characteristic.CurrentTemperature,
-          temp
-        );
+          await wait(1);
+
+          this.temperatureSensorService.updateCharacteristic(
+            Characteristic.CurrentTemperature,
+            temp
+          );
+          
+        } else {
+
+          this.debugLogNum("Wrong CurrentTemperature (only 0-100) ?", temp);
+          
+        }
+        
 
       }
 
