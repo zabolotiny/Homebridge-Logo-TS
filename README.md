@@ -323,8 +323,8 @@ Name                     | Value               | Required | Option for | Notes
 ------------------------ | ------------------- | -------- | ---------- | ------------------------
 `thermostatGetHCState`   | "VW210"             | yes*     | "thermostat" | Thermostat Get Heating Cooling State - AMn or VWn
 `thermostatSetHCState`   | "VW200"             | yes*     | "thermostat" | Thermostat Set Heating Cooling State - AMn or VWn
-`thermostatGetTemp`      | "VW212"             | yes*     | "thermostat" | Thermostat Get Temperature - AMn or VWn
-`thermostatGetTargetTemp`    | "VW214"         | yes*     | "thermostat" | Thermostat Get Target Temperature - AMn or VWn
+`thermostatGetTemp`      | "VW212"             | yes*     | "thermostat" | Thermostat Get Temperature - AMn or VWn - Current Temperature in °C (0°C - 100°C!!, a value of 105 is 10.5°C)
+`thermostatGetTargetTemp`    | "VW214"         | yes*     | "thermostat" | Thermostat Get Target Temperature - AMn or VWn - Current Temperature in °C (10°C - 38°C!!, a value of 105 is 10.5°C)
 `thermostatSetTargetTemp`    | "VW202"         | yes*     | "thermostat" | Thermostat Set Target Temperature - AMn or VWn
 `thermostatTempDisplayUnits` | 0               | yes*     | "thermostat" | Temperature Display Units - Celsius = 0; Fahrenheit = 1;
 
@@ -415,8 +415,8 @@ Name                     | Value               | Required | Option for | Notes
 `valveSetActiveOff`      | "V400.2"    | yes*     | "valve" | Valve Set Active to Off - Mn or Vn.n
 `valveGetInUse`          | "V400.3"    | yes*     | "valve" | Valve Get In Use - Mn or Vn.n
 `valveType`              | 0           | yes*     | "valve" | Valve Type - Generic Valve = 0, Irrigation = 1, Shower Head = 2, Water Faucet = 3,
-`valveSetDuration`       | "0"         | no*      | "valve" | Valve Set Duration - `"0"` or a valid LOGO! Address (AMn or VWn)
-`valveGetDuration`       | "0"         | no*      | "valve" | Valve Get Duration - `"0"` or a valid LOGO! Address (AMn or VWn)
+`valveSetDuration`       | "0"         | no*      | "valve" | Valve Set Duration - `"0"` or a valid LOGO! Address (AMn or VWn) - Value in Seconds (0 - 3600 sec)
+`valveGetDuration`       | "0"         | no*      | "valve" | Valve Get Remaining Duration - `"0"` or a valid LOGO! Address (AMn or VWn) - Value in Seconds (0 - 3600 sec)
 
 ```json
 "accessories": [
@@ -853,7 +853,7 @@ Name                     | Value               | Required | Option for | Notes
 
 __Required: yes* - means that this parameter is only required for this particular accessory!__  
 __Required: no* - means if no valid LOGO address is specified for this parameter, this characteristic returns the specified value or is deactivated in the accessory!__  
-  
+
 ## Test Homebridge-Logo-TS ##
 
 1. Download or clone Homebridge-Logo-TS.
