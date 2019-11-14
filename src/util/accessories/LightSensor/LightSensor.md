@@ -41,19 +41,19 @@ Name                     | Value               | Required | Option for    | Note
             "lightLDRLevelMax": 1000,
             "lightLDRLevelP1Min": 423,
             "lightLDRLevelP2Min": 696,
-            "lightLDRLevelP0S": 1,92170242765178,
-            "lightLDRLevelP0Y": -2,27030759992747,
-            "lightLDRLevelP1S": 3,85547119519305,
-            "lightLDRLevelP1Y": -7,34902696724256,
-            "lightLDRLevelP2S": 16,3271951868277,
-            "lightLDRLevelP2Y": -42,8043502895429
+            "lightLDRLevelP0S": 1.92170242765178,
+            "lightLDRLevelP0Y": -2.27030759992747,
+            "lightLDRLevelP1S": 3.85547119519305,
+            "lightLDRLevelP1Y": -7.34902696724256,
+            "lightLDRLevelP2S": 16.3271951868277,
+            "lightLDRLevelP2Y": -42.8043502895429
         }
     ]
 ```
 
 ## Lux Formula ##
 
-```
+```x
 Slope = INDEX( RGP( LOG(lux)[Area in table]; LOG(volt)[Area in table] ); 1 )  
 y-intercept = INDEX( RGP( LOG(lux)[Area in table]; LOG(volt)[Area in table] ); 2 )  
 A = 10 ^ y-intercept  
