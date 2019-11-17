@@ -5,6 +5,7 @@ let Characteristic: any;
 export class FilterMaintenanceAccessory {
 
   static filterMaintenanceType: string = "filterMaintenance";
+  static infoModel: string = "Filter Maintenance";
 
   public filterMaintenanceService: any;
   public filterChangeIndication: string      = "V120.0";

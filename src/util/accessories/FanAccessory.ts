@@ -5,6 +5,7 @@ let Characteristic: any;
 export class FanAccessory {
 
   static fanType: string = "fan";
+  static infoModel: string = "Fan";
 
   public fanService: any;
   public fanGetOn: string                   = "V130.0";

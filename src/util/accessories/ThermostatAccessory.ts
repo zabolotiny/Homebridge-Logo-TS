@@ -5,6 +5,7 @@ let Characteristic: any;
 export class ThermostatAccessory {
 
   static thermostatType: string = "thermostat";
+  static infoModel: string = "Thermostat";
 
   public thermostatService: any;
 

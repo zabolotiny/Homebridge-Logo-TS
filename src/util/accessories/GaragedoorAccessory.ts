@@ -5,6 +5,7 @@ let Characteristic: any;
 export class GaragedoorAccessory {
 
   static garagedoorType: string = "garagedoor";
+  static infoModel: string = "Garage Door";
 
   public garagedoorService: any;
 

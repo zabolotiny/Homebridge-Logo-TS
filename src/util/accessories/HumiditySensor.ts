@@ -5,6 +5,7 @@ let Characteristic: any;
 export class HumiditySensor {
 
   static humiditySensorType: string = "humiditySensor";
+  static infoModel: string = "Humidity Sensor";
 
   public humiditySensorService: any;
   public humidity: string = "AM1";

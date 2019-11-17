@@ -5,6 +5,7 @@ let Characteristic: any;
 export class MotionSensor {
 
   static motionSensorType: string = "motionSensor";
+  static infoModel: string = "Motion Sensor";
 
   public motionSensorService: any;
   public motionDetected: string = "M15";

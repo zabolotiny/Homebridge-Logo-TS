@@ -1,4 +1,5 @@
 import { wait } from "./util/wait";
+import { md5 } from "./util/md5";
 import callbackify from "./util/callbackify";
 
 import { ModBusLogo } from "./util/modbus-logo";
@@ -47,6 +48,10 @@ class LogoAccessory {
   // From config.
   log: Function;
   name: string;
+  manufacturer: string;
+  model: string;
+  serialNumber: string
+  firmwareRevision: string;
   interface: string;
   ip: string;
   port: number;
@@ -58,12 +63,14 @@ class LogoAccessory {
   pushButton: number;
   debugMsgLog: number;
   type: string;
+  typeName: string;
 
   // Runtime state.
   logo: any;
 
   // Services exposed.
   serviceToExpose:            any;
+  infoService:                any;
 
   switchAccessory:            SwitchAccessory            | undefined;
   blindAccessory:             BlindAccessory             | undefined;
@@ -89,17 +96,18 @@ class LogoAccessory {
   constructor(log: any, config: any) {
     this.log            = log;
     this.name           =           config["name"];
-    this.interface      =           config["interface"]       || modbusInterface;
+    this.interface      =           config["interface"]        || modbusInterface;
     this.ip             =           config["ip"];
-    this.port           =           config["port"]            || 505;
-    this.logoType       =           config["logoType"]        || logoType8SF4;
-    this.localTSAP      = parseInt( config["localTSAP"], 16)  || 0x1200;
-    this.remoteTSAP     = parseInt( config["remoteTSAP"], 16) || 0x2200;
-    this.updateInterval =           config["updateInterval"]  || 0;
-    this.buttonValue    =           config["buttonValue"]     || 1;
-    this.pushButton     =           config["pushButton"]      || 1;
-    this.debugMsgLog    =           config["debugMsgLog"]     || 0;
-    this.type           =           config["type"]            || SwitchAccessory.switchType;
+    this.port           =           config["port"]             || 505;
+    this.logoType       =           config["logoType"]         || logoType8SF4;
+    this.localTSAP      = parseInt( config["localTSAP"], 16)   || 0x1200;
+    this.remoteTSAP     = parseInt( config["remoteTSAP"], 16)  || 0x2200;
+    this.updateInterval =           config["updateInterval"]   || 0;
+    this.buttonValue    =           config["buttonValue"]      || 1;
+    this.pushButton     =           config["pushButton"]       || 1;
+    this.debugMsgLog    =           config["debugMsgLog"]      || 0;
+    this.type           =           config["type"]             || SwitchAccessory.switchType;
+    this.typeName       =                                         SwitchAccessory.infoModel;
 
     if (this.interface == modbusInterface) {
       this.logo = new ModBusLogo(this.ip, this.port, this.debugMsgLog, this.log);
@@ -107,23 +115,17 @@ class LogoAccessory {
       this.logo = new Snap7Logo(this.logoType, this.ip, this.localTSAP, this.remoteTSAP, this.debugMsgLog, this.log);
     }
 
-    // Characteristic "Manufacturer"      --> pjson.author.name
-    // Characteristic "Model"             --> this.type
-    // Characteristic "Firmware Revision" --> pjson.version
-    // Characteristic "Hardware Revision" --> this.logoType
-    // Characteristic "Serial Number"     --> "0xDEADBEEF"
-    // Characteristic "Version"
-
     /************************
      * LOGO! Switch Service *
      ************************/
 
     if (this.type == SwitchAccessory.switchType) {
+      this.typeName = SwitchAccessory.infoModel;
 
       this.switchAccessory = new SwitchAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const switchService = new Service.Switch(
-        this.name,
+        null,
         SwitchAccessory.switchType,
       );
 
@@ -136,7 +138,7 @@ class LogoAccessory {
         .on("get", callbackify(this.switchAccessory.getSwitchOn))
         .on("set", callbackify(this.switchAccessory.setSwitchOn));
 
-        this.serviceToExpose = switchService;
+      this.serviceToExpose = switchService;
 
       this.switchAccessory.switchService = this.serviceToExpose;
 
@@ -147,11 +149,12 @@ class LogoAccessory {
      ***********************/
 
     if (this.type == BlindAccessory.blindType) {
+      this.typeName = BlindAccessory.infoModel;
 
       this.blindAccessory = new BlindAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const blindService = new Service.WindowCovering(
-        this.name,
+        null, 
         BlindAccessory.blindType,
       );
 
@@ -187,11 +190,12 @@ class LogoAccessory {
      ************************/
 
     if (this.type == WindowAccessory.windowType) {
+      this.typeName = WindowAccessory.infoModel;
 
       this.windowAccessory = new WindowAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const windowService = new Service.Window(
-        this.name,
+        null, 
         WindowAccessory.windowType,
       );
 
@@ -227,11 +231,12 @@ class LogoAccessory {
      ****************************/
 
     if (this.type == GaragedoorAccessory.garagedoorType) {
+      this.typeName = GaragedoorAccessory.infoModel;
 
       this.garagedoorAccessory = new GaragedoorAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const garagedoorService = new Service.GarageDoorOpener(
-        this.name,
+        null, 
         GaragedoorAccessory.garagedoorType,
       );
 
@@ -264,11 +269,12 @@ class LogoAccessory {
      ***************************/
 
     if (this.type == LightbulbAccessory.lightbulbType) {
+      this.typeName = LightbulbAccessory.infoModel;
 
       this.lightbulbAccessory = new LightbulbAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const lightbulbService = new Service.Lightbulb(
-        this.name,
+        null, 
         LightbulbAccessory.lightbulbType,
       );
 
@@ -298,11 +304,12 @@ class LogoAccessory {
      ****************************/
 
     if (this.type == ThermostatAccessory.thermostatType) {
+      this.typeName = ThermostatAccessory.infoModel;
 
       this.thermostatAccessory = new ThermostatAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const thermostatService = new Service.Thermostat(
-        this.name,
+        null, 
         ThermostatAccessory.thermostatType,
       );
 
@@ -346,11 +353,12 @@ class LogoAccessory {
      **********************************/
 
     if (this.type == IrrigationSystemAccessory.irrigationSystemType) {
+      this.typeName = IrrigationSystemAccessory.infoModel;
 
       this.irrigationSystemAccessory = new IrrigationSystemAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const irrigationSystemService = new Service.IrrigationSystem(
-        this.name,
+        null, 
         IrrigationSystemAccessory.irrigationSystemType,
       );
 
@@ -385,11 +393,12 @@ class LogoAccessory {
      ***********************/
 
     if (this.type == ValveAccessory.valveType) {
+      this.typeName = ValveAccessory.infoModel;
 
       this.valveAccessory = new ValveAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const valveService = new Service.Valve(
-        this.name,
+        null, 
         ValveAccessory.valveType,
       );
 
@@ -442,11 +451,12 @@ class LogoAccessory {
      *********************/
 
     if (this.type == FanAccessory.fanType) {
+      this.typeName = FanAccessory.infoModel;
 
       this.fanAccessory = new FanAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const fanService = new Service.Fan(
-        this.name,
+        null, 
         FanAccessory.fanType,
       );
 
@@ -495,11 +505,12 @@ class LogoAccessory {
      ************************/
 
     if (this.type == Fanv2Accessory.fanv2Type) {
+      this.typeName = Fanv2Accessory.infoModel;
 
       this.fanv2Accessory = new Fanv2Accessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const fanv2Service = new Service.Fanv2(
-        this.name,
+        null, 
         Fanv2Accessory.fanv2Type,
       );
 
@@ -568,11 +579,12 @@ class LogoAccessory {
      ************************************/
 
     if (this.type == FilterMaintenanceAccessory.filterMaintenanceType) {
+      this.typeName = FilterMaintenanceAccessory.infoModel;
 
       this.filterMaintenanceAccessory = new FilterMaintenanceAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const filterMaintenanceService = new Service.FilterMaintenance(
-        this.name,
+        null, 
         FilterMaintenanceAccessory.filterMaintenanceType,
       );
 
@@ -611,11 +623,12 @@ class LogoAccessory {
      ****************************************************************/
 
     if (this.type == VentilationAccessory.ventilationType) {
+      this.typeName = VentilationAccessory.infoModel;
 
       this.ventilationAccessory = new VentilationAccessory(this.log, this.logo, this.updateInterval, this.buttonValue, this.pushButton, this.debugMsgLog, Characteristic);
 
       const ventilationService = new Service.Fan(
-        this.name,
+        null, 
         VentilationAccessory.ventilationType,
       );
 
@@ -692,11 +705,12 @@ class LogoAccessory {
      ******************************/
 
     if (this.type == LightSensor.lightSensorType) {
+      this.typeName = LightSensor.infoModel;
 
       this.lightSensor = new LightSensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
 
       const lightSensorService = new Service.LightSensor(
-        this.name,
+        null, 
         LightSensor.lightSensorType,
       );
 
@@ -734,11 +748,12 @@ class LogoAccessory {
      *******************************/
 
     if (this.type == MotionSensor.motionSensorType) {
+      this.typeName = MotionSensor.infoModel;
 
       this.motionSensor = new MotionSensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
 
       const motionSensorService = new Service.MotionSensor(
-        this.name,
+        null, 
         MotionSensor.motionSensorType,
       );
 
@@ -763,11 +778,12 @@ class LogoAccessory {
      ********************************/
 
     if (this.type == ContactSensor.contactSensorType) {
+      this.typeName = ContactSensor.infoModel;
 
       this.contactSensor = new ContactSensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
 
       const contactSensorService = new Service.ContactSensor(
-        this.name,
+        null, 
         ContactSensor.contactSensorType,
       );
 
@@ -792,11 +808,12 @@ class LogoAccessory {
      ******************************/
 
     if (this.type == SmokeSensor.smokeSensorType) {
+      this.typeName = SmokeSensor.infoModel;
 
       this.smokeSensor = new SmokeSensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
 
       const smokeSensorService = new Service.SmokeSensor(
-        this.name,
+        null, 
         SmokeSensor.smokeSensorType,
       );
 
@@ -821,11 +838,12 @@ class LogoAccessory {
      ************************************/
 
     if (this.type == TemperatureSensor.temperatureSensorType) {
+      this.typeName = TemperatureSensor.infoModel;
 
       this.temperatureSensor = new TemperatureSensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
 
       const temperatureSensorService = new Service.TemperatureSensor(
-        this.name,
+        null, 
         TemperatureSensor.temperatureSensorType,
       );
 
@@ -850,11 +868,12 @@ class LogoAccessory {
      *********************************/
 
     if (this.type == HumiditySensor.humiditySensorType) {
+      this.typeName = HumiditySensor.infoModel;
 
       this.humiditySensor = new HumiditySensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
 
       const humiditySensorService = new Service.HumiditySensor(
-        this.name,
+        null, 
         HumiditySensor.humiditySensorType,
       );
 
@@ -880,11 +899,12 @@ class LogoAccessory {
      ********************************************/
 
     if (this.type == CarbonDioxideSensor.carbonDioxideSensorType) {
+      this.typeName = CarbonDioxideSensor.infoModel;
 
       this.carbonDioxideSensor = new CarbonDioxideSensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
 
       const carbonDioxideSensorService = new Service.CarbonDioxideSensor(
-        this.name,
+        null, 
         CarbonDioxideSensor.carbonDioxideSensorType,
       );
 
@@ -918,11 +938,12 @@ class LogoAccessory {
      ************************************/
 
     if (this.type == AirQualitySensor.airQualitySensorType) {
+      this.typeName = AirQualitySensor.infoModel;
 
       this.airQualitySensor = new AirQualitySensor(this.log, this.logo, this.updateInterval, this.debugMsgLog, Characteristic);
 
       const airQualitySensorService = new Service.AirQualitySensor(
-        this.name,
+        null, 
         AirQualitySensor.airQualitySensorType,
       );
 
@@ -946,10 +967,28 @@ class LogoAccessory {
 
     }
 
+    /***************************************
+     * LOGO! Accessory Information Service *
+     ***************************************/
+
+    this.manufacturer     =  config["manufacturer"]     || pjson.author.name;
+    this.model            =  config["model"]            || this.typeName + " @ " + this.logoType;
+    this.serialNumber     =  config["serialNumber"]     || md5(this.name + this.typeName);
+    this.firmwareRevision =  config["firmwareRevision"] || pjson.version;
+    
   }
 
   getServices() {
-    return [ this.serviceToExpose ];
+
+    var informationService = new Service.AccessoryInformation();
+    informationService
+      .setCharacteristic(Characteristic.Manufacturer,     this.manufacturer)
+      .setCharacteristic(Characteristic.Model,            this.model)
+      .setCharacteristic(Characteristic.Name,             this.name)
+      .setCharacteristic(Characteristic.SerialNumber,     this.serialNumber)
+      .setCharacteristic(Characteristic.FirmwareRevision, this.firmwareRevision);
+
+    return [ informationService, this.serviceToExpose ];
   }
 
   /********************

@@ -5,6 +5,7 @@ let Characteristic: any;
 export class TemperatureSensor {
 
   static temperatureSensorType: string = "temperatureSensor";
+  static infoModel: string = "Temperature Sensor";
 
   public temperatureSensorService: any;
   public temperature: string = "AM2";

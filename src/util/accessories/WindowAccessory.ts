@@ -5,6 +5,7 @@ let Characteristic: any;
 export class WindowAccessory {
 
   static windowType: string = "window";
+  static infoModel: string = "Window";
 
   public windowService: any;
 

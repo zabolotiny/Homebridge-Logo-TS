@@ -5,6 +5,7 @@ let Characteristic: any;
 export class LightbulbAccessory {
 
   static lightbulbType: string = "lightbulb";
+  static infoModel: string = "Lightbulb";
 
   public lightbulbService: any;
 

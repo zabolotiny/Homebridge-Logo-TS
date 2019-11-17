@@ -5,6 +5,7 @@ let Characteristic: any;
 export class AirQualitySensor {
 
   static airQualitySensorType: string = "airQualitySensor";
+  static infoModel: string = "Air Quality Sensor";
 
   public airQualitySensorService: any;
   public carbonDioxideLevel: string = "AM3";

@@ -5,6 +5,7 @@ let Characteristic: any;
 export class LightSensor {
 
   static lightSensorType: string = "lightSensor";
+  static infoModel: string = "Light Sensor";
 
   public lightSensorService: any;
   public lightLevel: string = "AM3";

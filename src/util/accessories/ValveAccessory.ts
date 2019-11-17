@@ -5,6 +5,7 @@ let Characteristic: any;
 export class ValveAccessory {
 
   static valveType: string = "valve";
+  static infoModel: string = "Valve";
 
   public valveService: any;
 

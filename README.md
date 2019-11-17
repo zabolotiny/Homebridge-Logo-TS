@@ -686,7 +686,6 @@ Name                     | Value               | Required | Option for | Notes
             "ip": "10.0.0.100",
             "port": 505,
             "updateInterval": 30000,
-            "debugMsgLog": 1,
             "type": "lightSensor",
             "lightLevel": "AM3",
             "lightLDRLevelParts": 0
@@ -709,7 +708,6 @@ Name                     | Value               | Required | Option for | Notes
             "ip": "10.0.0.100",
             "port": 505,
             "updateInterval": 30000,
-            "debugMsgLog": 1,
             "type": "motionSensor",
             "motionDetected": "M9"
         }
@@ -731,7 +729,6 @@ Name                     | Value               | Required | Option for | Notes
             "ip": "10.0.0.100",
             "port": 505,
             "updateInterval": 30000,
-            "debugMsgLog": 1,
             "type": "contactSensor",
             "contactDetected": "M15"
         }
@@ -753,7 +750,6 @@ Name                     | Value               | Required | Option for | Notes
             "ip": "10.0.0.100",
             "port": 505,
             "updateInterval": 30000,
-            "debugMsgLog": 1,
             "type": "smokeSensor",
             "smokeDetected": "M12"
         }
@@ -775,7 +771,6 @@ Name                     | Value               | Required | Option for | Notes
             "ip": "10.0.0.100",
             "port": 505,
             "updateInterval": 30000,
-            "debugMsgLog": 1,
             "type": "temperatureSensor",
             "temperature": "AM2"
         }
@@ -797,7 +792,6 @@ Name                     | Value               | Required | Option for | Notes
             "ip": "10.0.0.100",
             "port": 505,
             "updateInterval": 30000,
-            "debugMsgLog": 1,
             "type": "humiditySensor",
             "humidity": "AM1"
         }
@@ -820,7 +814,6 @@ Name                     | Value               | Required | Option for | Notes
             "ip": "10.0.0.100",
             "port": 505,
             "updateInterval": 30000,
-            "debugMsgLog": 1,
             "type": "carbonDioxideSensor",
             "carbonDioxideLevel": "AM3",
             "carbonDioxideLimit": 1000
@@ -843,7 +836,6 @@ Name                     | Value               | Required | Option for | Notes
             "ip": "10.0.0.100",
             "port": 505,
             "updateInterval": 30000,
-            "debugMsgLog": 1,
             "type": "airQualitySensor",
             "carbonDioxideLevel": "AM3"
         }
@@ -862,3 +854,7 @@ __Required: no* - means if no valid LOGO address is specified for this parameter
 
 The plugin that this one is based on: [homebridge-tesla](https://github.com/nfarina/homebridge-tesla).  
 You can also view the [full list of supported HomeKit Services and Characteristics in the HAP-NodeJS protocol repository](https://github.com/KhaosT/HAP-NodeJS/blob/master/src/lib/gen/HomeKit.ts).  
+
+## Keywords ##
+
+__[homebridge-plugin](https://www.npmjs.com/search?q=keywords:homebridge-plugin), [homebridge](https://www.npmjs.com/search?q=keywords:homebridge), [siemens](https://www.npmjs.com/search?q=keywords:siemens), [logo](https://www.npmjs.com/search?q=keywords:logo), [snap7](https://www.npmjs.com/search?q=keywords:snap7), [plc](https://www.npmjs.com/search?q=keywords:plc), [sps](https://www.npmjs.com/search?q=keywords:sps)__

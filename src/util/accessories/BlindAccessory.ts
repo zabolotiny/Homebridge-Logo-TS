@@ -5,6 +5,7 @@ let Characteristic: any;
 export class BlindAccessory {
 
   static blindType: string = "blind";
+  static infoModel: string = "Blind";
 
   public blindService: any;
 

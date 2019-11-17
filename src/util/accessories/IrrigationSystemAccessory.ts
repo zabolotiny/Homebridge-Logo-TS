@@ -5,6 +5,7 @@ let Characteristic: any;
 export class IrrigationSystemAccessory {
 
   static irrigationSystemType: string = "irrigationSystem";
+  static infoModel: string = "Irrigation System";
 
   public irrigationSystemService: any;
 

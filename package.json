@@ -1,6 +1,6 @@
 {
   "name": "homebridge-logo-ts",
-  "version": "0.2.17",
+  "version": "1.0.0",
   "description": "Use a Siemens LOGO! PLC for switch on whatever you want. >>> $ npm run <scripts>",
   "homepage": "https://github.com/sinclair81/homebridge-logo-ts",
   "author": {
@@ -13,7 +13,13 @@
     "dist"
   ],
   "keywords": [
-    "homebridge-plugin"
+    "homebridge-plugin",
+    "homebridge",
+    "siemens",
+    "logo",
+    "snap7",
+    "plc",
+    "sps"
   ],
   "scripts": {
     "test": "ts-node ./src/index.ts",

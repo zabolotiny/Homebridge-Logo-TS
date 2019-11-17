@@ -5,6 +5,7 @@ let Characteristic: any;
 export class SmokeSensor {
 
   static smokeSensorType: string = "smokeSensor";
+  static infoModel: string = "Smoke Sensor";
 
   public smokeSensorService: any;
   public smokeDetected: string = "M12";

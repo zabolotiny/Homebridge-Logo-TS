@@ -5,6 +5,7 @@ let Characteristic: any;
 export class ContactSensor {
 
   static contactSensorType: string = "contactSensor";
+  static infoModel: string = "Contact Sensor";
 
   public contactSensorService: any;
   public contactDetected: string = "M9";

@@ -5,6 +5,7 @@ let Characteristic: any;
 export class SwitchAccessory {
 
   static switchType: string = "switch";
+  static infoModel: string = "Switch";
 
   public switchService: any;
 

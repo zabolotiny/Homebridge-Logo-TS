@@ -5,6 +5,7 @@ let Characteristic: any;
 export class VentilationAccessory {
 
   static ventilationType: string = "ventilation";
+  static infoModel: string = "Ventilation";
 
   public ventilationService: any;
   public ventilationGetOn: string                   = "V130.0";

@@ -5,6 +5,7 @@ let Characteristic: any;
 export class CarbonDioxideSensor {
 
   static carbonDioxideSensorType: string = "carbonDioxideSensor";
+  static infoModel: string = "Carbon Dioxide Sensor";
 
   public carbonDioxideSensorService: any;
   public carbonDioxideLevel: string = "AM3";
