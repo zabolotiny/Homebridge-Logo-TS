@@ -842,8 +842,17 @@ Name                     | Value               | Required | Option for | Notes
     ]
 ```
 
+<!-- markdownlint-disable MD020 MD024 -->
+##  ##
+
 __Required: yes* - means that this parameter is only required for this particular accessory!__  
 __Required: no* - means if no valid LOGO address is specified for this parameter, this characteristic returns the specified value or is deactivated in the accessory!__  
+
+##  ##
+<!-- markdownlint-enable MD020 MD024 -->
+
+The plugin that this one is based on: [homebridge-tesla](https://github.com/nfarina/homebridge-tesla).  
+You can also view the [full list of supported HomeKit Services and Characteristics in the HAP-NodeJS protocol repository](https://github.com/KhaosT/HAP-NodeJS/blob/master/src/lib/gen/HomeKit.ts).  
 
 ## Test Homebridge-Logo-TS ##
 
@@ -851,10 +860,3 @@ __Required: no* - means if no valid LOGO address is specified for this parameter
 2. Install: `$ npm install`
 3. Build:   `$ npm run build`
 4. Run:     `$ /usr/local/bin/homebridge -D -P ~/Homebridge-Logo-TS/`
-
-The plugin that this one is based on: [homebridge-tesla](https://github.com/nfarina/homebridge-tesla).  
-You can also view the [full list of supported HomeKit Services and Characteristics in the HAP-NodeJS protocol repository](https://github.com/KhaosT/HAP-NodeJS/blob/master/src/lib/gen/HomeKit.ts).  
-
-## Keywords ##
-
-__[homebridge-plugin](https://www.npmjs.com/search?q=keywords:homebridge-plugin), [homebridge](https://www.npmjs.com/search?q=keywords:homebridge), [siemens](https://www.npmjs.com/search?q=keywords:siemens), [logo](https://www.npmjs.com/search?q=keywords:logo), [snap7](https://www.npmjs.com/search?q=keywords:snap7), [plc](https://www.npmjs.com/search?q=keywords:plc), [sps](https://www.npmjs.com/search?q=keywords:sps)__
