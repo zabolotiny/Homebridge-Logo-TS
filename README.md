@@ -35,8 +35,7 @@ __Type of Sensor Accessory:__
 - [Carbon Dioxide Sensor](#carbon-dioxide-sensor-accessory-configuration)
 - [Air Quality Sensor](#air-quality-sensor-accessory-configuration)
 
-The plugin that this one is based on: [homebridge-tesla](https://github.com/nfarina/homebridge-tesla).  
-If you use Homebridge-Logo-TS please donate: [PayPal.Me/Sinclair81](https://www.PayPal.Me/Sinclair81) !!  
+ If you use Homebridge-Logo-TS please donate: [PayPal.Me/Sinclair81](https://www.PayPal.Me/Sinclair81) !!  
 
 ## Installation ##
 
@@ -860,3 +859,6 @@ __Required: no* - means if no valid LOGO address is specified for this parameter
 2. Install: `$ npm install`
 3. Build:   `$ npm run build`
 4. Run:     `$ /usr/local/bin/homebridge -D -P ~/Homebridge-Logo-TS/`
+
+The plugin that this one is based on: [homebridge-tesla](https://github.com/nfarina/homebridge-tesla).  
+You can also view the [full list of supported HomeKit Services and Characteristics in the HAP-NodeJS protocol repository](https://github.com/KhaosT/HAP-NodeJS/blob/master/src/lib/gen/HomeKit.ts).  
