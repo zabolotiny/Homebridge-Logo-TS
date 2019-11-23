@@ -369,7 +369,7 @@ Name                     | Value               | Required | Option for | Notes
 `irrigationSystemGetActive`      | "V400.0"    | yes*     | "irrigationSystem" | Irrigation System Get Active - Mn or Vn.n
 `irrigationSystemSetActiveOn`    | "V400.1"    | yes*     | "irrigationSystem" | Irrigation System Set Active to On - Mn or Vn.n
 `irrigationSystemSetActiveOff`   | "V400.2"    | yes*     | "irrigationSystem" | Irrigation System Set Active to Off - Mn or Vn.n
-`irrigationSystemGetProgramMode` | "VW402"     | yes*     | "irrigationSystem" | Irrigation System Get Program Mode - AMn or VWn
+`irrigationSystemGetProgramMode` | "VW402"     | yes*     | "irrigationSystem" | Irrigation System Get Program Mode - AMn or VWn - (0 - No Program scheduled; 1 - Program scheduled; 2 - Program scheduled manual Mode)
 `irrigationSystemGetInUse`       | "V400.3"    | yes*     | "irrigationSystem" | Irrigation System Get In Use - Mn or Vn.n
 
 ```json
