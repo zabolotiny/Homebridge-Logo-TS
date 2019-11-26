@@ -1,6 +1,7 @@
 # Homebridge-Logo-TS #
 
-[![npm version](https://badge.fury.io/js/homebridge-logo-ts.svg)](https://badge.fury.io/js/homebridge-logo-ts)  
+[![npm version](https://badge.fury.io/js/homebridge-logo-ts.svg)](https://badge.fury.io/js/homebridge-logo-ts)
+[![donate](https://img.shields.io/badge/donate-PayPal-blue.svg)](https://www.paypal.me/Sinclair81)
 
 <!-- markdownlint-disable MD033 -->
 <img src="https://raw.githubusercontent.com/Sinclair81/Homebridge-Logo-TS/master/Standardraum.png" align="right" alt="Standardraum" height="448" width="207">
@@ -34,8 +35,6 @@ __Type of Sensor Accessory:__
 - [Humidity Sensor](#humidity-sensor-accessory-configuration)
 - [Carbon Dioxide Sensor](#carbon-dioxide-sensor-accessory-configuration)
 - [Air Quality Sensor](#air-quality-sensor-accessory-configuration)
-
- If you use Homebridge-Logo-TS please donate: [PayPal.Me/Sinclair81](https://www.PayPal.Me/Sinclair81) !!  
 
 ## Installation ##
 
