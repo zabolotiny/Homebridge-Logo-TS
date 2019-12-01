@@ -32,10 +32,10 @@ export class SwitchAccessory {
 
     this.log            = log;
     this.logo           = logo;
-    this.updateInterval = updateInterval,
-    this.buttonValue    = buttonValue,
-    this.pushButton     = pushButton,
-    this.debugMsgLog    = debugMsgLog,
+    this.updateInterval = updateInterval;
+    this.buttonValue    = buttonValue;
+    this.pushButton     = pushButton;
+    this.debugMsgLog    = debugMsgLog;
     Characteristic      = characteristic;
 
     if (this.updateInterval > 0) {
@@ -89,6 +89,7 @@ export class SwitchAccessory {
     } else {
       this.logo.WriteLogo(this.switchSetOff, this.buttonValue, this.pushButton);
     }
+
   };
 
   //
