@@ -44,6 +44,10 @@ __Type of Sensor Accessory:__
 4. Install homebridge-logo-ts using: homebridge-config-ui-x's Webserver
 5. Update your configuration file with code like the sample below
 
+## Known Issues ##
+
+- Switch Accessory is not scene compatible. The communication with several accessories is too fast.
+
 ## Homebridge-Logo-TS Main Configuration Parameters ##
 
 Name                     | Value               | Required | Option for | Notes
@@ -109,7 +113,7 @@ Name                     | Value               | Required | Option for | Notes
 `blindDigital`           | 0                   | no       | "blind"    | 0 for Analog Control, 1 for Button Control
 `blindSetUp`             | "V5.0"              | no       | "blind"    | Blind Set Up - Mn or Vn.n - (Button Control)
 `blindSetDown`           | "V5.1"              | no       | "blind"    | Blind Set Down - Mn or Vn.n - (Button Control)
-`blindGetUpDown`         | "V5.2"              | no       | "blind"    | Blind Up or Down - Return 1 for Up or 0 for Down - (Button Control)
+`blindGetUpDown`         | "V5.2"              | no       | "blind"    | Blind Up or Down - Mn or Vn.n - Return 1 for Up or 0 for Down - (Button Control)
 
 ```json
 "accessories": [

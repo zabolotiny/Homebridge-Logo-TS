@@ -19,6 +19,7 @@ export class SwitchAccessory {
   buttonValue: number;
   pushButton: number;
   debugMsgLog: number;
+  lastOn: boolean;
   updateTimer: any;
 
   constructor(log: Function, 
@@ -41,6 +42,7 @@ export class SwitchAccessory {
     if (this.updateInterval > 0) {
       this.switchAutoUpdate();
     }
+    this.lastOn = false;
 
   }
 
@@ -62,6 +64,7 @@ export class SwitchAccessory {
       if (value != -1) {
 
         const on = value == 1 ? true : false;
+        this.lastOn = on;
         this.debugLogBool("Switch ?", on);
 
         await wait(1);
@@ -79,10 +82,13 @@ export class SwitchAccessory {
 
     });
 
+    return this.lastOn;
+
   };
 
   setSwitchOn = async (on: boolean) => {
     this.debugLogBool("Set switch to", on);
+    this.lastOn = on;
 
     if (on) {
       this.logo.WriteLogo(this.switchSetOn, this.buttonValue, this.pushButton);
