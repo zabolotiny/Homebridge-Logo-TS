@@ -12,7 +12,8 @@ You can download the spreadsheet which will create the plot and perform all of t
 Name                     | Value               | Required | Option for    | Notes
 ------------------------ | ------------------- | -------- | ------------- | ---------------------------------------------------
 `lightLevel`             | "AM3"               | no       | "lightSensor" | Light Sensor for Current Ambient Light Level in Lux
-`lightLDRLevelParts`     | 3                   | no       | "lightSensor" | Indicates how many formula parts the lux value is calculated. (0, 1, 2, 3)
+`lightLDRLevel`          | 0                   | no       | "lightSensor" | Light Level As LDR Level, `1` for calculat level from `lightLDRLevelParts`
+`lightLDRLevelParts`     | 3                   | no       | "lightSensor" | Indicates how many formula parts the lux value is calculated. (1, 2, 3)
 `lightLDRLevelMin`       | 0                   | no       | "lightSensor" | The minimum voltage of the LDR.
 `lightLDRLevelMax`       | 1000                | no       | "lightSensor" | The maximum voltage of the LDR.
 `lightLDRLevelP1Min`     | 423                 | no       | "lightSensor" | Specifies where the transition from Formula 1 to Formula 2 is.
@@ -36,6 +37,7 @@ Name                     | Value               | Required | Option for    | Note
             "debugMsgLog": 1,
             "type": "lightSensor",
             "lightLevel": "AM3",
+            "lightLDRLevel": 1,
             "lightLDRLevelParts": 3,
             "lightLDRLevelMin": 0,
             "lightLDRLevelMax": 1000,

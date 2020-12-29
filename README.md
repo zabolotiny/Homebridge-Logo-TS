@@ -675,23 +675,52 @@ Name                     | Value               | Required | Option for | Notes
 
 ## Light Sensor Accessory Configuration ##
 
-Name                     | Value               | Required | Option for | Notes
------------------------- | ------------------- | -------- | ---------- | ------------------------
-`lightLevel`             | "AM3"               | yes*     | "lightSensor" | Light Sensor for Current Ambient Light Level in Lux
-`lightLDRLevelParts`     | 0                   | yes*     | "lightSensor" | Indicates how many formula parts the lux value is calculated. [0, 1, 2, 3] 0 - simply shows the value of the LOGO!, [more information about the light sensor](src/util/accessories/LightSensor/LightSensor.md)
+Name                     | Value      | Required | Option for | Notes
+------------------------ | ---------- | -------- | ---------- | ------------------------
+`lightLevel`             | "AM3"      | yes*     | "lightSensor" | Light Sensor for Current Ambient Light Level in Lux
+`lightAsLux`             | 0          | no       | "lightSensor" | Light Level As Lux, `1` for calculat level from `lightAsLuxIn...` and `lightAsLuxOut...`
+`lightLDRLevel`          | 0          | no       | "lightSensor" | Light Level As LDR Level, `1` for calculat level from `lightLDRLevelParts`
+`lightAsLuxInMin`        | 0          | no       | "lightSensor" | Min Light Sensor Level from LOGO!
+`lightAsLuxInMax`        | 1000       | no       | "lightSensor" | Max Light Sensor Level from LOGO!
+`lightAsLuxOutMin`       | 0          | no       | "lightSensor" | Min Lux Level to display
+`lightAsLuxOutMax`       | 65535      | no       | "lightSensor" | Max Lux Level to display
+`lightLDRLevelParts`     | 3          | no       | "lightSensor" | Indicates how many formula parts the lux value is calculated. [1, 2, 3] [more information about the light sensor](src/util/accessories/LightSensor/LightSensor.md)
+  
+If `lightAsLux` is `0` and `lightLDRLevel` is `0` than this Light Sensor Accessory simply shows the value of the LOGO!
 
 ```json
 "accessories": [
         {
             "accessory": "Logo-TS",
-            "name": "Light Sensor",
+            "name": "Light Sensor (directly)",
+            "interface": "modbus",
+            "ip": "10.0.0.100",
+            "port": 505,
+            "updateInterval": 30000,
+            "type": "lightSensor",
+            "lightLevel": "AM3"
+        },
+        {
+            "accessory": "Logo-TS",
+            "name": "Light Sensor (0-10V lux sensor)",
             "interface": "modbus",
             "ip": "10.0.0.100",
             "port": 505,
             "updateInterval": 30000,
             "type": "lightSensor",
             "lightLevel": "AM3",
-            "lightLDRLevelParts": 0
+            "lightAsLux": 1
+        },
+        {
+            "accessory": "Logo-TS",
+            "name": "Light Sensor (0-10V LDR sensor)",
+            "interface": "modbus",
+            "ip": "10.0.0.100",
+            "port": 505,
+            "updateInterval": 30000,
+            "type": "lightSensor",
+            "lightLevel": "AM3",
+            "lightLDRLevel": 1
         }
     ]
 ```

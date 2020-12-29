@@ -8,10 +8,19 @@ export class LightSensor {
   static infoModel: string = "Light Sensor";
 
   public lightSensorService: any;
-  public lightLevel: string = "AM3";
+  public lightLevel: string         = "AM3";
+
+  // neu --
+  public lightAsLux: number         = 0;
+  public lightLDRLevel: number      = 0;
+
+  public lightAsLuxInMin: number    = 0;
+  public lightAsLuxInMax: number    = 1000;
+  public lightAsLuxOutMin: number   = 0;
+  public lightAsLuxOutMax: number   = 65535;
+  // -- neu
 
   public lightLDRLevelParts: number = 3;
-
   public lightLDRLevelMin: number   = 0;
   public lightLDRLevelMax: number   = 1000;
   public lightLDRLevelP1Min: number = 423;
@@ -109,42 +118,58 @@ export class LightSensor {
 
     let lux = volt;
 
-    if (this.lightLDRLevelParts == 1) {
-      if ((volt >= this.lightLDRLevelMin) && (volt <= this.lightLDRLevelMax)) {
-        let a = Math.pow(10, this.lightLDRLevelP0Y);
-        let b = this.lightLDRLevelP0S;
-        lux = a * Math.pow(volt, b);
+    if (this.lightAsLux == 1) {
+      if (volt <= this.lightAsLuxInMin) {
+        return this.lightAsLuxOutMin;
       }
+      if (volt >= this.lightAsLuxInMax) {
+        return this.lightAsLuxOutMax;
+      }
+      lux = ((volt * this.lightAsLuxOutMax) / this.lightAsLuxInMax);
     }
 
-    if (this.lightLDRLevelParts == 2) {
-      if ((volt >= this.lightLDRLevelMin) && (volt < this.lightLDRLevelP1Min)) {
-        let a = Math.pow(10, this.lightLDRLevelP0Y);
-        let b = this.lightLDRLevelP0S;
-        lux = a * Math.pow(volt, b);
+    if (this.lightLDRLevel == 1) {
+      if (this.lightLDRLevelParts < 1) {
+        this.lightLDRLevelParts = 1;
       }
-      if ((volt >= this.lightLDRLevelP1Min) && (volt <= this.lightLDRLevelMax)) {
-        let a = Math.pow(10, this.lightLDRLevelP1Y);
-        let b = this.lightLDRLevelP1S;
-        lux = a * Math.pow(volt, b);
+      if (this.lightLDRLevelParts > 3) {
+        this.lightLDRLevelParts = 3;
       }
-    }
-
-    if (this.lightLDRLevelParts == 3) {
-      if ((volt >= this.lightLDRLevelMin) && (volt < this.lightLDRLevelP1Min)) {
-        let a = Math.pow(10, this.lightLDRLevelP0Y);
-        let b = this.lightLDRLevelP0S;
-        lux = a * Math.pow(volt, b);
+      if (this.lightLDRLevelParts == 1) {
+        if ((volt >= this.lightLDRLevelMin) && (volt <= this.lightLDRLevelMax)) {
+          let a = Math.pow(10, this.lightLDRLevelP0Y);
+          let b = this.lightLDRLevelP0S;
+          lux = a * Math.pow(volt, b);
+        }
       }
-      if ((volt >= this.lightLDRLevelP1Min) && (volt < this.lightLDRLevelP2Min)) {
-        let a = Math.pow(10, this.lightLDRLevelP1Y);
-        let b = this.lightLDRLevelP1S;
-        lux = a * Math.pow(volt, b);
+      if (this.lightLDRLevelParts == 2) {
+        if ((volt >= this.lightLDRLevelMin) && (volt < this.lightLDRLevelP1Min)) {
+          let a = Math.pow(10, this.lightLDRLevelP0Y);
+          let b = this.lightLDRLevelP0S;
+          lux = a * Math.pow(volt, b);
+        }
+        if ((volt >= this.lightLDRLevelP1Min) && (volt <= this.lightLDRLevelMax)) {
+          let a = Math.pow(10, this.lightLDRLevelP1Y);
+          let b = this.lightLDRLevelP1S;
+          lux = a * Math.pow(volt, b);
+        }
       }
-      if ((volt >= this.lightLDRLevelP2Min) && (volt <= this.lightLDRLevelMax)) {
-        let a = Math.pow(10, this.lightLDRLevelP2Y);
-        let b = this.lightLDRLevelP2S;
-        lux = a * Math.pow(volt, b);
+      if (this.lightLDRLevelParts == 3) {
+        if ((volt >= this.lightLDRLevelMin) && (volt < this.lightLDRLevelP1Min)) {
+          let a = Math.pow(10, this.lightLDRLevelP0Y);
+          let b = this.lightLDRLevelP0S;
+          lux = a * Math.pow(volt, b);
+        }
+        if ((volt >= this.lightLDRLevelP1Min) && (volt < this.lightLDRLevelP2Min)) {
+          let a = Math.pow(10, this.lightLDRLevelP1Y);
+          let b = this.lightLDRLevelP1S;
+          lux = a * Math.pow(volt, b);
+        }
+        if ((volt >= this.lightLDRLevelP2Min) && (volt <= this.lightLDRLevelMax)) {
+          let a = Math.pow(10, this.lightLDRLevelP2Y);
+          let b = this.lightLDRLevelP2S;
+          lux = a * Math.pow(volt, b);
+        }
       }
     }
 

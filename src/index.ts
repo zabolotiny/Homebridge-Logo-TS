@@ -714,7 +714,15 @@ class LogoAccessory {
         LightSensor.lightSensorType,
       );
 
-      this.lightSensor.lightLevel         = config["lightLevel"] || "AM3";
+      this.lightSensor.lightLevel         = config["lightLevel"]         || "AM3";
+
+      this.lightSensor.lightAsLux         = config["lightAsLux"]         || 0;
+      this.lightSensor.lightLDRLevel      = config["lightLDRLevel"]      || 0;
+
+      this.lightSensor.lightAsLuxInMin    = config["lightAsLuxInMin"]    || 0;
+      this.lightSensor.lightAsLuxInMax    = config["lightAsLuxInMax"]    || 1000;
+      this.lightSensor.lightAsLuxOutMin   = config["lightAsLuxOutMin"]   || 0;
+      this.lightSensor.lightAsLuxOutMax   = config["lightAsLuxOutMax"]   || 65535;
 
       this.lightSensor.lightLDRLevelParts = config["lightLDRLevelParts"] || 3;
       this.lightSensor.lightLDRLevelMin   = config["lightLDRLevelMin"]   || 0;
