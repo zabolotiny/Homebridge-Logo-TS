@@ -139,7 +139,7 @@ export class Snap7Logo {
                 target_len = 4;
             }
             
-            this.WriteS7(s7client, db, target.addr, target_len, buffer_on, debugLog, 5, (success: Boolean) => {
+            this.WriteS7(s7client, db, target.addr, target_len, debugLog, 5, buffer_on, (success: Boolean) => {
                 if(!success) {
                     return -1;
                 }
@@ -149,7 +149,7 @@ export class Snap7Logo {
                     sleep(300).then(() => {
                         var buffer_off = Buffer.from([0]);
                     
-                        this.WriteS7(s7client, db, target.addr, target_len, buffer_off, debugLog, 5, (success: Boolean) => {
+                        this.WriteS7(s7client, db, target.addr, target_len, debugLog, 5, buffer_off, (success: Boolean) => {
                             if(!success) {
                                 return -1;
                             }
@@ -168,11 +168,13 @@ export class Snap7Logo {
         });
     }
 
-    WriteS7(s7client: S7Client, db: number, start: number, size: number, buffer: number, debugLog: number, retryCount: number, callBack: (success: Boolean) => any) {
+    WriteS7(s7client: any, db: number, start: number, size: number, debugLog: number, retryCount: number, buffer?: Buffer, callBack?: (success: Boolean) => any) {
         var log: any = this.log;
         if (retryCount == 0) {
             log(' >> Retry counter reached max value');
-            callBack(false);
+            if (callBack) {
+                callBack(false);
+            }
             return -1;
         }
         retryCount = retryCount - 1;
@@ -182,12 +184,17 @@ export class Snap7Logo {
                     log(' >> DBWrite failed. Code #' + err + ' - ' + s7client.ErrorText(err));
                 }
                 log(' >> Retrying:' + retryCount);
-                sleep(200).then(() => {
-                    this.WriteS7(s7client, db, start, size, buffer, debugLog, retryCount, callBack);
+                sleep(500).then(() => {
+                    s7client.Disconnect();
+                    s7client.Connect((err: Error) => {
+                        this.WriteS7(s7client, db, start, size, debugLog, retryCount, buffer, callBack);
+                    });
                 });
                 return
             }
-            callBack(true);
+            if (callBack) {
+                callBack(true);
+            }
         });
     }
 
