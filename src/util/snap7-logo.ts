@@ -46,10 +46,10 @@ export class Snap7Logo {
 
         var s7client  = new snap7.S7Client();
         s7client.SetConnectionParams(this.ipAddr, this.local_TSAP, this.remote_TSAP);
-        s7client.Connect(function(err: Error) {
-            if(err) {
+        this.ConnectS7(s7client, debugLog, 5,(success: Boolean) => {
+            if(!success) {
                 if (debugLog == 1) {
-                    log(' >> Connection failed. Code #' + err + ' - ' + s7client.ErrorText(err));
+                    log(' >> Connection failed.');
                 }
                 callBack(-1);
                 return -1;
@@ -106,10 +106,10 @@ export class Snap7Logo {
         var type             = this.target_type;
         var s7client  = new snap7.S7Client();
         s7client.SetConnectionParams(this.ipAddr, this.local_TSAP, this.remote_TSAP);
-        s7client.Connect((err: Error) => {
-            if(err) {
+        this.ConnectS7(s7client, debugLog, 5,(success: Boolean) => {
+            if(!success) {
                 if (debugLog == 1) {
-                    log(' >> Connection failed. Code #' + err + ' - ' + s7client.ErrorText(err));
+                    log(' >> Connection failed.');
                 }
                 return -1;
             }
@@ -168,6 +168,33 @@ export class Snap7Logo {
         });
     }
 
+    ConnectS7(s7client: any, debugLog: number, retryCount: number, callBack?: (success: Boolean) => any) {
+        var log: any = this.log;
+        if (retryCount == 0) {
+            log(' >> Retry counter reached max value');
+            if (callBack) {
+                callBack(false);
+            }
+            return -1;
+        }
+        retryCount = retryCount - 1;
+        s7client.Connect((err: Error) => {
+            if(err) {
+                if (debugLog == 1) {
+                    log(' >> Connection failed. Retrying. Code #' + err + ' - ' + s7client.ErrorText(err));
+                }
+                sleep(200).then(() => {
+                    this.ConnectS7(s7client, debugLog, retryCount, callBack);
+                });
+                return -1;
+            }
+            if (callBack) {
+                callBack(true);
+            }
+        });
+    }
+
+
     WriteS7(s7client: any, db: number, start: number, size: number, debugLog: number, retryCount: number, buffer?: Buffer, callBack?: (success: Boolean) => any) {
         var log: any = this.log;
         if (retryCount == 0) {
@@ -186,7 +213,7 @@ export class Snap7Logo {
                 log(' >> Retrying:' + retryCount);
                 sleep(500).then(() => {
                     s7client.Disconnect();
-                    s7client.Connect((err: Error) => {
+                    this.ConnectS7(s7client, debugLog, 5,(success: Boolean) => {
                         this.WriteS7(s7client, db, start, size, debugLog, retryCount, buffer, callBack);
                     });
                 });
