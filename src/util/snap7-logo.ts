@@ -97,13 +97,21 @@ export class Snap7Logo {
     }
 
     WriteLogo(item: string, value: number, pushButton: number) {
+        this.WriteLogoRetry(item, value, pushButton, 5);
+    }
+
+    WriteLogoRetry(item: string, value: number, pushButton: number, retryCounter: number) {
 
         var debugLog: number = this.debugMsgLog;
         var log: any         = this.log;
         var getAddressAndBit = this.getAddressAndBit;
         var db               = this.target_db;
         var type             = this.target_type;
-
+        if (retryCounter == 0) {
+            log(' >> Retry counter reached max value');
+            return -1;
+        }
+        retryCounter = retryCounter - 1;
         var s7client  = new snap7.S7Client();
         s7client.SetConnectionParams(this.ipAddr, this.local_TSAP, this.remote_TSAP);
         s7client.Connect(function(err: Error) {
@@ -111,7 +119,9 @@ export class Snap7Logo {
                 if (debugLog == 1) {
                     log(' >> Connection failed. Code #' + err + ' - ' + s7client.ErrorText(err));
                 }
-                return -1;
+                sleep(300).then(() => {
+                    this.WriteLogoRetry(item, value, pushButton, retryCounter);
+                });
             }
 
             var target = getAddressAndBit(item, type);
@@ -144,12 +154,14 @@ export class Snap7Logo {
                     if (debugLog == 1) {
                         log(' >> DBWrite failed. Code #' + err + ' - ' + s7client.ErrorText(err));
                     }
-                    return -1;
+                    sleep(200).then(() => {
+                        this.WriteLogoRetry(item, value, pushButton, retryCounter);
+                    });
                 }
 
                 if (pushButton == 1) {
 
-                    sleep(200).then(() => {
+                    sleep(300).then(() => {
                         var buffer_off = Buffer.from([0]);
                     
                         s7client.DBWrite(db, target.addr, target_len, buffer_off, function(err: Error) {
@@ -157,7 +169,9 @@ export class Snap7Logo {
                                 if (debugLog == 1) {
                                     log(' >> DBWrite failed. Code #' + err + ' - ' + s7client.ErrorText(err));
                                 }
-                                return -1;
+                                sleep(300).then(() => {
+                                    this.WriteLogoRetry(item, value, pushButton, retryCounter);
+                                });
                             }
 
                             s7client.Disconnect();
