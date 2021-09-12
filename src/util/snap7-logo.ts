@@ -1,3 +1,4 @@
+
 let snap7 = require('node-snap7');
 
 export enum WordLen {
@@ -97,31 +98,20 @@ export class Snap7Logo {
     }
 
     WriteLogo(item: string, value: number, pushButton: number) {
-        this.WriteLogoRetry(item, value, pushButton, 5);
-    }
-
-    WriteLogoRetry(item: string, value: number, pushButton: number, retryCounter: number) {
 
         var debugLog: number = this.debugMsgLog;
         var log: any         = this.log;
         var getAddressAndBit = this.getAddressAndBit;
         var db               = this.target_db;
         var type             = this.target_type;
-        if (retryCounter == 0) {
-            log(' >> Retry counter reached max value');
-            return -1;
-        }
-        retryCounter = retryCounter - 1;
         var s7client  = new snap7.S7Client();
         s7client.SetConnectionParams(this.ipAddr, this.local_TSAP, this.remote_TSAP);
-        s7client.Connect(function(err: Error) {
+        s7client.Connect((err: Error) => {
             if(err) {
                 if (debugLog == 1) {
                     log(' >> Connection failed. Code #' + err + ' - ' + s7client.ErrorText(err));
                 }
-                sleep(300).then(() => {
-                    this.WriteLogoRetry(item, value, pushButton, retryCounter);
-                });
+                return -1;
             }
 
             var target = getAddressAndBit(item, type);
@@ -149,14 +139,9 @@ export class Snap7Logo {
                 target_len = 4;
             }
             
-            s7client.DBWrite(db, target.addr, target_len, buffer_on, function(err: Error) {
-                if(err) {
-                    if (debugLog == 1) {
-                        log(' >> DBWrite failed. Code #' + err + ' - ' + s7client.ErrorText(err));
-                    }
-                    sleep(200).then(() => {
-                        this.WriteLogoRetry(item, value, pushButton, retryCounter);
-                    });
+            this.WriteS7(s7client, db, target.addr, target_len, buffer_on, debugLog, 5, (success: Boolean) => {
+                if(!success) {
+                    return -1;
                 }
 
                 if (pushButton == 1) {
@@ -164,14 +149,9 @@ export class Snap7Logo {
                     sleep(300).then(() => {
                         var buffer_off = Buffer.from([0]);
                     
-                        s7client.DBWrite(db, target.addr, target_len, buffer_off, function(err: Error) {
-                            if(err) {
-                                if (debugLog == 1) {
-                                    log(' >> DBWrite failed. Code #' + err + ' - ' + s7client.ErrorText(err));
-                                }
-                                sleep(300).then(() => {
-                                    this.WriteLogoRetry(item, value, pushButton, retryCounter);
-                                });
+                        this.WriteS7(s7client, db, target.addr, target_len, buffer_off, debugLog, 5, (success: Boolean) => {
+                            if(!success) {
+                                return -1;
                             }
 
                             s7client.Disconnect();
@@ -186,7 +166,29 @@ export class Snap7Logo {
             });
 
         });
+    }
 
+    WriteS7(s7client: S7Client, db: number, start: number, size: number, buffer: number, debugLog: number, retryCount: number, callBack: (success: Boolean) => any) {
+        var log: any = this.log;
+        if (retryCount == 0) {
+            log(' >> Retry counter reached max value');
+            callBack(false);
+            return -1;
+        }
+        retryCount = retryCount - 1;
+        s7client.DBWrite(db, start, size, buffer, (err: Error) => {
+            if(err) {
+                if (debugLog == 1) {
+                    log(' >> DBWrite failed. Code #' + err + ' - ' + s7client.ErrorText(err));
+                }
+                log(' >> Retrying:' + retryCount);
+                sleep(200).then(() => {
+                    this.WriteS7(s7client, db, start, size, buffer, debugLog, retryCount, callBack);
+                });
+                return
+            }
+            callBack(true);
+        });
     }
 
     getAddressAndBit(name: string, target_type: string): LogoAddress {
